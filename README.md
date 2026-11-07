@@ -2,6 +2,10 @@
 
 サッカーの戦術を、2Dピッチ上の22人の動きで試して学ぶブラウザゲームです。
 
+**遊ぶ:** https://atsu-chai.github.io/football_simulator/
+
+`main` へ push すると、GitHub Actions がテストとビルドを行い、GitHub Pages へ自動で公開します。
+
 ```bash
 npm install
 npm run dev
