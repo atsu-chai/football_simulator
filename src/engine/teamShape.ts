@@ -103,7 +103,8 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
           x = f.line + f.length * 0.34;
           y = 34 + sideSign * 10;
         } else {
-          x += 3;
+          // 残る場合も、CBより一段前で幅を取ってビルドアップに参加する
+          x += 10;
         }
         break;
       case 'wb':
@@ -147,6 +148,11 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
     }
     x = Math.min(x, lim - 0.5);
   } else {
+    // 最終ラインは中盤ほどボールサイドへ寄らず、逆サイドのCBは中央に絞って残る
+    if (p.role === 'cb' || p.role === 'fb' || p.role === 'wb') {
+      const ball = toRel(p.team, m.ball.pos);
+      y = 34 + (ball.y - 34) * 0.2 + (slot.y - 0.5) * f.width * 0.92;
+    }
     switch (p.role) {
       case 'wb':
         x = f.line + 1;

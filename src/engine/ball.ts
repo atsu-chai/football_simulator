@@ -231,6 +231,28 @@ function checkControl(m: MatchState) {
     }
   }
   if (!best) return;
+  // 浮き球は、受け手のすぐ近くに相手がいれば競り合いになる(弾んだ後も、落下点での奪い合い)
+  if (pass && pass.lofted && pass.to === best.id && !pass.cross) {
+    let rival: Player | null = null;
+    let rd = 2.2;
+    for (const o of m.players) {
+      if (o.team === best.team || o.role === 'gk' || m.t < o.stunnedUntil) continue;
+      const d = dist(o.pos, best.pos);
+      if (d < rd) {
+        rd = d;
+        rival = o;
+      }
+    }
+    if (rival && m.rand() < 0.5) {
+      // 競り負けたボールはこぼれ球になる
+      b.pass = null;
+      b.lastTouch = rival.id;
+      const a = Math.atan2(b.pos.y - rival.pos.y, b.pos.x - rival.pos.x) + (m.rand() - 0.5);
+      b.vel = { x: Math.cos(a) * 7, y: Math.sin(a) * 7 };
+      b.vz = 1.5;
+      return;
+    }
+  }
   takeControl(m, best);
 }
 

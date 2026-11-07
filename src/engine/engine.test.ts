@@ -159,3 +159,25 @@ describe('進行', () => {
   });
 });
 
+
+describe('敗因の診断', () => {
+  it('想定解は攻略の鍵をすべて満たし、初期設定は少なくとも1つ外す', async () => {
+    const { STAGE_KEYS } = await import('../data/stages');
+    const { DEFAULT_TACTICS } = await import('../data/formations');
+    const m = makeTestMatch();
+    for (const s of STAGES) {
+      const keys = STAGE_KEYS[s.id].filter((k) => k.label !== '後半に修正する');
+      for (const key of keys) expect(key.check(s.solution, m), `STAGE ${s.id}: ${key.label}`).toBe(true);
+      expect(STAGE_KEYS[s.id].some((key) => !key.check(DEFAULT_TACTICS, m)), `STAGE ${s.id}`).toBe(true);
+    }
+  });
+  it('負けた試合では悪かった点が挙がる', async () => {
+    const { diagnose } = await import('./diagnosis');
+    const s = STAGES[4];
+    const m = runToEnd(createMatch({ teams: [team('A'), s.opponent], seed: 3 }));
+    const { STAGE_KEYS } = await import('../data/stages');
+    const d = diagnose(m, STAGE_KEYS[s.id]);
+    expect(d.bad.length).toBeGreaterThan(0);
+    expect(d.bad.every((f) => f.detail.length > 0)).toBe(true);
+  });
+});

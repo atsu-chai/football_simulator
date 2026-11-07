@@ -18,5 +18,7 @@ npm run dev
 | `npm run balance -- 100` | 全ステージを1設定100試合ずつ自動実行し、想定解の効果を検証 |
 | `npx tsx scripts/search.ts <ステージ> 14` | そのステージで効く戦術を総当たりで探索 |
 | `npx tsx scripts/styles.ts 20` | 戦術スタイルどうしの相性表 |
+| `npx tsx scripts/realism.ts 8` | パスの距離・浮き球の割合・サポート距離など、動きの現実らしさの指標 |
+| `npx tsx scripts/shape.ts 4-3-3 4` | 守備時・攻撃時の各選手の平均位置 |
 
 エンジン(`src/engine/`)はDOMに依存せず、シードが同じなら同じ試合になります。

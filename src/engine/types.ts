@@ -98,6 +98,8 @@ export interface PassInfo {
   startX: number;
   offside: boolean[];
   cross: boolean;
+  /** 走り込む味方の前のスペースへ出したパス。 */
+  through: boolean;
 }
 
 export type ShotOutcome = 'goal' | 'saved' | 'miss' | 'blocked';

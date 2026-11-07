@@ -151,3 +151,12 @@ select {
 .energy { display: grid; grid-template-columns: 44px auto 44px; gap: 4px; align-items: center; font-size: 10px; color: var(--muted); margin-top: 2px; }
 .energy i { height: 4px; border-radius: 2px; display: block; min-width: 1px; }
 .energy i:first-child { justify-self: end; }
+
+.finding { padding: 8px 0; border-top: 1px solid var(--line); }
+.finding:first-of-type { border-top: 0; padding-top: 0; }
+.finding-title { font-weight: 700; display: flex; gap: 8px; align-items: baseline; }
+.finding .mark { width: 1em; flex: none; }
+.finding.bad .mark { color: var(--bad); }
+.finding.ok .mark { color: var(--accent); }
+.finding .small { margin: 3px 0 0 calc(1em + 8px); color: var(--muted); }
+.finding .fix { color: var(--text); }

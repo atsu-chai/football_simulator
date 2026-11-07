@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FORMATIONS, ROLE_LABEL } from '../../data/formations';
 import { explain } from '../../engine/analysis';
+import { diagnose, Finding } from '../../engine/diagnosis';
+import { STAGE_KEYS } from '../../data/stages';
 import { MatchEvent, MatchState, PITCH_W } from '../../engine/types';
 import { drawBallAt, drawDot, drawPitch, sx, sy } from '../../render/pitch';
 import { StatsTable } from '../components/StatsTable';
@@ -93,6 +95,21 @@ function Replay({ m, goal }: { m: MatchState; goal: MatchEvent }) {
   return <div ref={holder} className="pitch-frame"><canvas ref={canvas} aria-label="ゴールのリプレイ" /></div>;
 }
 
+function Diagnosis({ items, title }: { items: Finding[]; title: string }) {
+  return (
+    <div className="panel diag">
+      <h3>{title}</h3>
+      {items.map((f) => (
+        <div key={f.title} className={`finding ${f.ok ? 'ok' : 'bad'}`}>
+          <div className="finding-title"><span className="mark" aria-hidden>{f.ok ? '✓' : '✕'}</span>{f.title}</div>
+          {!f.ok && <p className="small">{f.detail}</p>}
+          {f.fix && <p className="small fix">直し方: {f.fix}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Result({ plan, m, stars, retry, next, home }: {
   plan: MatchPlan;
   m: MatchState;
@@ -108,6 +125,7 @@ export function Result({ plan, m, stars, retry, next, home }: {
   const [goalIdx, setGoalIdx] = useState(goals.length ? 0 : -1);
   const [showAnswer, setShowAnswer] = useState(false);
   const verdict = won ? '勝利' : m.score[0] === m.score[1] ? '引き分け' : '敗戦';
+  const diag = useMemo(() => diagnose(m, stage ? STAGE_KEYS[stage.id] : []), [m, stage]);
   return (
     <div className="wrap">
       <div className="result-head">
@@ -118,8 +136,11 @@ export function Result({ plan, m, stars, retry, next, home }: {
       </div>
       <div className="two">
         <div>
+          {!won && diag.bad.length > 0 && <Diagnosis title="どこが悪かったか" items={diag.bad} />}
+          {won && diag.bad.length > 0 && <Diagnosis title="さらに良くするには" items={diag.bad.slice(0, 2)} />}
+          {diag.good.length > 0 && <Diagnosis title="できていたこと" items={diag.good} />}
           <div className="panel">
-            <h3>なぜこの結果になったか</h3>
+            <h3>試合の数字から</h3>
             <ul>{lines.map((l) => <li key={l}>{l}</li>)}</ul>
           </div>
           {stage && (

@@ -131,6 +131,8 @@ function movePlayer(m: MatchState, p: Player) {
     const x = relX(p.team, p.pos.x);
     const ahead = m.players.some((o) => o.team !== p.team && o.role !== 'gk' && relX(p.team, o.pos.x) > x - 1 && dist(o.pos, p.pos) < 14);
     if (!ahead) carry = 7.5;
+    // 守備者がすぐ近くにいる時は、ボールを守りながらなので速く運べない
+    else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
   }
   const top = (isCarrier ? carry : 2.4 + 5.2 * p.urgency) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
