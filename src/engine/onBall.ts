@@ -1,11 +1,11 @@
 import { clamp, dist, pointToSegment, relX, sigmoid, toAbs, toRel } from './geometry';
 import { GOAL_W, MatchState, PITCH_W, Player, Side, Vec } from './types';
-import { giveBall, groundPassSpeed, groundPassTime, kick, loftTime, onBallWon } from './ball';
+import { giveBall, groundPassSpeed, groundPassTime, kick, loftLandingFor, loftTime, onBallWon } from './ball';
 import { addEvent, gameMinute } from './events';
 import { offsideLimit } from './teamShape';
 
 const SPRINT = 7.6;
-export const XG_SCALE = 2.2;
+export const XG_SCALE = 2.6;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -303,10 +303,12 @@ function makePass(m: MatchState, p: Player, q: Player, point: Vec, lofted: boole
   const d0 = dist(p.pos, point);
   const pressure = nearestOpp(m, side, p.pos);
   const skill = m.cfg.teams[side].skill ?? 1;
-  const err = ((lofted ? 0.07 : 0.028) + (pressure < 2.5 ? 0.05 : 0) + d0 * 0.0006) / skill;
+  const err = ((lofted ? 0.05 : 0.028) + (pressure < 2.5 ? 0.05 : 0) + d0 * (lofted ? 0.0009 : 0.0005)) / skill;
   const ang = (m.rand() + m.rand() - 1) * err;
   const dir = Math.atan2(point.y - p.pos.y, point.x - p.pos.x) + ang;
-  const aim: Vec = { x: p.pos.x + Math.cos(dir) * d0, y: p.pos.y + Math.sin(dir) * d0 };
+  // 浮き球は距離感もずれる(長いほど大きく)
+  const len = lofted ? d0 * (1 + (m.rand() + m.rand() - 1) * (0.06 + d0 * 0.0015) / skill) : d0;
+  const aim: Vec = { x: p.pos.x + Math.cos(dir) * len, y: p.pos.y + Math.sin(dir) * len };
 
   stats.passes += 1;
   const rel = relX(side, p.pos.x);
@@ -343,8 +345,10 @@ function makePass(m: MatchState, p: Player, q: Player, point: Vec, lofted: boole
   b.pass = { from: p.id, to: q.id, point: aim, lofted, startX: p.pos.x, offside, cross, through };
   b.lastTouch = p.id;
   if (lofted) {
-    const T = loftTime(d0);
-    kick(m, aim, d0 / T, 0.5 * 9.8 * T);
+    // スペースへの浮き球は手前に落とし、弾んで転がった先で受け手が拾えるようにする
+    const dLand = through ? loftLandingFor(len) : len;
+    const T = loftTime(dLand);
+    kick(m, aim, dLand / T, 0.5 * 9.8 * T);
     b.z = 0.1;
   } else {
     kick(m, aim, groundPassSpeed(d0));

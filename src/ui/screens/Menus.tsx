@@ -1,3 +1,5 @@
+import { CHAPTERS, chapterOf } from '../../data/story';
+import { StoryState, storyFinished } from '../../game/story';
 import { useState } from 'react';
 import { DEFAULT_TACTICS, FORMATION_IDS, tactic } from '../../data/formations';
 import { Stage, STAGES } from '../../data/stages';
@@ -8,9 +10,10 @@ import { LicenseBar } from '../components/Career';
 import { CARDS } from '../../game/content';
 import { BADGES } from '../../game/progress';
 
-export function Home({ go, cleared, progress, daily }: {
-  go: (s: 'stages' | 'teams' | 'free' | 'daily' | 'codex' | 'achievements') => void;
+export function Home({ go, cleared, progress, daily, story }: {
+  go: (s: 'stages' | 'teams' | 'free' | 'daily' | 'codex' | 'achievements' | 'story') => void;
   cleared: number;
+  story: StoryState;
   progress: Progress;
   daily: { opponent: string; rule: string; done: boolean };
 }) {
@@ -28,6 +31,19 @@ export function Home({ go, cleared, progress, daily }: {
           <span className="small muted">{daily.done ? '本日クリア済み。もう一度挑戦できます(XP 2倍は1日1回)' : `条件: ${daily.rule} ・ クリアで XP 2倍`}</span>
         </button>
       </div>
+      <button className="mode story-mode" onClick={() => go('story')}>
+        <span className="kicker">ストーリー</span>
+        <h3>JFL から世界の頂点へ</h3>
+        <p>
+          小さなクラブを率いて昇格を重ね、アジア、そして世界一を目指す。
+          {storyFinished(story)
+            ? ` 世界制覇 ${story.titles} 回`
+            : ` 現在: ${chapterOf(story.chapter).league}「${chapterOf(story.chapter).title}」`}
+        </p>
+        <ol className="ladder mini" aria-hidden>
+          {CHAPTERS.map((c) => <li key={c.id} className={c.id < story.chapter ? 'done' : c.id === story.chapter ? 'now' : 'locked'}><span className="league">{c.league}</span></li>)}
+        </ol>
+      </button>
       <div className="mode-grid">
         <button className="mode" onClick={() => go('stages')}>
           <h3>ステージ</h3>

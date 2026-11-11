@@ -24,7 +24,7 @@ export function saveProgress(p: Progress) {
   }
 }
 
-export type PlayMode = 'stage' | 'use' | 'face' | 'watch' | 'free' | 'daily';
+export type PlayMode = 'stage' | 'use' | 'face' | 'watch' | 'free' | 'daily' | 'story';
 
 export interface MatchPlan {
   mode: PlayMode;
@@ -40,5 +40,7 @@ export interface MatchPlan {
   coachHints?: CoachHint[];
   /** デイリーチャレンジのルール。フォーメーション固定もここで指定する。 */
   daily?: { date: string; rule: DailyRule };
+  /** ストーリーモードの章と試合の番号。 */
+  story?: { chapter: number; match: number };
   seed: number;
 }

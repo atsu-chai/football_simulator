@@ -5,6 +5,7 @@ import { TacticsPanel } from '../components/TacticsPanel';
 import { MatchPlan } from '../store';
 import { QuizCard } from '../components/Career';
 import { quizFor } from '../../game/content';
+import { chapterOf, styleOf } from '../../data/story';
 
 export function Prematch({ plan, back, kick, quizAnswered, onQuiz }: {
   plan: MatchPlan;
@@ -15,6 +16,8 @@ export function Prematch({ plan, back, kick, quizAnswered, onQuiz }: {
 }) {
   const [t, setT] = useState<Tactics>(plan.initial);
   const [hintN, setHintN] = useState(0);
+  const [weak, setWeak] = useState(false);
+  const storyOpp = plan.story ? chapterOf(plan.story.chapter).opponents[plan.story.match] : undefined;
   const stage = plan.stage;
   const home = { ...plan.home, tactics: t };
   const quiz = stage ? quizFor(stage.id) : undefined;
@@ -32,6 +35,15 @@ export function Prematch({ plan, back, kick, quizAnswered, onQuiz }: {
             <div className="panel daily-rule">
               <h3>今日のチャレンジ</h3>
               <p>条件: <b>{plan.daily.rule.label}</b>。達成すると、この試合の XP が2倍になります(1日1回)。</p>
+            </div>
+          )}
+          {storyOpp && (
+            <div className="panel">
+              <h3>スカウティング: {storyOpp.name}({plan.away.tactics.formation})</h3>
+              <p>{styleOf(storyOpp.style).scouting}</p>
+              {weak
+                ? <p className="small fix" style={{ marginTop: 6 }}>弱点: {styleOf(storyOpp.style).weakness}</p>
+                : <button className="chip" style={{ marginTop: 8 }} onClick={() => setWeak(true)}>弱点のヒントを見る</button>}
             </div>
           )}
           <Board home={home} away={plan.away} editable={plan.editable} onOffset={setT} />

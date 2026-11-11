@@ -3,6 +3,10 @@ import { DEFAULT_TACTICS } from './data/formations';
 import { myTeamBase, MY_COLOR, Stage, STAGE_KEYS, STAGES } from './data/stages';
 import { RealTeam, teamSetup, TEAMS } from './data/teams';
 import { answerQuiz, applyMatch, dailyFor, managerialImpact, nextFailedKeys, Outcome, todayString } from './game/progress';
+import { chapterOf, opponentSetup, roundLabel } from './data/story';
+import { MatchResult, penaltyShootout, recordStoryMatch, restartStory, StoryOutcome, storyFinished } from './game/story';
+import { mulberry32 } from './engine/geometry';
+import { StoryHub } from './ui/screens/Story';
 import { Achievements, Codex } from './ui/components/Career';
 import { MatchState, Tactics, TeamSetup } from './engine/types';
 import { FreeSetup, Home, StageSelect, TeamDetail, TeamList } from './ui/screens/Menus';
@@ -19,9 +23,10 @@ type Screen =
   | { name: 'free' }
   | { name: 'codex' }
   | { name: 'achievements' }
+  | { name: 'story' }
   | { name: 'prematch'; plan: MatchPlan; from: Screen }
   | { name: 'match'; plan: MatchPlan; from: Screen }
-  | { name: 'result'; plan: MatchPlan; m: MatchState; stars: number; from: Screen; outcome: Outcome };
+  | { name: 'result'; plan: MatchPlan; m: MatchState; stars: number; from: Screen; outcome: Outcome; story?: StoryOutcome };
 
 const newSeed = () => Math.floor(Math.random() * 1e9);
 
@@ -72,6 +77,23 @@ export function App() {
     const prevFailed = stage ? p.failedKeys[stage.id] : undefined;
     const overcame = !!(stage && won && prevFailed && prevFailed.length > 0 && prevFailed.every((l) => !failing.includes(l)));
 
+    // ストーリー: 勝敗を記録して章の進行を決める。同じ試合を二重に記録しない
+    let story: StoryOutcome | undefined;
+    let storyNext = p.story;
+    if (plan.story && plan.story.chapter === p.story.chapter && plan.story.match === p.story.results.length) {
+      const ch = chapterOf(plan.story.chapter);
+      let result: MatchResult = won ? 'W' : m.score[0] === m.score[1] ? 'D' : 'L';
+      let pk: StoryOutcome['pk'];
+      if (result === 'D' && ch.format === 'cup') {
+        const r = penaltyShootout(mulberry32(plan.seed ^ 0x5bd1e995), ch.mySkill, ch.opponents[plan.story.match].skill);
+        pk = { me: r.me, opp: r.opp };
+        result = r.won ? 'W' : 'L';
+      }
+      const rec = recordStoryMatch(p.story, result, m.tactics[0]);
+      storyNext = rec.next;
+      story = { result, event: rec.event, pk };
+    }
+
     const outcome = applyMatch(p, {
       mode: plan.mode,
       stageId: stage?.id,
@@ -80,10 +102,12 @@ export function App() {
       overcame,
       managerial: plan.editable ? managerialImpact(m) : null,
       dailyCleared: !!(plan.daily && won && plan.daily.rule.check(m)),
+      storyEvent: story?.event,
     });
+    outcome.next.story = storyNext;
     if (stage) outcome.next.failedKeys = nextFailedKeys(p.failedKeys, stage.id, won, failing);
     update(outcome.next);
-    setScreen({ name: 'result', plan, m, stars, from, outcome });
+    setScreen({ name: 'result', plan, m, stars, from, outcome, story });
   }, [update]);
 
   const today = (() => {
@@ -98,6 +122,19 @@ export function App() {
     };
   };
 
+  const storyPlan = (): MatchPlan | null => {
+    const st = progress.story;
+    const ch = storyFinished(st) ? null : chapterOf(st.chapter);
+    const o = ch?.opponents[st.results.length];
+    if (!ch || !o) return null;
+    const initial = st.tactics ?? DEFAULT_TACTICS;
+    const home: TeamSetup = { name: st.club, short: st.club.slice(0, 4), color: MY_COLOR, tactics: initial, skill: ch.mySkill };
+    return {
+      mode: 'story', title: `${ch.league} ${roundLabel(ch, st.results.length)} vs ${o.name}`, home, away: distinct(home, opponentSetup(o)),
+      editable: true, initial, seed: newSeed(), story: { chapter: ch.id, match: st.results.length },
+    };
+  };
+
   const setAutoPause = useCallback((v: boolean) => update({ ...progress, autoPause: v }), [progress, update]);
   const quitTo = useCallback((s: Screen) => () => setScreen(s), []);
 
@@ -106,10 +143,12 @@ export function App() {
       return (
         <Home
           cleared={Object.values(progress.stars).filter((n) => n > 0).length}
+          story={progress.story}
           progress={progress}
           daily={{ opponent: today.opp.name, rule: today.rule.label, done: progress.daily.last === today.date }}
           go={(n) => {
-            if (n === 'daily') setScreen({ name: 'prematch', plan: dailyPlan(), from: { name: 'home' } });
+            if (n === 'story') setScreen({ name: 'story' });
+            else if (n === 'daily') setScreen({ name: 'prematch', plan: dailyPlan(), from: { name: 'home' } });
             else setScreen({ name: n } as Screen);
           }}
         />
@@ -120,6 +159,19 @@ export function App() {
           progress={progress}
           back={() => setScreen({ name: 'home' })}
           pick={(s) => setScreen({ name: 'prematch', plan: stagePlan(s), from: { name: 'stages' } })}
+        />
+      );
+    case 'story':
+      return (
+        <StoryHub
+          story={progress.story}
+          back={() => setScreen({ name: 'home' })}
+          play={() => {
+            const plan = storyPlan();
+            if (plan) setScreen({ name: 'prematch', plan, from: { name: 'story' } });
+          }}
+          rename={(club) => update({ ...progress, story: { ...progress.story, club } })}
+          restart={() => update({ ...progress, story: restartStory(progress.story) })}
         />
       );
     case 'codex':
@@ -189,7 +241,7 @@ export function App() {
         />
       );
     case 'result': {
-      const { plan, m, stars, from, outcome } = screen;
+      const { plan, m, stars, from, outcome, story } = screen;
       const stage = plan.stage;
       const nextStage = stage ? STAGES.find((s) => s.id === stage.id + 1) : undefined;
       return (
@@ -198,6 +250,7 @@ export function App() {
           m={m}
           stars={stars}
           outcome={outcome}
+          story={story}
           retry={() => setScreen({ name: 'prematch', plan: { ...plan, seed: newSeed() }, from })}
           next={nextStage ? () => setScreen({ name: 'prematch', plan: stagePlan(nextStage), from }) : undefined}
           home={() => setScreen(from)}

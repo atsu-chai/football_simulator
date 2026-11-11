@@ -10,6 +10,8 @@ import { drawBallAt, drawDot, drawPitch, sx, sy } from '../../render/pitch';
 import { StatsTable } from '../components/StatsTable';
 import { usePitchCanvas } from '../components/usePitchCanvas';
 import { MatchPlan } from '../store';
+import type { StoryOutcome } from '../../game/story';
+import { CHAPTERS } from '../../data/story';
 
 function ShotMap({ m }: { m: MatchState }) {
   const { holder, canvas, view } = usePitchCanvas(320);
@@ -112,7 +114,32 @@ function Diagnosis({ items, title }: { items: Finding[]; title: string }) {
   );
 }
 
-export function Result({ plan, m, stars, retry, next, home, outcome }: {
+function StoryPanel({ s }: { s: StoryOutcome }) {
+  const e = s.event;
+  return (
+    <div className={`panel story-result ${e.kind}`}>
+      {s.pk && <p className="small">PK 戦 {s.pk.me} - {s.pk.opp} で{s.result === 'W' ? '勝利' : '敗退'}</p>}
+      {e.kind === 'continue' && <p>{s.result === 'W' ? '勝ち点3を積み上げた。' : s.result === 'D' ? '勝ち点1。次で取り返そう。' : '痛い敗戦。次の相手をよく見よう。'}</p>}
+      {e.kind === 'cleared' && (
+        <>
+          <span className="kicker">{e.last ? '世界制覇' : `${e.chapter.league} 突破`}</span>
+          <h3>{e.last ? '世界一!' : `次は ${CHAPTERS[e.chapter.id]?.league ?? ''} へ`}</h3>
+          <p>{e.chapter.clear}</p>
+        </>
+      )}
+      {e.kind === 'failed' && (
+        <>
+          <span className="kicker">{e.chapter.league}</span>
+          <h3>{e.chapter.format === 'cup' ? '敗退' : '昇格ならず'}</h3>
+          <p>{e.chapter.fail}</p>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function Result({ plan, m, stars, retry, next, home, outcome, story }: {
+  story?: StoryOutcome;
   outcome?: Outcome;
   plan: MatchPlan;
   m: MatchState;
@@ -137,6 +164,7 @@ export function Result({ plan, m, stars, retry, next, home, outcome }: {
         <div style={{ fontWeight: 700, fontSize: 20 }}>{verdict}</div>
         {stage && <div className="stars" style={{ fontSize: 22 }} aria-label={`星 ${stars} 個`}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</div>}
       </div>
+      {story && <div className="reward-top"><StoryPanel s={story} /></div>}
       {outcome && <div className="reward-top"><RewardPanel outcome={outcome} /></div>}
       <div className="two">
         <div>
@@ -183,9 +211,15 @@ export function Result({ plan, m, stars, retry, next, home, outcome }: {
         <div>
           <div className="panel"><h3>スタッツ</h3><StatsTable m={m} /></div>
           <div className="panel" style={{ display: 'grid', gap: 8 }}>
-            {next && won && <button className="btn primary" onClick={next}>次のステージへ</button>}
-            <button className={`btn ${won ? '' : 'primary'}`} onClick={retry}>もう一度挑戦</button>
-            <button className="btn" onClick={home}>メニューへ戻る</button>
+            {plan.mode === 'story' ? (
+              <button className="btn primary" onClick={home}>ストーリーへ戻る</button>
+            ) : (
+              <>
+                {next && won && <button className="btn primary" onClick={next}>次のステージへ</button>}
+                <button className={`btn ${won ? '' : 'primary'}`} onClick={retry}>もう一度挑戦</button>
+                <button className="btn" onClick={home}>メニューへ戻る</button>
+              </>
+            )}
           </div>
         </div>
       </div>

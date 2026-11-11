@@ -3,6 +3,7 @@ import { FormationId, MatchState, Side } from '../engine/types';
 import { countRoles, backLine } from '../engine/diagnosis';
 import { possessionPct, ppda } from '../engine/analysis';
 import { CARDS } from './content';
+import { emptyStory, StoryEvent, StoryState } from './story';
 
 export interface Progress {
   /** ステージ番号 → 獲得した★の数(勝利で1)。 */
@@ -17,12 +18,14 @@ export interface Progress {
   failedKeys: Record<number, string[]>;
   daily: { last: string | null; streak: number; best: number };
   counts: { matches: number; wins: number; watched: number; quizCorrect: number; managerial: number };
+  story: StoryState;
 }
 
 export const emptyProgress = (): Progress => ({
   stars: {}, autoPause: true, xp: 0, badges: {}, quiz: {}, failedKeys: {},
   daily: { last: null, streak: 0, best: 0 },
   counts: { matches: 0, wins: 0, watched: 0, quizCorrect: 0, managerial: 0 },
+  story: emptyStory(),
 });
 
 /** 古い保存データ(★と自動停止だけ)も読めるように、足りない項目を補う。 */
@@ -34,6 +37,7 @@ export function migrate(raw: unknown): Progress {
     ...base, ...r,
     daily: { ...base.daily, ...r.daily },
     counts: { ...base.counts, ...r.counts },
+    story: { ...base.story, ...r.story },
   };
 }
 
@@ -106,7 +110,7 @@ const dayBefore = (date: string) => {
 // ---- 実績 ----
 
 export interface MatchContext {
-  mode: 'stage' | 'use' | 'face' | 'watch' | 'free' | 'daily';
+  mode: 'stage' | 'use' | 'face' | 'watch' | 'free' | 'daily' | 'story';
   stageId?: number;
   m: MatchState;
   stars: number;
@@ -115,6 +119,8 @@ export interface MatchContext {
   /** 試合中の変更で流れを変えた分(分と xG 差の改善)。 */
   managerial: { minute: number; gain: number } | null;
   dailyCleared: boolean;
+  /** ストーリーモードで、この試合によって章が終わったか。 */
+  storyEvent?: StoryEvent;
 }
 
 export interface Badge {
@@ -126,6 +132,7 @@ export interface Badge {
 
 const won = (c: MatchContext) => c.m.score[0] > c.m.score[1];
 const playable = (c: MatchContext) => c.mode !== 'watch';
+const clearedChapter = (c: MatchContext, id: number) => c.storyEvent?.kind === 'cleared' && c.storyEvent.chapter.id === id;
 
 /** 0-1 から逆転したか。ゴールの順番から判定する。 */
 export function cameFromBehind(m: MatchState, me: Side = 0): boolean {
@@ -159,6 +166,10 @@ export const BADGES: Badge[] = [
   { id: 'giant', name: '名門撃破', hint: '「倒す」モードで名チームに勝つ', check: (c) => c.mode === 'face' && won(c) },
   { id: 'scout', name: 'スカウトの目', hint: 'スカウティング予想に5回正解する', check: (_c, n) => n.counts.quizCorrect >= 5 },
   { id: 'student', name: '研究熱心', hint: '名チームの試合を3回観戦する', check: (_c, n) => n.counts.watched >= 3 },
+  { id: 'story-up', name: '初昇格', hint: 'ストーリーで JFL を突破する', check: (c) => clearedChapter(c, 1) },
+  { id: 'story-j1', name: '日本の頂点', hint: 'ストーリーで J1 を制する', check: (c) => clearedChapter(c, 4) },
+  { id: 'story-asia', name: 'アジア王者', hint: 'ストーリーでアジアの頂点に立つ', check: (c) => clearedChapter(c, 5) },
+  { id: 'story-world', name: '世界制覇', hint: 'ストーリーで世界一になる', check: (c) => clearedChapter(c, 6) },
   { id: 'streak3', name: '3日連続', hint: 'デイリーチャレンジを3日連続でクリアする', check: (_c, n) => n.daily.streak >= 3 },
   { id: 'streak7', name: '1週間の習慣', hint: 'デイリーチャレンジを7日連続でクリアする', check: (_c, n) => n.daily.streak >= 7 },
 ];
@@ -201,13 +212,14 @@ export interface Outcome {
 export const XP = {
   win: 100, draw: 40, loss: 20, objective: 30, firstClear: 100, threeStar: 80,
   quiz: 30, badge: 50, managerial: 40, overcame: 80, watch: 15, dailyMultiplier: 2,
+  chapter: 200, world: 500,
 };
 
 /** 試合結果を進行に反映し、もらえる XP と新しく得たものを返す。 */
 export function applyMatch(p: Progress, c: MatchContext, today = todayString()): Outcome {
   const rewards: Reward[] = [];
   const next: Progress = {
-    ...p, stars: { ...p.stars }, badges: { ...p.badges }, failedKeys: { ...p.failedKeys },
+    ...p, stars: { ...p.stars }, badges: { ...p.badges }, failedKeys: { ...p.failedKeys }, story: p.story,
     daily: { ...p.daily }, counts: { ...p.counts },
   };
   const m = c.m;
@@ -238,6 +250,13 @@ export function applyMatch(p: Progress, c: MatchContext, today = todayString()):
     }
     next.stars[c.stageId] = Math.max(prevStars, c.stars);
     if (c.overcame) rewards.push({ label: '前回の敗因を克服', xp: XP.overcame });
+  }
+
+  if (c.storyEvent?.kind === 'cleared') {
+    const ch = c.storyEvent.chapter;
+    rewards.push(c.storyEvent.last
+      ? { label: '世界制覇', xp: XP.world }
+      : { label: `${ch.league} ${ch.format === 'cup' ? '優勝' : '突破'}`, xp: XP.chapter });
   }
 
   if (c.managerial) {

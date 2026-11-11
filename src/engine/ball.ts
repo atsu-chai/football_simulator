@@ -16,6 +16,36 @@ export function groundPassTime(d: number) {
 export function loftTime(d: number) {
   return 0.9 + d / 30;
 }
+/** 浮き球が着地したときに残る横方向の速さと、跳ね返りの強さ。芝で勢いが殺される。 */
+export const BOUNCE_KEEP = 0.6;
+export const BOUNCE_VZ = 0.3;
+
+/** 着地点までの距離 dLand で蹴った浮き球が、止まりかけるまでに進む全距離。 */
+function loftTravel(dLand: number) {
+  const T = loftTime(dLand);
+  let v = (dLand / T) * BOUNCE_KEEP;
+  let vz = 0.5 * G * T * BOUNCE_VZ;
+  let d = dLand;
+  while (vz > 2.5) {
+    const t = (2 * vz) / G;
+    d += v * t;
+    v *= BOUNCE_KEEP;
+    vz *= BOUNCE_VZ;
+  }
+  return d + Math.max(0, v * v - 4) / (2 * GROUND_DECEL);
+}
+
+/** 浮き球をスペースへ落とすとき、ボールが目標の付近で止まるように手前に落とす距離。 */
+export function loftLandingFor(d: number) {
+  let lo = d * 0.3;
+  let hi = d;
+  for (let i = 0; i < 14; i++) {
+    const mid = (lo + hi) / 2;
+    if (loftTravel(mid) > d) hi = mid;
+    else lo = mid;
+  }
+  return lo;
+}
 
 export function kick(m: MatchState, to: Vec, speed: number, vz = 0) {
   const b = m.ball;
@@ -97,9 +127,9 @@ export function stepBall(m: MatchState) {
     b.vz -= G * TICK;
     if (b.z <= 0) {
       b.z = 0;
-      b.vz = Math.abs(b.vz) > 2.5 ? -b.vz * 0.35 : 0;
-      b.vel.x *= 0.72;
-      b.vel.y *= 0.72;
+      b.vz = Math.abs(b.vz) > 2.5 ? -b.vz * BOUNCE_VZ : 0;
+      b.vel.x *= BOUNCE_KEEP;
+      b.vel.y *= BOUNCE_KEEP;
     }
   } else {
     const sp = Math.hypot(b.vel.x, b.vel.y);
@@ -261,6 +291,27 @@ function inOwnBox(p: Player, at: Vec) {
   return r.x < 16.5 && Math.abs(r.y - 34) < 20.2;
 }
 
+function miscontrol(m: MatchState, p: Player, lofted: boolean): boolean {
+  const b = m.ball;
+  let near = 99;
+  for (const o of m.players) if (o.team !== p.team) near = Math.min(near, dist(o.pos, p.pos));
+  const sp = Math.hypot(b.vel.x, b.vel.y);
+  const chance =
+    (0.03 + (near < 2 ? 0.16 : near < 4 ? 0.07 : 0) + (sp > 12 ? 0.04 : 0) + (lofted ? 0.1 : 0)) /
+    (m.cfg.teams[p.team].skill ?? 1);
+  if (m.rand() >= chance) return false;
+  // こぼれたボールは足元から数m転がり、近くの選手の奪い合いになる
+  b.pass = null;
+  b.lastTouch = p.id;
+  const a = Math.atan2(b.vel.y, b.vel.x) + (m.rand() - 0.5) * 2.2;
+  const v = 3.5 + m.rand() * 3;
+  b.vel = { x: Math.cos(a) * v, y: Math.sin(a) * v };
+  b.vz = 0;
+  b.z = 0;
+  p.stunnedUntil = m.t + 0.45;
+  return true;
+}
+
 function takeControl(m: MatchState, p: Player) {
   const b = m.ball;
   const pass = b.pass;
@@ -275,6 +326,8 @@ function takeControl(m: MatchState, p: Player) {
         freeKick(m, (1 - p.team) as Side, { ...p.pos });
         return;
       }
+      // トラップの乱れ。寄せられているほど、速い・浮いたボールほどこぼしやすい
+      if (p.role !== 'gk' && !pass.cross && miscontrol(m, p, pass.lofted)) return;
       stats.passesDone += 1;
       const key = `${passer.slot}-${p.slot}`;
       stats.links[key] = (stats.links[key] ?? 0) + 1;

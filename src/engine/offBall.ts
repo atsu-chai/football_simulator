@@ -1,5 +1,5 @@
 import { clamp, dist, pointToSegment, toAbs, toRel } from './geometry';
-import { GROUND_DECEL } from './ball';
+import { BOUNCE_KEEP, BOUNCE_VZ, GROUND_DECEL } from './ball';
 import { threat, nearestOpp } from './onBall';
 import { offsideLimit, oppLineX, shapeTarget } from './teamShape';
 import { MatchState, PITCH_W, Player, TICK, Vec } from './types';
@@ -223,8 +223,8 @@ export function interceptPoint(m: MatchState, p: Player): { at: Vec; time: numbe
       vz -= 9.8 * dt;
       if (z <= 0) {
         z = 0;
-        vz = 0;
-        vel = { x: vel.x * 0.72, y: vel.y * 0.72 };
+        vz = Math.abs(vz) > 2.5 ? -vz * BOUNCE_VZ : 0;
+        vel = { x: vel.x * BOUNCE_KEEP, y: vel.y * BOUNCE_KEEP };
       }
     } else {
       const sp = Math.hypot(vel.x, vel.y);
