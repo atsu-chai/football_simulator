@@ -249,7 +249,7 @@ export function MatchScreen({ plan, autoPause, setAutoPause, finish, quit }: {
           {tab === 'tactics' && editable && (
             <div style={{ maxHeight: 620, overflowY: 'auto' }}>
               <p className="muted small" style={{ marginBottom: 8 }}>変更はすぐ反映されます。一時停止中は味方選手をドラッグして基準位置を調整できます。</p>
-              <TacticsPanel t={t} onChange={applyT} />
+              <TacticsPanel t={t} onChange={applyT} formationLocked={!!plan.daily?.rule.lockFormation} />
             </div>
           )}
           {tab === 'stats' && <StatsTable m={m} />}

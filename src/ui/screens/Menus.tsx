@@ -4,13 +4,29 @@ import { Stage, STAGES } from '../../data/stages';
 import { RealTeam, TEAMS } from '../../data/teams';
 import { Tactics } from '../../engine/types';
 import { Progress } from '../store';
+import { LicenseBar } from '../components/Career';
+import { CARDS } from '../../game/content';
+import { BADGES } from '../../game/progress';
 
-export function Home({ go, cleared }: { go: (s: 'stages' | 'teams' | 'free') => void; cleared: number }) {
+export function Home({ go, cleared, progress, daily }: {
+  go: (s: 'stages' | 'teams' | 'free' | 'daily' | 'codex' | 'achievements') => void;
+  cleared: number;
+  progress: Progress;
+  daily: { opponent: string; rule: string; done: boolean };
+}) {
   return (
     <div className="wrap">
       <div className="hero">
         <h1>タクティクス・ラボ</h1>
         <p>あなたは監督です。相手の形を読み、配置と指示で有利を作り、22人の動きで答え合わせをしましょう。</p>
+      </div>
+      <div className="career">
+        <LicenseBar xp={progress.xp} />
+        <button className={`daily ${daily.done ? 'done' : ''}`} onClick={() => go('daily')}>
+          <span className="kicker">今日のチャレンジ {progress.daily.streak > 0 ? `・${progress.daily.streak}日連続` : ''}</span>
+          <h3>vs {daily.opponent}</h3>
+          <span className="small muted">{daily.done ? '本日クリア済み。もう一度挑戦できます(XP 2倍は1日1回)' : `条件: ${daily.rule} ・ クリアで XP 2倍`}</span>
+        </button>
       </div>
       <div className="mode-grid">
         <button className="mode" onClick={() => go('stages')}>
@@ -25,6 +41,10 @@ export function Home({ go, cleared }: { go: (s: 'stages' | 'teams' | 'free') => 
           <h3>自由対戦</h3>
           <p>好きな戦術どうしをぶつけて、自分の仮説を試す。</p>
         </button>
+      </div>
+      <div className="sub-links">
+        <button className="btn" onClick={() => go('codex')}>戦術図鑑 {CARDS.filter((c) => (progress.stars[c.stage] ?? 0) > 0).length}/{CARDS.length}</button>
+        <button className="btn" onClick={() => go('achievements')}>実績 {BADGES.filter((b) => progress.badges[b.id]).length}/{BADGES.length}</button>
       </div>
     </div>
   );

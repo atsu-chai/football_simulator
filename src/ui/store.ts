@@ -1,22 +1,19 @@
 import { CoachHint, Tactics, TeamSetup } from '../engine/types';
 import { Stage } from '../data/stages';
+import { DailyRule, emptyProgress, migrate, Progress } from '../game/progress';
+
+export type { Progress };
 
 const KEY = 'tactics-lab-progress-v1';
-
-export interface Progress {
-  /** ステージ番号 → 獲得した★の数(勝利で1)。 */
-  stars: Record<number, number>;
-  autoPause: boolean;
-}
 
 export function loadProgress(): Progress {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { stars: {}, autoPause: true, ...JSON.parse(raw) };
+    if (raw) return migrate(JSON.parse(raw));
   } catch {
     /* 保存領域が使えない環境ではその回限りの進行で動かす */
   }
-  return { stars: {}, autoPause: true };
+  return emptyProgress();
 }
 
 export function saveProgress(p: Progress) {
@@ -27,7 +24,7 @@ export function saveProgress(p: Progress) {
   }
 }
 
-export type PlayMode = 'stage' | 'use' | 'face' | 'watch' | 'free';
+export type PlayMode = 'stage' | 'use' | 'face' | 'watch' | 'free' | 'daily';
 
 export interface MatchPlan {
   mode: PlayMode;
@@ -41,5 +38,7 @@ export interface MatchPlan {
   note?: string;
   /** 観戦中に流す解説。 */
   coachHints?: CoachHint[];
+  /** デイリーチャレンジのルール。フォーメーション固定もここで指定する。 */
+  daily?: { date: string; rule: DailyRule };
   seed: number;
 }

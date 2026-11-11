@@ -3,6 +3,8 @@ import { FORMATIONS, ROLE_LABEL } from '../../data/formations';
 import { explain } from '../../engine/analysis';
 import { diagnose, Finding } from '../../engine/diagnosis';
 import { STAGE_KEYS } from '../../data/stages';
+import { RewardPanel } from '../components/Career';
+import { Outcome } from '../../game/progress';
 import { MatchEvent, MatchState, PITCH_W } from '../../engine/types';
 import { drawBallAt, drawDot, drawPitch, sx, sy } from '../../render/pitch';
 import { StatsTable } from '../components/StatsTable';
@@ -110,7 +112,8 @@ function Diagnosis({ items, title }: { items: Finding[]; title: string }) {
   );
 }
 
-export function Result({ plan, m, stars, retry, next, home }: {
+export function Result({ plan, m, stars, retry, next, home, outcome }: {
+  outcome?: Outcome;
   plan: MatchPlan;
   m: MatchState;
   stars: number;
@@ -134,6 +137,7 @@ export function Result({ plan, m, stars, retry, next, home }: {
         <div style={{ fontWeight: 700, fontSize: 20 }}>{verdict}</div>
         {stage && <div className="stars" style={{ fontSize: 22 }} aria-label={`星 ${stars} 個`}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</div>}
       </div>
+      {outcome && <div className="reward-top"><RewardPanel outcome={outcome} /></div>}
       <div className="two">
         <div>
           {!won && diag.bad.length > 0 && <Diagnosis title="どこが悪かったか" items={diag.bad} />}

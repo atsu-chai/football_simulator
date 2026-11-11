@@ -3,12 +3,21 @@ import { Tactics } from '../../engine/types';
 import { Board } from '../components/Board';
 import { TacticsPanel } from '../components/TacticsPanel';
 import { MatchPlan } from '../store';
+import { QuizCard } from '../components/Career';
+import { quizFor } from '../../game/content';
 
-export function Prematch({ plan, back, kick }: { plan: MatchPlan; back: () => void; kick: (t: Tactics) => void }) {
+export function Prematch({ plan, back, kick, quizAnswered, onQuiz }: {
+  plan: MatchPlan;
+  back: () => void;
+  kick: (t: Tactics) => void;
+  quizAnswered?: boolean;
+  onQuiz?: (stage: number, correct: boolean) => void;
+}) {
   const [t, setT] = useState<Tactics>(plan.initial);
   const [hintN, setHintN] = useState(0);
   const stage = plan.stage;
   const home = { ...plan.home, tactics: t };
+  const quiz = stage ? quizFor(stage.id) : undefined;
   return (
     <div className="wrap">
       <div className="topbar">
@@ -18,6 +27,13 @@ export function Prematch({ plan, back, kick }: { plan: MatchPlan; back: () => vo
       </div>
       <div className="two">
         <div>
+          {quiz && onQuiz && <QuizCard quiz={quiz} answered={quizAnswered} onAnswer={(c) => onQuiz(quiz.stage, c)} />}
+          {plan.daily && (
+            <div className="panel daily-rule">
+              <h3>今日のチャレンジ</h3>
+              <p>条件: <b>{plan.daily.rule.label}</b>。達成すると、この試合の XP が2倍になります(1日1回)。</p>
+            </div>
+          )}
           <Board home={home} away={plan.away} editable={plan.editable} onOffset={setT} />
           {stage && (
             <>
@@ -44,7 +60,7 @@ export function Prematch({ plan, back, kick }: { plan: MatchPlan; back: () => vo
         </div>
         <div className="panel">
           {plan.editable
-            ? <TacticsPanel t={t} onChange={setT} />
+            ? <TacticsPanel t={t} onChange={setT} formationLocked={!!plan.daily?.rule.lockFormation} />
             : <p className="muted">このモードでは両チームとも自動で戦います。試合中のオーバーレイと解説に注目してください。</p>}
         </div>
       </div>
