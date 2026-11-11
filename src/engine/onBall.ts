@@ -5,7 +5,7 @@ import { addEvent, gameMinute } from './events';
 import { offsideLimit } from './teamShape';
 
 const SPRINT = 7.6;
-export const XG_SCALE = 2.6;
+export const XG_SCALE = 1.3;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -56,14 +56,14 @@ export function passSafety(m: MatchState, from: Vec, to: Vec, side: Side, lofted
   return safe;
 }
 
-export function computeXg(m: MatchState, p: Player, at: Vec): number {
+export function computeXg(m: MatchState, p: Player, at: Vec, header = false): number {
   const rel = toRel(p.team, at);
   const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
   const a1 = Math.atan2(rel.y - (34 - GOAL_W / 2), PITCH_W - rel.x);
   const a2 = Math.atan2(rel.y - (34 + GOAL_W / 2), PITCH_W - rel.x);
   const angle = Math.abs(a1 - a2);
-  // 中央からのシュートの基準値(6m で約0.55、PKの位置で約0.27、16m で約0.13、20m で約0.07)
-  let xg = 0.55 * Math.exp(-(d - 6) / 7);
+  // 中央からのシュートの基準値(6m で約0.6、PKの位置で約0.24、16m で約0.10、20m で約0.05、25m で約0.02)
+  let xg = 0.6 * Math.exp(-(d - 6) / 5.5);
   // 同じ距離でも、角度がないほど入りにくい
   const central = 2 * Math.atan(GOAL_W / 2 / Math.max(d, 1));
   xg *= clamp(angle / central, 0.25, 1);
@@ -88,7 +88,9 @@ export function computeXg(m: MatchState, p: Player, at: Vec): number {
   const gk = m.players.find((o) => o.team !== p.team && o.role === 'gk')!;
   const gkRel = toRel(p.team, gk.pos);
   if (Math.abs(gkRel.y - rel.y) > 7 && d < 18) xg *= 1.4;
-  return clamp(xg * XG_SCALE * (m.cfg.teams[p.team].skill ?? 1), 0.005, 0.78);
+  // ヘディングは同じ位置でも足より入りにくい
+  if (header) xg *= 0.55;
+  return clamp(xg * XG_SCALE * m.skillNow[p.team], 0.005, 0.7);
 }
 
 interface Option {
@@ -104,7 +106,7 @@ export function decideOnBall(m: MatchState, p: Player) {
   const sinceWin = m.t - m.possessionSince;
   const counter = t.onWin === 'counter' && sinceWin < 6;
   const safeMode = t.onWin === 'keep' && sinceWin < 4;
-  const skill = m.cfg.teams[side].skill ?? 1;
+  const skill = m.skillNow[side];
   const noise = (0.016 + (pressure < 3 ? 0.03 : 0)) / skill;
   const tempoMul = { slow: 0.7, normal: 1, fast: 1.2 }[t.tempo] * (counter ? 1.4 : 1) * (safeMode ? 0.75 : 1);
   const riskPow = { short: 2.1, mixed: 1.5, long: 1.15 }[t.buildUp] * (safeMode ? 1.15 : 1) * (counter ? 0.75 : 1);
@@ -117,14 +119,18 @@ export function decideOnBall(m: MatchState, p: Player) {
   // シュート
   if (rel.x > 72 && p.role !== 'gk') {
     const xg = computeXg(m, p, p.pos);
-    if (xg > 0.03) options.push({ score: xg * 7 + 0.22, run: () => shoot(m, p, xg, false) });
+    // xG を保持の価値と同じ尺度に直す。ミドルは他に手がない時だけ、ゴール前の好機は迷わず打つ
+    const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
+    const longRange = d > 18 ? 0.05 + (d - 18) * 0.008 : 0;
+    const inBox = rel.x > PITCH_W - 16.5 && Math.abs(rel.y - 34) < 20.16;
+    if (xg > 0.012 && d < 32) options.push({ score: xg * 6 + 0.2 + (inBox ? 0.07 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
   }
 
   // パス
   for (const q of m.players) {
     if (q.team !== side || q.id === p.id) continue;
     const qRel = toRel(side, q.pos);
-    if (qRel.x > lim + 0.9 && q.role !== 'gk') {
+    if (qRel.x > lim + 0.3 && q.role !== 'gk') {
       if (dist(q.pos, p.pos) > 3) continue;
     }
     if (q.role === 'gk' && rel.x > 40) continue;
@@ -137,20 +143,20 @@ export function decideOnBall(m: MatchState, p: Player) {
     if (d > 28 || (d > 20 && Math.abs(q.pos.y - p.pos.y) > 26)) addPass(leadPt, q, true);
 
     // 背後のスペースへのスルーパス。走り出している味方にだけ出す。
-    if (q.runUntil > m.t && q.runTarget && qRel.x <= lim + 0.9) {
+    if (q.runUntil > m.t && q.runTarget && qRel.x <= lim + 0.3) {
       addPass(q.runTarget, q, false, true);
       if (d > 14) addPass(q.runTarget, q, true, true);
     }
     // 背後への一発。カウンター時、ロング志向、相手ラインが高いときに狙う。
     const spaceBehind = PITCH_W - 7 - lim;
     const forwardRole = q.role === 'st' || q.role === 'wg' || q.role === 'iw';
-    if (forwardRole && qRel.x <= lim + 0.9 && rel.x < lim - 6 && (counter || t.buildUp === 'long' || spaceBehind > 18)) {
+    if (forwardRole && qRel.x <= lim + 0.3 && rel.x < lim - 6 && (counter || t.buildUp === 'long' || spaceBehind > 18)) {
       const depth = Math.min(spaceBehind + 2, 15);
       const pt = toAbs(side, { x: lim + depth, y: qRel.y + (34 - qRel.y) * 0.2 });
       addPass(pt, q, d > 16, true);
     }
     // サイドからのクロス(ボックス内の味方へ)
-    if (rel.x > 76 && Math.abs(rel.y - 34) > 12 && qRel.x > 83 && Math.abs(qRel.y - 34) < 16) {
+    if (rel.x > 74 && Math.abs(rel.y - 34) > 12 && qRel.x > 83 && Math.abs(qRel.y - 34) < 16) {
       addPass(q.pos, q, true, false, true);
     }
   }
@@ -169,7 +175,7 @@ export function decideOnBall(m: MatchState, p: Player) {
       let best = 1e9;
       for (const q of m.players) {
         if (q.team !== side || q.id === p.id || q.role === 'gk') continue;
-        if (relX(side, q.pos.x) > lim + 0.9) continue;
+        if (relX(side, q.pos.x) > lim + 0.3) continue;
         const tq = dist(q.pos, at);
         if (tq < best) {
           best = tq;
@@ -302,7 +308,7 @@ function makePass(m: MatchState, p: Player, q: Player, point: Vec, lofted: boole
   const side = p.team;
   const d0 = dist(p.pos, point);
   const pressure = nearestOpp(m, side, p.pos);
-  const skill = m.cfg.teams[side].skill ?? 1;
+  const skill = m.skillNow[side];
   const err = ((lofted ? 0.05 : 0.028) + (pressure < 2.5 ? 0.05 : 0) + d0 * (lofted ? 0.0009 : 0.0005)) / skill;
   const ang = (m.rand() + m.rand() - 1) * err;
   const dir = Math.atan2(point.y - p.pos.y, point.x - p.pos.x) + ang;
@@ -346,7 +352,8 @@ function makePass(m: MatchState, p: Player, q: Player, point: Vec, lofted: boole
   b.lastTouch = p.id;
   if (lofted) {
     // スペースへの浮き球は手前に落とし、弾んで転がった先で受け手が拾えるようにする
-    const dLand = through ? loftLandingFor(len) : len;
+    // クロスは狙った地点の少し奥に落とし、そこを頭の高さで通過させる
+    const dLand = through ? loftLandingFor(len) : cross ? len + 3 : len;
     const T = loftTime(dLand);
     kick(m, aim, dLand / T, 0.5 * 9.8 * T);
     b.z = 0.1;
@@ -384,7 +391,7 @@ function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
     const dg = dist(o.pos, goal);
     if (dg > shotDist) continue;
     const { d, t } = pointToSegment(o.pos, p.pos, goal);
-    if (d < 1.3 && t * shotDist < closest) {
+    if (d < 2.2 && t * shotDist < closest) {
       closest = t * shotDist;
       blocker = o.id;
     }
@@ -392,9 +399,14 @@ function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
 
   const r = m.rand();
   let outcome: 'goal' | 'saved' | 'miss' | 'blocked';
-  if (blocker >= 0 && !header && m.rand() < 0.4) outcome = 'blocked';
-  else if (r < xg) outcome = 'goal';
-  else if (r < xg + 0.3 + xg * 0.4) outcome = 'saved';
+  // コースに入った守備者は、近いほど当てやすい
+  const blockP = blocker >= 0 ? (closest < 6 ? 0.8 : 0.58) * (1 - xg) : 0;
+  // xG はブロックされる分も含めた値なので、ブロックされなかったシュートはその分だけ入りやすい
+  const blocked = !header && m.rand() < blockP;
+  const pGoal = Math.min(0.95, xg / (1 - (header ? 0 : blockP)));
+  if (blocked) outcome = 'blocked';
+  else if (r < pGoal) outcome = 'goal';
+  else if (r < pGoal + 0.3 + xg * 0.4) outcome = 'saved';
   else outcome = 'miss';
 
   const gk = m.players.find((o) => o.team !== side && o.role === 'gk')!;
@@ -435,7 +447,7 @@ function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
 
 /** クロスに合わせたヘディング/ボレー。シュートできなければ false。 */
 export function attemptHeader(m: MatchState, p: Player, header: boolean): boolean {
-  const xg = computeXg(m, p, m.ball.pos);
+  const xg = computeXg(m, p, m.ball.pos, header);
   if (xg < 0.02) return false;
   m.ball.owner = -1;
   shoot(m, p, xg, header);
@@ -455,7 +467,7 @@ export function resolveTackles(m: MatchState) {
       m.challenged = c.id;
       if (relX(d.team, d.pos.x) > 42) m.stats[d.team].defActionsHigh += 1;
     }
-    const skillRatio = (m.cfg.teams[d.team].skill ?? 1) / (m.cfg.teams[c.team].skill ?? 1);
+    const skillRatio = m.skillNow[d.team] / m.skillNow[c.team];
     const support = nearbyDefenders(m, c) > 1 ? 1.5 : 1;
     if (m.rand() < 0.06 * skillRatio * support) {
       const s = m.stats[d.team];

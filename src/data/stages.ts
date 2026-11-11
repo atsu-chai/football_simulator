@@ -1,6 +1,6 @@
 import { CoachHint, MatchState, ScriptPhase, Tactics, TeamSetup } from '../engine/types';
 import { backLine, centralMids, changedInSecondHalf, countRoles, StageKey } from '../engine/diagnosis';
-import { tactic } from './formations';
+import { DEFAULT_TACTICS, tactic } from './formations';
 
 export const MY_COLOR = '#3BA7F5';
 export const OPP_COLOR = '#F2694C';
@@ -48,7 +48,7 @@ export const STAGES: Stage[] = [
   {
     id: 1, title: '中盤を制する', concept: '数的優位',
     opponent: opp('ブロック・フラッツ', { formation: '4-4-2', buildUp: 'short' }),
-    solution: tactic({ formation: '3-5-2', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high' }),
+    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'short', width: 'wide', fullbacks: 'overlap', pressHeight: 'high', onLoss: 'counterpress' }),
     brief: '相手は4-4-2。中盤は2枚だけです。あなたが中盤に3枚置けば、そこで常に1人余ります。',
     scouting: ['中盤が横一列の2枚で、その間と前後が空く', 'プレスは穏やか。後ろから短くつないでくる', 'サイドは1対1の関係ができやすい'],
     hints: ['中盤の中央に3枚置けるフォーメーションを選ぼう(3-5-2 など)', '数的関係オーバーレイで中盤の人数を確認しよう', '前から奪いに行くと中盤の余りがさらに生きる'],
@@ -59,7 +59,7 @@ export const STAGES: Stage[] = [
   {
     id: 2, title: '幅で揺さぶる', concept: '幅とサイドチェンジ',
     opponent: opp('ダイヤモンド・シティ', { formation: '4-1-2-1-2', width: 'narrow', compactness: 'tight' }),
-    solution: tactic({ formation: '4-4-2', width: 'wide', fullbacks: 'overlap', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-4-2', width: 'wide', fullbacks: 'overlap', pressHeight: 'high' }),
     brief: '相手は中央に人を集めるダイヤモンド型。その代わり、サイドには人がいません。',
     scouting: ['中央に5人以上が密集する', 'サイドを守るのはSBだけ', '横に振ると中盤のスライドが間に合わない'],
     hints: ['幅を「広い」に設定しよう', 'SBを上げてサイドで2対1を作ろう', '5レーンのオーバーレイで大外の使い方を見よう'],
@@ -70,7 +70,7 @@ export const STAGES: Stage[] = [
   {
     id: 3, title: 'ハーフスペースの鍵', concept: 'ハーフスペース攻略',
     opponent: opp('セブン・ウォール', { formation: '5-4-1', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.3),
-    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 10: 'iw' }, width: 'wide', fullbacks: 'overlap', onLoss: 'counterpress', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 10: 'iw' }, width: 'wide', fullbacks: 'overlap', pressHeight: 'high', onLoss: 'counterpress' }),
     brief: '相手は5-4-1のブロックで中央を固め、奪えば速攻を狙います。5バックの間、ハーフスペースが崩しの入口です。',
     scouting: ['最終ラインが5枚で、背後のスペースは小さい', '中盤4枚と最終ラインの間は狭いが空く', '奪われると1トップへ素早く長いボールが来る'],
     hints: ['ウイングを「インサイドWG」にして、5バックの間(ハーフスペース)に立たせよう', '幅を「広い」にしてSBで大外を取り、内側のレーンを広げよう', '奪われたら即時奪回。相手の速攻を出させない'],
@@ -81,7 +81,7 @@ export const STAGES: Stage[] = [
   {
     id: 4, title: '攻めながら守る', concept: 'レストディフェンス',
     opponent: opp('スパーク・カウンターズ', { formation: '4-4-2', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.15),
-    solution: tactic({ formation: '3-5-2', onLoss: 'counterpress', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-1-4-1', buildUp: 'short', width: 'wide', fullbacks: 'invert', pressHeight: 'high', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は中盤に網を張って奪い、一気に前線へ蹴ってきます。攻めるほど背後が危険になります。',
     scouting: ['奪った瞬間に2トップが走り出す', 'ボールを持つ時間は短い', 'ビルドアップでは蹴ってくる'],
     hints: ['アンカーを置いて、攻撃中も中央に人を残そう', '3バック(3-5-2 など)か、SBを「残る」にして後ろに3人以上を残そう', '奪われた瞬間に囲む「即時奪回」を試そう'],
@@ -92,7 +92,7 @@ export const STAGES: Stage[] = [
   {
     id: 5, title: 'プレスを越える', concept: 'プレス回避',
     opponent: opp('ハンターズ', { formation: '4-3-3', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high' }, 0.94),
-    solution: tactic({ formation: '5-4-1', buildUp: 'long', onWin: 'counter', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '5-4-1', buildUp: 'long', width: 'wide', fullbacks: 'invert', pressHeight: 'high', onWin: 'counter' }),
     brief: '相手は高い位置から3人で奪いに来ます。前に人が多いぶん、最終ラインの背後は広大です。',
     scouting: ['前線3枚と中盤が連動して寄せてくる', '最終ラインは高く、背後に30m以上のスペース', 'ショートで繋ぐと囲まれやすい'],
     hints: ['ビルドアップを「長く」にしてプレスを飛び越えよう', '後ろに5枚置けば、蹴った後に奪い返されても耐えられる', '奪ったら速攻。相手の前線は高い位置に残っている'],
@@ -103,7 +103,7 @@ export const STAGES: Stage[] = [
   {
     id: 6, title: 'ウイングバックの裏', concept: '幅の守備の弱点',
     opponent: opp('トライデント', { formation: '3-5-2', pressHeight: 'mid' }, 0.95),
-    solution: tactic({ formation: '4-4-2', width: 'wide', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-4-2', width: 'wide', pressHeight: 'high', lineHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は3バック。大外を守るのはウイングバック1人で、その背後はCBが見るには遠い場所です。',
     scouting: ['WBが高い位置を取ると、その裏が空く', 'CB3枚の幅は広くない', '中盤は3枚で厚い'],
     hints: ['4-4-2のウイングを大外に張らせて、幅を「広い」にしよう', '相手のCB3枚を横に広げ、2トップで間を突く', '中盤より前で奪えばWBの裏は空いたまま'],
@@ -114,7 +114,7 @@ export const STAGES: Stage[] = [
   {
     id: 7, title: 'ライン間の住人', concept: 'ライン間の活用',
     opponent: opp('グリッド・ユナイテッド', { formation: '4-2-3-1', compactness: 'normal', pressHeight: 'mid' }),
-    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, pressHeight: 'high' }),
     brief: '整理されたゾーン守備です。人を捕まえに来ないので、守備者と守備者の間にいれば受けられます。',
     scouting: ['ゾーンの間で受ける選手に寄せるのが遅い', 'ボランチ2枚の前後に段差ができる', '4バックの横のスライドは堅実'],
     hints: ['陣形はそのままでいい。ウイングを「インサイドWG」にして内側で受けよう', 'トップ下と合わせて、相手の中盤と最終ラインの間に3人が立つ', '前から奪いに行き、ライン間で受ける回数を増やそう'],
@@ -123,8 +123,8 @@ export const STAGES: Stage[] = [
   },
   {
     id: 8, title: 'マンツーマン崩し', concept: '偽9とローテーション',
-    opponent: opp('シャドウズ', { formation: '3-5-2', marking: 'man', pressHeight: 'high', pressIntensity: 'normal' }),
-    solution: tactic({ formation: '4-2-3-1', roles: { 10: 'f9', 7: 'iw', 9: 'iw' }, fullbacks: 'overlap', tempo: 'fast', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    opponent: opp('シャドウズ', { formation: '3-5-2', marking: 'man', pressHeight: 'high', pressIntensity: 'normal' }, 1.5),
+    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, tempo: 'fast', width: 'wide', fullbacks: 'invert', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '全員が1人ずつマークに付いてきます。味方が動けば相手も動きます。つまり、相手の配置を操作できます。',
     scouting: ['担当の相手にどこまでも付いてくる', '動き出しへの反応は一瞬遅れる', 'カバーリングの余り人がいないので、1人剥がされると一気に崩れる'],
     hints: ['陣形はそのままでいい。CFを偽9番にして相手CBを釣り出そう', 'ウイングをインサイドWGにして、空いた中央へ走り込ませよう', 'テンポを上げ、SBも上げて担当者を動かし続けよう'],
@@ -135,7 +135,7 @@ export const STAGES: Stage[] = [
   {
     id: 9, title: 'ゼロトップ対策', concept: '釣り出しへの対処',
     opponent: opp('ファントム', { formation: '4-3-3', roles: { 9: 'f9', 8: 'iw', 10: 'iw' }, pressHeight: 'mid', buildUp: 'short' }),
-    solution: tactic({ formation: '5-3-2', compactness: 'tight', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '4-4-2', tempo: 'fast', fullbacks: 'overlap', pressHeight: 'high', compactness: 'tight', onLoss: 'counterpress' }),
     brief: '相手にCFがいません。CBが誰を見るか迷った瞬間に、WGが内側へ走り込んできます。',
     scouting: ['CFが中盤まで下がってくる', 'WGが斜めに最終ラインの裏へ走る', '最前線に基準点がないので押し返しやすい'],
     hints: ['中盤の中央に3枚置き、下がるCFを中盤で捕まえよう(5-3-2 など)', 'コンパクトに保ち、CBは釣り出されないように', '基準点のない相手には2トップで押し返せる'],
@@ -145,7 +145,7 @@ export const STAGES: Stage[] = [
   {
     id: 10, title: '5レーンを塞ぐ', concept: '3-2-5への対抗',
     opponent: opp('ファイブ・レーンズ', { formation: '4-3-3', fullbacks: 'invert', width: 'wide', pressHeight: 'high', lineHeight: 'high', onLoss: 'counterpress', buildUp: 'short' }, 0.95),
-    solution: tactic({ formation: '5-3-2', compactness: 'tight', onWin: 'counter', buildUp: 'long', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '3-4-3', buildUp: 'short', tempo: 'fast', width: 'narrow', pressHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は攻撃時に5レーンすべてへ人を置きます。4バックでは大外とハーフスペースを同時に守り切れません。',
     scouting: ['SBが内側に入り、後方は3-2の形になる', '前線5人が全レーンに立つ', 'ボールを失うと後方は5人だけ'],
     hints: ['WBが下がって5枚になる形で全レーンを埋めよう', '中央を閉じて外へ追いやる', '奪ったら前線2枚へ長いボールで速攻'],
@@ -155,7 +155,7 @@ export const STAGES: Stage[] = [
   {
     id: 11, title: '切り替えの戦争', concept: 'ゲーゲンプレス対策',
     opponent: opp('リップタイド', { formation: '4-3-3', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high', onLoss: 'counterpress', tempo: 'fast' }, 0.97),
-    solution: tactic({ formation: '5-3-2', buildUp: 'long', onWin: 'counter', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '5-4-1', buildUp: 'long', tempo: 'slow', width: 'narrow', fullbacks: 'overlap', pressHeight: 'high', compactness: 'tight', onWin: 'counter' }),
     brief: '相手は奪われた瞬間に3人で囲み、奪えばすぐ縦へ攻めます。最も速いチームです。',
     scouting: ['ボールを失った5秒間の圧力が非常に強い', '密集を作るぶん逆サイドが空く', '最終ラインは高い'],
     hints: ['最終ラインに5枚置いて背後を消そう', 'ビルドアップは長く、囲まれる前に手放す', '相手の体力が落ちる後半が勝負どころ'],
@@ -165,7 +165,7 @@ export const STAGES: Stage[] = [
   {
     id: 12, title: '変化する相手', concept: '試合中の修正',
     opponent: opp('カメレオン', { formation: '5-4-1', pressHeight: 'low', lineHeight: 'deep', compactness: 'tight' }, 1.3),
-    solution: tactic({ formation: '5-3-2', width: 'wide', onLoss: 'counterpress', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' }),
+    solution: tactic({ formation: '5-3-2', width: 'wide', pressHeight: 'high', onLoss: 'counterpress' }),
     brief: '最終試験です。相手は点差と時間に応じて戦術を変えてきます。一時停止とハーフタイムを使って修正してください。',
     scouting: ['前半は5-4-1で深く守る', '後半に入るとハイプレスへ切り替える', 'ビハインドになると前線の人数を増やす'],
     hints: ['前半は低いブロックを崩す設定で入ろう', 'ハーフタイムにプレス対策へ切り替えよう', '数的関係のオーバーレイで相手の変化に気づこう'],
@@ -270,3 +270,16 @@ export const STAGE_KEYS: Record<number, StageKey[]> = {
     pressHigh,
   ],
 };
+
+/**
+ * 弱点の誇張: ステージの相手は、こちらの設定がそのステージの学び(攻略の鍵)を満たすほど地力が下がる。
+ * 初期設定でもともと満たしている鍵は数えず、すべて満たすと WEAKNESS だけ下がる。
+ * 現実の試合では戦術の差は勝率の小さな差にしかならないので、学びが結果に表れるように相手の崩れ方を大きくしている。
+ */
+export const WEAKNESS = 0.45;
+const NO_EVENTS = { events: [] } as unknown as MatchState;
+for (const s of STAGES) {
+  const lesson = (STAGE_KEYS[s.id] ?? []).filter((key) => !key.check(DEFAULT_TACTICS, NO_EVENTS));
+  if (lesson.length === 0) continue;
+  s.opponent.skillMod = (m) => 1 - (WEAKNESS * lesson.filter((key) => key.check(m.tactics[0], m)).length) / lesson.length;
+}

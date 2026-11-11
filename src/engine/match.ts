@@ -13,7 +13,7 @@ import {
 } from './types';
 
 /** プレスする選手1人・1ティックあたりの消耗。全試合走り続けるとほぼ尽きる。 */
-const PRESS_COST = 0.0001;
+const PRESS_COST = 0.0001 * (900 / 1200);
 const NUMBERS = [1, 2, 4, 5, 3, 6, 8, 10, 7, 11, 9];
 
 function emptyStats(): TeamStats {
@@ -57,8 +57,9 @@ export function createMatch(cfg: MatchConfig): MatchState {
     lineDrop: [0, 0], energy: [1, 1], lastLine: [30, 30], dead: null, setPieceUntil: 0, score: [0, 0],
     stats: [emptyStats(), emptyStats()], shots: [], events: [], frames_rec: [],
     firedScripts: new Set(), firedHints: new Set(), coachNextAt: 15,
-    rand: mulberry32(cfg.seed), markingDirty: [true, true], challenged: -1,
+    rand: mulberry32(cfg.seed), markingDirty: [true, true], challenged: -1, skillNow: [1, 1],
   };
+  refreshSkill(m);
   kickoff(m, 0, 1);
   addEvent(m, 'kickoff', 'キックオフ');
   return m;
@@ -108,6 +109,14 @@ export function resume(m: MatchState) {
 }
 
 /** 試合中の戦術変更。役割の再割当も行う。 */
+/** 地力を計算し直す。ステージの相手は、こちらの設定が弱点を突いているほど崩れる。 */
+export function refreshSkill(m: MatchState) {
+  for (const s of [0, 1] as Side[]) {
+    const team = m.cfg.teams[s];
+    m.skillNow[s] = (team.skill ?? 1) * (team.skillMod ? team.skillMod(m) : 1);
+  }
+}
+
 export function setTactics(m: MatchState, side: Side, t: Tactics) {
   m.tactics[side] = { ...t };
   const slots = FORMATIONS[t.formation];
@@ -116,6 +125,7 @@ export function setTactics(m: MatchState, side: Side, t: Tactics) {
     p.role = t.roles?.[p.slot] ?? slots[p.slot].role;
   }
   m.markingDirty[side] = true;
+  refreshSkill(m);
 }
 
 function movePlayer(m: MatchState, p: Player) {
@@ -244,6 +254,7 @@ export function step(m: MatchState) {
   if (m.finished || m.atHalftime) return;
   m.t += TICK;
   runScript(m);
+  if (Math.round(m.t / TICK) % 50 === 0) refreshSkill(m);
   updateLastLines(m);
   updateFrames(m);
   for (const side of [0, 1] as Side[]) if (m.markingDirty[side]) assignMarks(m, side);

@@ -154,6 +154,11 @@ function resolveShot(m: MatchState) {
     if (dist(d.pos, b.pos) < 1.8) {
       b.shot = null;
       b.lastTouch = d.id;
+      // ブロックしたボールの一部はゴールラインを割ってコーナーになる
+      if (m.rand() < 0.45) {
+        awardCorner(m, (1 - d.team) as Side, b.pos.y);
+        return;
+      }
       const a = m.rand() * Math.PI * 2;
       b.vel = { x: Math.cos(a) * 9, y: Math.sin(a) * 9 };
       b.vz = 1.5;
@@ -169,6 +174,9 @@ function resolveShot(m: MatchState) {
         giveBall(m, gk);
         b.pass = null;
         gk.decideAt = m.t + 1.8;
+      } else if (m.rand() < 0.55) {
+        // ゴールの外へ弾き出してコーナー
+        awardCorner(m, shooterTeam, b.pos.y);
       } else {
         // 弾いたボールはこぼれ球になり、セカンドボールの勝負になる。
         const a = (m.rand() - 0.5) * 2.4;
@@ -179,6 +187,13 @@ function resolveShot(m: MatchState) {
       }
     }
   }
+}
+
+function awardCorner(m: MatchState, team: Side, y: number) {
+  const x = team === 0 ? PITCH_W - 0.3 : 0.3;
+  m.stats[team].corners += 1;
+  addEvent(m, 'corner', 'コーナーキック', team);
+  startDead(m, 'corner', team, { x, y: y < 34 ? 0.3 : PITCH_H - 0.3 }, 2.6);
 }
 
 function checkOut(m: MatchState): boolean {
@@ -239,7 +254,8 @@ function checkControl(m: MatchState) {
   for (const p of m.players) {
     if (m.t < p.stunnedUntil) continue;
     const reach = p.role === 'gk' && inOwnBox(p, b.pos) ? 2 : 1.25;
-    const maxZ = p.role === 'gk' && inOwnBox(p, b.pos) ? 2.7 : 2.0;
+    const crossTarget = !!pass?.cross && m.players[pass.from].team === p.team;
+    const maxZ = p.role === 'gk' && inOwnBox(p, b.pos) ? 2.7 : crossTarget ? 2.5 : 2.0;
     if (b.z > maxZ) continue;
     const d = dist(p.pos, b.pos);
     if (d > reach) continue;
@@ -298,7 +314,7 @@ function miscontrol(m: MatchState, p: Player, lofted: boolean): boolean {
   const sp = Math.hypot(b.vel.x, b.vel.y);
   const chance =
     (0.03 + (near < 2 ? 0.16 : near < 4 ? 0.07 : 0) + (sp > 12 ? 0.04 : 0) + (lofted ? 0.1 : 0)) /
-    (m.cfg.teams[p.team].skill ?? 1);
+    m.skillNow[p.team];
   if (m.rand() >= chance) return false;
   // こぼれたボールは足元から数m転がり、近くの選手の奪い合いになる
   b.pass = null;
@@ -333,13 +349,19 @@ function takeControl(m: MatchState, p: Player) {
       stats.links[key] = (stats.links[key] ?? 0) + 1;
       if (relX(p.team, p.pos.x) > 70) stats.finalThirdPasses += 1;
     } else {
+      // 自陣ボックスでクロスを跳ね返した守備者は、無理せずゴールラインの外へ逃がすこともある
+      if (pass.cross && p.role !== 'gk' && inOwnBox(p, b.pos) && m.rand() < 0.45) {
+        b.pass = null;
+        awardCorner(m, passer.team, b.pos.y);
+        return;
+      }
       const s = m.stats[p.team];
       s.interceptions += 1;
       onBallWon(m, p);
     }
   }
   // 空中のボールを相手ボックス内で受けたら、そのままヘディング/ボレー。
-  const header = b.z > 0.9;
+  const header = b.z > 0.7;
   const attackingBox = toRel(p.team, b.pos);
   const wasCross = pass?.cross && m.players[pass.from].team === p.team;
   if (p.role !== 'gk' && wasCross && attackingBox.x > 88.5 && Math.abs(attackingBox.y - 34) < 18) {

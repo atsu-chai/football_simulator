@@ -121,7 +121,7 @@ export function attackerMove(m: MatchState, p: Player) {
   p.urgency = dist(p.pos, base) > 9 ? 0.75 : 0.5;
 }
 
-const SUPPORTERS = 4;
+const SUPPORTERS = 3;
 
 /** 保持者に近い順で上位の味方か。GK と、前線で相手の最終ラインを押し下げる CF は除く。 */
 const HOLDERS = new Set(['gk', 'st', 'wg', 'iw', 'wb']);
@@ -131,7 +131,7 @@ function isSupporter(m: MatchState, p: Player, carrier: Player): boolean {
   // CF は最終ラインを押し下げる役。下がって受けるのは偽9番の仕事
   if (p.role === 'gk' || p.role === 'st') return false;
   const d = dist(p.pos, carrier.pos);
-  if (d > 30 || (HOLDERS.has(p.role) && d > 13)) return false;
+  if (d > 25 || (HOLDERS.has(p.role) && d > 13)) return false;
   let closer = 0;
   for (const q of m.players) {
     if (q.team !== p.team || q.id === p.id || q.id === carrier.id || q.role === 'gk' || q.role === 'st') continue;
@@ -141,13 +141,13 @@ function isSupporter(m: MatchState, p: Player, carrier: Player): boolean {
   return closer < SUPPORTERS;
 }
 
-/** 保持者の周り10〜16mで、相手から離れていてパスコースが通る場所。後ろや横も候補に入れる。 */
+/** 保持者の周り10〜15mで、相手から離れていてパスコースが通る場所。後ろや横も候補に入れる。 */
 function findSupportSpot(m: MatchState, p: Player, carrier: Player, base: Vec, lim: number): Vec {
   const side = p.team;
   const c = toRel(side, carrier.pos);
   let best = base;
   let bestScore = -1e9;
-  for (const r of [8, 13]) {
+  for (const r of [10, 15]) {
     for (let k = -5; k <= 6; k++) {
       const a = (k / 12) * Math.PI * 2;
       const cand: Vec = {
@@ -164,10 +164,10 @@ function findSupportSpot(m: MatchState, p: Player, carrier: Player, base: Vec, l
       // 味方と同じ場所に重ならない
       let crowd = 0;
       for (const q of m.players) {
-        if (q.team === side && q.id !== p.id && q.id !== carrier.id && dist(q.pos, abs) < 7) crowd += 1;
+        if (q.team === side && q.id !== p.id && q.id !== carrier.id && dist(q.pos, abs) < 9) crowd += 1;
       }
-      const score = open * 0.5 + Math.min(lane, 6) * 0.7 + threat(cand) * 2.5 - crowd * 2.5
-        - dist(abs, p.pos) * 0.1 - dist(abs, base) * 0.06;
+      const score = open * 0.5 + Math.min(lane, 6) * 0.7 + threat(cand) * 2.5 - crowd * 3
+        - dist(abs, p.pos) * 0.1 - dist(abs, base) * 0.1;
       if (score > bestScore) {
         bestScore = score;
         best = abs;

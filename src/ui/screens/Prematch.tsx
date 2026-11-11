@@ -52,6 +52,7 @@ export function Prematch({ plan, back, kick, quizAnswered, onQuiz }: {
               <div className="panel" style={{ marginTop: 12 }}>
                 <h3>今回のテーマ: {stage.concept}</h3>
                 <p>{stage.brief}</p>
+                <p className="small muted" style={{ marginTop: 6 }}>この相手は弱点を突かれると崩れます。攻略の鍵を満たすほど、相手のパスや守備の質が落ちます(試合中に変えても効きます)。</p>
               </div>
               <div className="panel">
                 <h3>スカウティング: {stage.opponent.name}({stage.opponent.tactics.formation})</h3>

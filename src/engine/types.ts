@@ -11,9 +11,9 @@ export const GOAL_W = 7.32;
 export const GOAL_H = 2.44;
 export const TICK = 0.1;
 /** 1試合のシミュレーション秒数。 */
-export const MATCH_SECONDS = 900;
-/** 1倍速での再生倍率。実時間では約6.7分で1試合が終わる。 */
-export const BASE_PLAYBACK = 2.2;
+export const MATCH_SECONDS = 1200;
+/** 1倍速での再生倍率。実時間では約7分で1試合が終わる。 */
+export const BASE_PLAYBACK = 2.8;
 
 export type RoleId =
   | 'gk'
@@ -67,6 +67,8 @@ export interface TeamSetup {
   tactics: Tactics;
   /** 1.0 が基準。ステージ差は戦術で作るため、振れ幅は小さく保つ。 */
   skill?: number;
+  /** ステージの相手用: 試合の状況から地力に掛ける倍率。弱点(攻略の鍵)を突かれるほど下がる。 */
+  skillMod?: (m: MatchState) => number;
 }
 
 export interface Player {
@@ -271,6 +273,8 @@ export interface MatchState {
   rand: () => number;
   /** 相手に人を当てる割当表の再計算要求。 */
   markingDirty: [boolean, boolean];
+  /** いまの地力(skill × 弱点による倍率)。戦術変更と定期的な更新で計算し直す。 */
+  skillNow: [number, number];
   /** 直近で守備者が寄せたボール保持者。同じ保持で二重に数えないために持つ。 */
   challenged: number;
 }

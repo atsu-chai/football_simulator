@@ -4,7 +4,7 @@ import { MatchState, PITCH_H, PITCH_W, Player, Side, Tactics, TeamFrame, Vec } f
 
 const HEIGHT = { low: 21, mid: 33, high: 47 };
 const LINE_ADJ = { deep: -6, normal: 0, high: 7 };
-const LEN_DEF = { loose: 36, normal: 29, tight: 22 };
+const LEN_DEF = { loose: 33, normal: 26, tight: 20 };
 const WID_DEF = { loose: 50, normal: 43, tight: 35 };
 const WID_ATT = { narrow: 42, normal: 54, wide: 65 };
 
@@ -94,6 +94,8 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
   if (f.hasBall) {
     const lim = oppLineX(m, p.team);
     const edge = f.width / 2;
+    // 自陣深くからの組み立てでは、CBがボックスの両脇へ開き、SBは高く幅を取ってパスの出口を作る
+    const deepBuild = toRel(p.team, m.ball.pos).x < 30;
     switch (p.role) {
       case 'fb':
         if (t.fullbacks === 'overlap') {
@@ -106,6 +108,10 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
           // 残る場合も、CBより一段前で幅を取ってビルドアップに参加する
           x += 10;
         }
+        if (deepBuild && t.fullbacks !== 'invert') {
+          x = Math.max(x, 30);
+          y = 34 + sideSign * Math.min(edge + 1, 30);
+        }
         break;
       case 'wb':
         // 同じ選手が攻守の幅を担うので、SBの上がりより一段低い位置までにする
@@ -116,6 +122,11 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         // SB が内側に入る/高く上がるとCBは幅を取り、後方の3枚を作る。
         if (t.fullbacks !== 'stay' && FORMATIONS[t.formation].some((s) => s.role === 'fb')) {
           y = 34 + sideSign * 11;
+        }
+        if (deepBuild) {
+          // 中央のCB(3バックの真ん中)は残り、両脇はペナルティエリアの角の外へ開く
+          y = 34 + (slot.y - 0.5) * 2 * 17;
+          x = Math.max(x, 8);
         }
         break;
       }

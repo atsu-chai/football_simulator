@@ -23,5 +23,7 @@ npm run dev
 | `npx tsx scripts/passes.ts 10` | パスの種類ごとの成功率(味方に渡った・奪われた・外に出た) |
 | `OUT=/tmp sh scripts/balance-par.sh 100` | 12ステージのバランス検証をステージごとに並列で実行 |
 | `npx tsx scripts/story.ts 30 [章]` | ストーリーの各章を、初期設定と相手に合わせた戦術で突破できるか測る |
+| `npx tsx scripts/audit.ts 10` | 得点・シュート距離・決定率・パス成功率などを、欧州主要リーグの目安と並べて比べる |
+| `npx tsx scripts/solve.ts <ステージ> 24 40` | 攻略の鍵を満たす戦術をランダムに作り、最もよく勝つ模範解答の候補を探す |
 
 エンジン(`src/engine/`)はDOMに依存せず、シードが同じなら同じ試合になります。

@@ -115,7 +115,8 @@ function defenderMove(m: MatchState, p: Player) {
   let target: Vec = baseRel;
   if (mark) {
     const r = toRel(side, mark.pos);
-    const pull = 0.5;
+    // ゾーンでは持ち場を大きく離れない。近くの相手に少し寄せて、パスコースを狭める程度にとどめる
+    const pull = isBack ? 0.35 : 0.3;
     // 最終ラインは横には寄るが、縦はラインの高さを保つ(手前に立つFWに引かれて下がり続けないため)
     const pullX = isBack ? 0 : pull;
     target = {
@@ -156,8 +157,9 @@ function defenderMove(m: MatchState, p: Player) {
   }
 
   const rel = toRel(side, p.pos);
-  // ボールより前にいる選手は全力で帰陣する
-  const behind = rel.x > ball.x + 4;
+  // ボールより前にいる守備者と中盤は全力で帰陣する。前線の選手は自分の持ち場(カウンターの出口)まで戻る
+  const forward = p.role === 'st' || p.role === 'f9' || p.role === 'wg' || p.role === 'iw';
+  const behind = !forward && rel.x > ball.x + 4;
   if (behind) {
     target.x = Math.min(target.x, ball.x - 2);
   }
