@@ -74,6 +74,9 @@ export function setPossession(m: MatchState, side: Side) {
   }
 }
 
+// 選手が持ち場に戻るのを待つ最長の追加時間(秒)。キックオフは配置済みなので待たない。
+const MAX_EXTRA_WAIT: Record<DeadKind, number> = { kickoff: 0, throw: 4, free: 6, goalkick: 7, corner: 9 };
+
 function startDead(m: MatchState, kind: DeadKind, team: Side, at: Vec, delay: number) {
   const b = m.ball;
   b.owner = -1;
@@ -99,8 +102,8 @@ function startDead(m: MatchState, kind: DeadKind, team: Side, at: Vec, delay: nu
       taker = p.id;
     }
   }
-  m.dead = { kind, team, at: { ...at }, until: m.t + delay, taker };
-  if (kind === 'corner') m.setPieceUntil = m.t + delay + 3;
+  m.dead = { kind, team, at: { ...at }, until: m.t + delay, maxUntil: m.t + delay + MAX_EXTRA_WAIT[kind], taker };
+  if (kind === 'corner') m.setPieceUntil = m.t + delay + MAX_EXTRA_WAIT.corner + 3;
 }
 
 export function freeKick(m: MatchState, team: Side, at: Vec) {

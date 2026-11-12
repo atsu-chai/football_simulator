@@ -8,7 +8,7 @@ import { addEvent, gameMinute } from './events';
 import { runCoach } from './coach';
 import { shapeTarget, updateFrames, updateLastLines } from './teamShape';
 import {
-  Ball, MATCH_SECONDS, MatchConfig, MatchState, PITCH_H, PITCH_W, Player, Side, TICK, Tactics,
+  Ball, DeadBall, MATCH_SECONDS, MatchConfig, MatchState, PITCH_H, PITCH_W, Player, Side, TICK, Tactics,
   TeamStats, Vec,
 } from './types';
 
@@ -98,7 +98,7 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
   const taker = m.players
     .filter((p) => p.team === team && (p.role === 'st' || p.role === 'f9' || p.role === 'am' || p.role === 'cm'))
     .sort((a, b) => relX(team, b.pos.x) - relX(team, a.pos.x))[0];
-  m.dead = { kind: 'kickoff', team, at: vec(PITCH_W / 2, PITCH_H / 2), until: m.t + delay, taker: taker.id };
+  m.dead = { kind: 'kickoff', team, at: vec(PITCH_W / 2, PITCH_H / 2), until: m.t + delay, maxUntil: m.t + delay, taker: taker.id };
   m.markingDirty = [true, true];
 }
 
@@ -207,9 +207,9 @@ function stepDead(m: MatchState) {
       target = { x: d.at.x + Math.cos(a) * 8, y: d.at.y + Math.sin(a) * 8 };
     }
     p.target = target;
-    p.urgency = d.kind === 'kickoff' ? 0.3 : 0.85;
+    p.urgency = d.kind === 'kickoff' ? 0.3 : 0.92;
   }
-  if (m.t >= d.until) {
+  if (m.t >= d.maxUntil || (m.t >= d.until && restartReady(m, d))) {
     taker.pos = { ...d.at };
     taker.prev = { ...d.at };
     m.ball.pos = { ...d.at };
@@ -217,6 +217,17 @@ function stepDead(m: MatchState) {
     restartWith(m, taker);
     if (d.kind === 'goalkick') taker.decideAt = m.t + 0.1;
   }
+}
+
+/** キッカーがボールに着き、ほとんどの選手が持ち場に戻ったら再開できる。 */
+function restartReady(m: MatchState, d: DeadBall): boolean {
+  if (dist(m.players[d.taker].pos, d.at) > 1) return false;
+  let late = 0;
+  for (const p of m.players) {
+    if (p.id === d.taker || p.role === 'gk') continue;
+    if (dist(p.pos, p.target) > 3) late++;
+  }
+  return late <= 2;
 }
 
 const BOX_SPOTS: Vec[] = [

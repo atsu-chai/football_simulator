@@ -76,8 +76,8 @@ export const STYLE_STAGE: Record<StyleId, number> = {
   flat442: 1, diamond: 2, bus: 3, counter: 4, hunters: 5, wingbacks: 6,
   zone4231: 7, manmark: 8, falseNine: 9, positional: 10, gegen: 11,
 };
-// ストーリーでは弱点の誇張を学習ステージより小さくする。
-export const STORY_WEAKNESS = 0.45;
+// ストーリーは全スタイル共通の補正。学習ステージの強い個別補正は持ち込まない。
+export const STORY_WEAKNESS = 0.65;
 
 export interface StoryOpponent {
   name: string;
@@ -175,9 +175,9 @@ export const CHAPTERS: Chapter[] = [
     clear: '世界一。JFL の小さなクラブは、あなたの戦術で世界の頂点に立った。',
     fail: '世界の壁に跳ね返された。でも差はわずか。もう一度挑もう。',
     opponents: [
-      { name: 'アトレティコ・セレステ', color: '#7FC8F8', style: 'counter', skill: 1.2 },
-      { name: 'ノルテ・ロイヤルズ', color: '#F4F1E8', style: 'gegen', skill: 1.23 },
-      { name: 'アルカディア', color: '#9B7BE0', style: 'positional', skill: 1.27 },
+      { name: 'アトレティコ・セレステ', color: '#7FC8F8', style: 'counter', skill: 1.35 },
+      { name: 'ノルテ・ロイヤルズ', color: '#F4F1E8', style: 'gegen', skill: 1.4 },
+      { name: 'アルカディア', color: '#9B7BE0', style: 'positional', skill: 1.45 },
     ],
   },
 ];

@@ -136,7 +136,10 @@ export interface DeadBall {
   kind: DeadKind;
   team: Side;
   at: Vec;
+  /** これより前には再開しない(最短の間)。 */
   until: number;
+  /** 選手が戻りきれなくても、これを過ぎたら再開する。 */
+  maxUntil: number;
   taker: number;
 }
 
