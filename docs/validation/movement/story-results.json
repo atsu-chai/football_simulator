@@ -1,0 +1,340 @@
+{
+  "matchesPerOpponentPerSetup": 30,
+  "seeds": [
+    3100,
+    3129
+  ],
+  "method": "未変更の対戦結果を再利用し、変更したbus・wingbacksを同じシードで差し替えた。表示勝率から30試合の整数勝敗数を一意に復元。章突破率は対戦間独立と仮定した勝敗分布による推計で、カップの引分けはPK勝率50%。",
+  "chapters": [
+    {
+      "chapter": 1,
+      "matchesPerOpponentPerSetup": 30,
+      "target": 7,
+      "opponents": [
+        {
+          "name": "浜風FC",
+          "style": "flat442",
+          "counts": [
+            11,
+            9,
+            15,
+            6
+          ]
+        },
+        {
+          "name": "北嶺ユナイテッド",
+          "style": "counter",
+          "counts": [
+            14,
+            7,
+            17,
+            9
+          ]
+        },
+        {
+          "name": "港町SC",
+          "style": "diamond",
+          "counts": [
+            14,
+            9,
+            19,
+            5
+          ]
+        },
+        {
+          "name": "緑ヶ丘FC",
+          "style": "bus",
+          "counts": [
+            15,
+            7,
+            19,
+            4
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": 6.466666666666667,
+        "estimatedClearPct": 51.20654320987654
+      },
+      "solution": {
+        "expectedPoints": 7.8,
+        "estimatedClearPct": 70.87999999999998
+      }
+    },
+    {
+      "chapter": 2,
+      "matchesPerOpponentPerSetup": 30,
+      "target": 7,
+      "opponents": [
+        {
+          "name": "白鷺SC",
+          "style": "hunters",
+          "counts": [
+            17,
+            7,
+            21,
+            5
+          ]
+        },
+        {
+          "name": "岬アスレティック",
+          "style": "wingbacks",
+          "counts": [
+            14,
+            9,
+            16,
+            6
+          ]
+        },
+        {
+          "name": "霧島FC",
+          "style": "counter",
+          "counts": [
+            17,
+            5,
+            17,
+            9
+          ]
+        },
+        {
+          "name": "雷鳥ユナイテッド",
+          "style": "zone4231",
+          "counts": [
+            14,
+            7,
+            14,
+            8
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": 7.133333333333333,
+        "estimatedClearPct": 61.35123456790124
+      },
+      "solution": {
+        "expectedPoints": 7.7333333333333325,
+        "estimatedClearPct": 70.6879012345679
+      }
+    },
+    {
+      "chapter": 3,
+      "matchesPerOpponentPerSetup": 30,
+      "target": 10,
+      "opponents": [
+        {
+          "name": "大河FC",
+          "style": "falseNine",
+          "counts": [
+            9,
+            15,
+            12,
+            4
+          ]
+        },
+        {
+          "name": "樹海ヴィクトリー",
+          "style": "bus",
+          "counts": [
+            22,
+            1,
+            21,
+            5
+          ]
+        },
+        {
+          "name": "鋼鉄シティ",
+          "style": "manmark",
+          "counts": [
+            27,
+            1,
+            26,
+            4
+          ]
+        },
+        {
+          "name": "青嵐SC",
+          "style": "diamond",
+          "counts": [
+            18,
+            9,
+            13,
+            6
+          ]
+        },
+        {
+          "name": "紅葉アスレティック",
+          "style": "hunters",
+          "counts": [
+            18,
+            5,
+            18,
+            6
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": 10.433333333333332,
+        "estimatedClearPct": 68.00066666666666
+      },
+      "solution": {
+        "expectedPoints": 9.833333333333332,
+        "estimatedClearPct": 55.992592592592594
+      }
+    },
+    {
+      "chapter": 4,
+      "matchesPerOpponentPerSetup": 30,
+      "target": 11,
+      "opponents": [
+        {
+          "name": "王都FC",
+          "style": "zone4231",
+          "counts": [
+            16,
+            8,
+            17,
+            2
+          ]
+        },
+        {
+          "name": "東邦ユナイテッド",
+          "style": "positional",
+          "counts": [
+            17,
+            6,
+            16,
+            6
+          ]
+        },
+        {
+          "name": "黒潮マリンズ",
+          "style": "counter",
+          "counts": [
+            15,
+            5,
+            16,
+            7
+          ]
+        },
+        {
+          "name": "旭日SC",
+          "style": "gegen",
+          "counts": [
+            14,
+            9,
+            24,
+            0
+          ]
+        },
+        {
+          "name": "古都ヴィッセ",
+          "style": "manmark",
+          "counts": [
+            20,
+            2,
+            27,
+            1
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": 9.200000000000001,
+        "estimatedClearPct": 31.445925925925927
+      },
+      "solution": {
+        "expectedPoints": 10.533333333333335,
+        "estimatedClearPct": 48.39328395061729
+      }
+    },
+    {
+      "chapter": 5,
+      "matchesPerOpponentPerSetup": 30,
+      "target": null,
+      "opponents": [
+        {
+          "name": "デザート・ファルコンズ",
+          "style": "bus",
+          "counts": [
+            8,
+            13,
+            19,
+            6
+          ]
+        },
+        {
+          "name": "タイガー・シティ",
+          "style": "hunters",
+          "counts": [
+            14,
+            7,
+            18,
+            2
+          ]
+        },
+        {
+          "name": "ゴールデン・ドラゴンズ",
+          "style": "positional",
+          "counts": [
+            17,
+            5,
+            19,
+            7
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": null,
+        "estimatedClearPct": 18.32638888888889
+      },
+      "solution": {
+        "expectedPoints": null,
+        "estimatedClearPct": 34.83333333333333
+      }
+    },
+    {
+      "chapter": 6,
+      "matchesPerOpponentPerSetup": 30,
+      "target": null,
+      "opponents": [
+        {
+          "name": "アトレティコ・セレステ",
+          "style": "counter",
+          "counts": [
+            15,
+            5,
+            17,
+            9
+          ]
+        },
+        {
+          "name": "ノルテ・ロイヤルズ",
+          "style": "gegen",
+          "counts": [
+            15,
+            3,
+            21,
+            6
+          ]
+        },
+        {
+          "name": "アルカディア",
+          "style": "positional",
+          "counts": [
+            14,
+            6,
+            14,
+            9
+          ]
+        }
+      ],
+      "default": {
+        "expectedPoints": null,
+        "estimatedClearPct": 18.180555555555557
+      },
+      "solution": {
+        "expectedPoints": null,
+        "estimatedClearPct": 35.355555555555554
+      }
+    }
+  ]
+}

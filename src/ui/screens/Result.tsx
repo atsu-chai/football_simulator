@@ -190,6 +190,10 @@ export function Result({ plan, m, stars, retry, next, home, outcome, story }: {
                 <p className="small muted" style={{ marginTop: 10 }}>
                   {stage.solution.formation} / ビルドアップ {stage.solution.buildUp} / プレス {stage.solution.pressHeight} / ライン {stage.solution.lineHeight} / 幅 {stage.solution.width} / 切替 {stage.solution.onLoss}・{stage.solution.onWin}
                   {stage.solution.roles ? ` / 役割 ${Object.entries(stage.solution.roles).map(([k, r]) => `${FORMATIONS[stage.solution.formation][+k].role}→${ROLE_LABEL[r!]}`).join('、')}` : ''}
+                  {stage.solutionAfter && <>
+                    <br />後半: {stage.solutionAfter.formation} / ビルドアップ {stage.solutionAfter.buildUp} / テンポ {stage.solutionAfter.tempo} / 幅 {stage.solutionAfter.width} / 切替 {stage.solutionAfter.onLoss}・{stage.solutionAfter.onWin}
+                    {stage.solutionAfter.roles ? ` / 役割 ${Object.entries(stage.solutionAfter.roles).map(([k, r]) => `${FORMATIONS[stage.solutionAfter!.formation][+k].role}→${ROLE_LABEL[r!]}`).join('、')}` : ''}
+                  </>}
                 </p>
               )}
             </div>

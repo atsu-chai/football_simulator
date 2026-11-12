@@ -2,9 +2,10 @@
 // 使い方: npx tsx scripts/solve.ts <ステージ番号> [候補数] [試合数]
 import { DEFAULT_TACTICS, FORMATION_IDS, tactic } from '../src/data/formations';
 import { myTeamBase, STAGE_KEYS, STAGES } from '../src/data/stages';
-import { createMatch, runToEnd } from '../src/engine/match';
+import { createMatch, resume, runToEnd, setTactics, step } from '../src/engine/match';
 import { mulberry32 } from '../src/engine/geometry';
 import { MatchState, Tactics } from '../src/engine/types';
+import { addEvent } from '../src/engine/events';
 
 const id = Number(process.argv[2]);
 const K = Number(process.argv[3] ?? 30);
@@ -38,10 +39,20 @@ function randomTactics(): Tactics {
   });
 }
 
-function run(t: Tactics) {
+function run(t: Tactics, adapt = false) {
   let w = 0, g = 0;
   for (let i = 0; i < N; i++) {
-    const m = runToEnd(createMatch({ teams: [myTeamBase(t), s.opponent], seed: 5000 + i, script: s.script ? { side: 1, phases: s.script } : undefined }));
+    const m = createMatch({ teams: [myTeamBase(t), s.opponent], seed: 5000 + i, script: s.script ? { side: 1, phases: s.script } : undefined });
+    if (adapt && s.solutionAfter) {
+      while (!m.finished) {
+        step(m);
+        if (m.atHalftime) {
+          addEvent(m, 'tactic', '後半の相手のプレスに合わせて戦術を変更', 0);
+          setTactics(m, 0, s.solutionAfter);
+          resume(m);
+        }
+      }
+    } else runToEnd(m);
     if (m.score[0] > m.score[1]) w++;
     g += m.score[0] + m.score[1];
   }
@@ -54,7 +65,7 @@ while (cands.length < K) {
   const t = randomTactics();
   if (keys.every((k) => k.check(t, stub(false)))) cands.push(t);
 }
-const res = cands.map((t) => ({ t, ...run(t) })).sort((a, b) => b.w - a.w);
+const res = cands.map((t) => ({ t, ...run(t, true) })).sort((a, b) => b.w - a.w);
 console.log(`STAGE ${id} base ${base.w.toFixed(0)}`);
 for (const r of res.slice(0, 4)) {
   const { formation, roles, buildUp, tempo, width, fullbacks, pressHeight, pressIntensity, lineHeight, compactness, onLoss, onWin } = r.t;

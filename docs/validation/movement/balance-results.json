@@ -1,0 +1,93 @@
+{
+  "seeds": [
+    5000,
+    5099
+  ],
+  "criterion": "gap >= 20 points and 2 <= goals <= 5",
+  "results": [
+    {
+      "stage": 1,
+      "status": "OK",
+      "gapPoints": 23,
+      "goalsPerMatch": 3.62,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 2,
+      "status": "OK",
+      "gapPoints": 24.0,
+      "goalsPerMatch": 4.63,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 3,
+      "status": "OK",
+      "gapPoints": 36.0,
+      "goalsPerMatch": 3.85,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 4,
+      "status": "OK",
+      "gapPoints": 29,
+      "goalsPerMatch": 4.0,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 5,
+      "status": "OK",
+      "gapPoints": 30,
+      "goalsPerMatch": 4.11,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 6,
+      "status": "OK",
+      "gapPoints": 26,
+      "goalsPerMatch": 4.39,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 7,
+      "status": "OK",
+      "gapPoints": 30,
+      "goalsPerMatch": 4.42,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 8,
+      "status": "OK",
+      "gapPoints": 21,
+      "goalsPerMatch": 4.69,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 9,
+      "status": "OK",
+      "gapPoints": 26,
+      "goalsPerMatch": 2.79,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 10,
+      "status": "OK",
+      "gapPoints": 24,
+      "goalsPerMatch": 3.46,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 11,
+      "status": "OK",
+      "gapPoints": 24,
+      "goalsPerMatch": 3.72,
+      "matchesPerSetup": 100
+    },
+    {
+      "stage": 12,
+      "status": "NG",
+      "gapPoints": 18.0,
+      "goalsPerMatch": 4.28,
+      "matchesPerSetup": 100
+    }
+  ]
+}

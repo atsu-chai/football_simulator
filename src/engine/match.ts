@@ -34,8 +34,8 @@ function makePlayers(cfg: MatchConfig): Player[] {
     FORMATIONS[t.formation].forEach((slot, i) => {
       out.push({
         id: out.length, team: side, slot: i, role: t.roles?.[i] ?? slot.role, number: NUMBERS[i],
-        pos: vec(0, 0), prev: vec(0, 0), vel: vec(0, 0), target: vec(0, 0), urgency: 0.5,
-        decideAt: 0, stunnedUntil: 0, runUntil: 0, runTarget: null, nextSpotAt: 0, spot: null,
+        pos: vec(0, 0), prev: vec(0, 0), vel: vec(0, 0), target: vec(0, 0), moveTarget: vec(0, 0), urgency: 0.5,
+        decideAt: 0, stunnedUntil: 0, runUntil: 0, runTarget: null, nextSpotAt: 0, spot: null, spotOwner: -1,
         markTarget: -1, pressing: false,
       });
     });
@@ -88,8 +88,10 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
     p.prev = { ...a };
     p.vel = vec(0, 0);
     p.target = { ...a };
+    p.moveTarget = { ...a };
     p.runTarget = null;
     p.spot = null;
+    p.spotOwner = -1;
     p.stunnedUntil = 0;
     p.pressing = false;
   }
@@ -131,10 +133,19 @@ export function setTactics(m: MatchState, side: Side, t: Tactics) {
 function movePlayer(m: MatchState, p: Player) {
   p.prev = { ...p.pos };
   const stunned = m.t < p.stunnedUntil;
-  const dx = p.target.x - p.pos.x;
-  const dy = p.target.y - p.pos.y;
-  const d = Math.hypot(dx, dy);
   const isCarrier = m.ball.owner === p.id;
+  const urgent = isCarrier || p.pressing || p.urgency >= 0.9;
+  // 追走・保持時は反応を優先し、持ち場の調整は約0.5秒かけて追従する。
+  const target = p.moveTarget;
+  const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : 0.5));
+  if (dist(target, p.target) > (urgent ? 0.15 : 0.7)) {
+    target.x += (p.target.x - target.x) * blend;
+    target.y += (p.target.y - target.y) * blend;
+  }
+  p.moveTarget = target;
+  const dx = target.x - p.pos.x;
+  const dy = target.y - p.pos.y;
+  const d = Math.hypot(dx, dy);
   let carry = 6.2;
   if (isCarrier) {
     // 前に守備者がいなければ、ほぼ全速でゴールへ運べる
@@ -144,9 +155,11 @@ function movePlayer(m: MatchState, p: Player) {
     // 守備者がすぐ近くにいる時は、ボールを守りながらなので速く運べない
     else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
   }
-  const top = (isCarrier ? carry : 2.4 + 5.2 * p.urgency) * (stunned ? 0.35 : 1);
+  const top = (isCarrier ? carry : 1 + 6.6 * p.urgency ** 6) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
-  const speed = Math.min(top * tired, d * 2.2);
+  // 到着前に減速する。位置の微調整で走り続けない。
+  const remaining = Math.max(0, d - (urgent ? 0.15 : 0.8));
+  const speed = Math.min(top * tired, remaining * (urgent ? 2.2 : 1.2), Math.sqrt(2 * 3 * remaining));
   let vx = d > 0.05 ? (dx / d) * speed : 0;
   let vy = d > 0.05 ? (dy / d) * speed : 0;
   // 味方と重ならないように少し離れる
@@ -155,12 +168,15 @@ function movePlayer(m: MatchState, p: Player) {
     const sx = p.pos.x - o.pos.x;
     const sy = p.pos.y - o.pos.y;
     const sd = Math.hypot(sx, sy);
-    if (sd < 3 && sd > 0.01) {
-      vx += (sx / sd) * (3 - sd) * 0.9;
-      vy += (sy / sd) * (3 - sd) * 0.9;
+    if (sd < 1.8 && sd > 0.01) {
+      vx += (sx / sd) * (1.8 - sd) * 0.7;
+      vy += (sy / sd) * (1.8 - sd) * 0.7;
     }
   }
-  const maxDv = 0.65;
+  // 加速・旋回を制限する。押し戻しを足しても最高速度を超えない。
+  const desired = Math.hypot(vx, vy);
+  if (desired > top * tired) { vx *= top * tired / desired; vy *= top * tired / desired; }
+  const maxDv = (urgent ? 3.5 : 2.5) * TICK;
   const ax = vx - p.vel.x;
   const ay = vy - p.vel.y;
   const a = Math.hypot(ax, ay);

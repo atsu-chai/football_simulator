@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CHAPTERS } from '../data/story';
+import { CHAPTERS, opponentSetup, STORY_WEAKNESS, STYLE_STAGE } from '../data/story';
+import { DEFAULT_TACTICS } from '../data/formations';
+import { STAGES } from '../data/stages';
+import { createMatch, setTactics } from '../engine/match';
 import { mulberry32 } from '../engine/geometry';
 import { makeTestMatch } from '../engine/testUtils';
 import { applyMatch, emptyProgress, migrate } from './progress';
@@ -75,6 +78,19 @@ describe('ストーリーの報酬', () => {
 });
 
 describe('ストーリーの内容', () => {
+  it('初期設定には補正せず、対策を変更すると各スタイルの弱点が実際の試合に反映される', () => {
+    for (const c of CHAPTERS) for (const o of c.opponents) {
+      const m = createMatch({ teams: [
+        { name: '自分', short: '自分', color: '#888', tactics: DEFAULT_TACTICS, skill: c.mySkill },
+        opponentSetup(o),
+      ], seed: 42 });
+      expect(m.skillNow[1]).toBeCloseTo(o.skill);
+      const solution = STAGES.find((s) => s.id === STYLE_STAGE[o.style])!.solution;
+      setTactics(m, 0, solution);
+      expect(m.skillNow[1]).toBeCloseTo(o.skill * (1 - STORY_WEAKNESS));
+    }
+  });
+
   it('章ごとに相手がいて、後の章ほど相手が強い', () => {
     const avg = CHAPTERS.map((c) => c.opponents.reduce((s, o) => s + o.skill, 0) / c.opponents.length);
     for (let i = 1; i < avg.length; i++) expect(avg[i]).toBeGreaterThan(avg[i - 1]);

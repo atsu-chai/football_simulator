@@ -1,0 +1,38 @@
+
+> football-tactics-simulator@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 /Users/ooshitaatsushinin/project/football_simulator
+
+ ✓ src/game/story.test.ts (10 tests) 77ms
+ ✓ src/game/progress.test.ts (14 tests) 66ms
+ ✓ src/engine/engine.test.ts (20 tests) 33413ms
+   ✓ 決定論 > 同じシードなら同じ試合になる 6309ms
+   ✓ 決定論 > シードが違えば試合は変わる 5244ms
+   ✓ オフサイド > 試合全体で数字が破綻しない 2107ms
+   ✓ 指標 > 保持率は合計100%になり、説明文が生成される 2105ms
+   ✓ 進行 > ハーフタイムで止まり resume で再開する 929ms
+   ✓ 進行 > スクリプトで相手の戦術が変わる 1997ms
+   ✓ 進行 > 全チームが1試合走り切れる 13125ms
+   ✓ 敗因の診断 > 負けた試合では悪かった点が挙がる 1556ms
+
+ Test Files  3 passed (3)
+      Tests  44 passed (44)
+   Start at  13:52:46
+   Duration  38.56s (transform 2.62s, setup 0ms, collect 6.59s, tests 33.56s, environment 6ms, prepare 2.12s)
+
+
+
+> football-tactics-simulator@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 63 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:   0.30 kB
+dist/assets/index-BDW5FJS_.css   12.71 kB │ gzip:   3.22 kB
+dist/assets/index-B06DLypS.js   271.30 kB │ gzip: 100.19 kB
+✓ built in 3.88s

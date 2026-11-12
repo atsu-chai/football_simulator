@@ -12,8 +12,8 @@ export const GOAL_H = 2.44;
 export const TICK = 0.1;
 /** 1試合のシミュレーション秒数。 */
 export const MATCH_SECONDS = 1200;
-/** 1倍速での再生倍率。実時間では約7分で1試合が終わる。 */
-export const BASE_PLAYBACK = 2.8;
+/** 1倍速での再生倍率。実時間では約11分46秒で1試合が終わる。 */
+export const BASE_PLAYBACK = 1.7;
 
 export type RoleId =
   | 'gk'
@@ -81,6 +81,8 @@ export interface Player {
   prev: Vec;
   vel: Vec;
   target: Vec;
+  /** 移動用の目標。戦術上の目標の細かな揺れを吸収する。 */
+  moveTarget: Vec;
   urgency: number;
   decideAt: number;
   stunnedUntil: number;
@@ -88,6 +90,8 @@ export interface Player {
   runTarget: Vec | null;
   nextSpotAt: number;
   spot: Vec | null;
+  /** サポート位置の基準となる保持者。-1 は絶対座標。 */
+  spotOwner: number;
   markTarget: number;
   pressing: boolean;
 }

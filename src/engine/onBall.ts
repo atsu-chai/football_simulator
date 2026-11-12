@@ -123,7 +123,7 @@ export function decideOnBall(m: MatchState, p: Player) {
     const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
     const longRange = d > 18 ? 0.05 + (d - 18) * 0.008 : 0;
     const inBox = rel.x > PITCH_W - 16.5 && Math.abs(rel.y - 34) < 20.16;
-    if (xg > 0.012 && d < 32) options.push({ score: xg * 6 + 0.2 + (inBox ? 0.07 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
+    if (xg > 0.012 && d < 32) options.push({ score: xg * 5.5 + 0.12 + (inBox ? 0.07 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
   }
 
   // パス

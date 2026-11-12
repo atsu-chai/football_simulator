@@ -91,11 +91,12 @@ export function attackerMove(m: MatchState, p: Player) {
 
   // ボール保持者の近くの数人は、短いパスを受けられる角度を作りに寄る
   if (hub && hub.team === side && hub.id !== p.id && isSupporter(m, p, hub)) {
-    if (m.t >= p.nextSpotAt || !p.spot || Math.hypot(p.spot.x, p.spot.y) > 20) {
-      p.nextSpotAt = m.t + 0.6 + m.rand() * 0.3;
+    if (m.t >= p.nextSpotAt || !p.spot || p.spotOwner !== hub.id) {
+      p.nextSpotAt = m.t + 1.2 + m.rand() * 0.4;
       const at = findSupportSpot(m, p, hub, base, lim);
       // 保持者からの相対位置で覚え、保持者が運んでも角度を保って付いていく
       p.spot = { x: at.x - hub.pos.x, y: at.y - hub.pos.y };
+      p.spotOwner = hub.id;
     }
     const tgt = toRel(side, { x: hub.pos.x + p.spot.x, y: hub.pos.y + p.spot.y });
     p.target = toAbs(side, { x: clamp(tgt.x, 2, Math.min(lim - 0.4, PITCH_W - 3)), y: clamp(tgt.y, 2, 66) });
@@ -106,9 +107,10 @@ export function attackerMove(m: MatchState, p: Player) {
   // 空いている場所を探して受ける
   const ballDist = dist(p.pos, m.ball.pos);
   if (ballDist < 32 && p.role !== 'cb') {
-    if (m.t >= p.nextSpotAt || (p.spot && Math.hypot(p.spot.x, p.spot.y) <= 20)) {
-      p.nextSpotAt = m.t + 0.5 + m.rand() * 0.3;
+    if (m.t >= p.nextSpotAt || !p.spot || p.spotOwner !== -1) {
+      p.nextSpotAt = m.t + 1.2 + m.rand() * 0.4;
       p.spot = findOpenSpot(m, p, base, lim);
+      p.spotOwner = -1;
     }
     if (p.spot) {
       p.target = p.spot;
@@ -167,7 +169,7 @@ function findSupportSpot(m: MatchState, p: Player, carrier: Player, base: Vec, l
         if (q.team === side && q.id !== p.id && q.id !== carrier.id && dist(q.pos, abs) < 9) crowd += 1;
       }
       const score = open * 0.5 + Math.min(lane, 6) * 0.7 + threat(cand) * 2.5 - crowd * 3
-        - dist(abs, p.pos) * 0.1 - dist(abs, base) * 0.1;
+        - dist(abs, p.pos) * 0.1 - dist(abs, base) * 0.1 - dist(abs, p.target) * 0.12;
       if (score > bestScore) {
         bestScore = score;
         best = abs;
@@ -198,7 +200,7 @@ function findOpenSpot(m: MatchState, p: Player, base: Vec, lim: number): Vec {
       if (o.team === side) continue;
       lane = Math.min(lane, pointToSegment(o.pos, ballPos, abs).d);
     }
-    const score = open * 0.5 + Math.min(lane, 6) * 0.6 + threat(c) * 7 - dist(abs, base) * 0.08;
+    const score = open * 0.5 + Math.min(lane, 6) * 0.6 + threat(c) * 7 - dist(abs, base) * 0.08 - dist(abs, p.target) * 0.12;
     if (score > bestScore) {
       bestScore = score;
       best = abs;

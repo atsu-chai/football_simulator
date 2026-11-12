@@ -1,33 +1,23 @@
 // ストーリーの各章が、初期設定のままでは厳しく、相手に合わせた戦術なら突破できるかを確かめる。
-// 使い方: npx tsx scripts/story.ts [試合数]
-import { DEFAULT_TACTICS, tactic } from '../src/data/formations';
-import { MY_COLOR } from '../src/data/stages';
-import { CHAPTERS, opponentSetup, StyleId } from '../src/data/story';
+// 使い方: npx tsx scripts/story.ts [試合数] [開始章] [終了章]
+import { DEFAULT_TACTICS } from '../src/data/formations';
+import { MY_COLOR, STAGES } from '../src/data/stages';
+import { CHAPTERS, opponentSetup, StyleId, STYLE_STAGE } from '../src/data/story';
 import { createMatch, runToEnd } from '../src/engine/match';
 import { Tactics } from '../src/engine/types';
 
 const N = Number(process.argv[2] ?? 40);
 const from = Number(process.argv[3] ?? 1);
-const mid = { pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'normal' } as const;
-// 各スタイルへの対策(ステージの模範解答に合わせた設定)
-const ANSWER: Record<StyleId, Tactics> = {
-  flat442: tactic({ formation: '3-5-2', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high' }),
-  diamond: tactic({ formation: '4-4-2', width: 'wide', fullbacks: 'overlap', ...mid }),
-  bus: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, width: 'wide', onLoss: 'counterpress', ...mid }),
-  counter: tactic({ formation: '4-1-2-1-2', fullbacks: 'stay', onLoss: 'counterpress', ...mid }),
-  hunters: tactic({ formation: '5-4-1', buildUp: 'long', onWin: 'counter', ...mid }),
-  wingbacks: tactic({ formation: '4-4-2', width: 'wide', ...mid }),
-  zone4231: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, ...mid }),
-  manmark: tactic({ formation: '4-2-3-1', roles: { 10: 'f9', 7: 'iw', 9: 'iw' }, fullbacks: 'overlap', tempo: 'fast', ...mid }),
-  falseNine: tactic({ formation: '4-4-2', compactness: 'tight', ...mid }),
-  positional: tactic({ formation: '3-5-2', compactness: 'tight', onWin: 'counter', ...mid }),
-  gegen: tactic({ formation: '5-3-2', buildUp: 'long', onWin: 'counter', ...mid }),
-};
+const to = Number(process.argv[4] ?? CHAPTERS.length);
+// ステージで検証した攻略戦術を使い、検証専用の対策が古いまま残るのを防ぐ。
+const answer = (style: StyleId) => STAGES.find((s) => s.id === STYLE_STAGE[style])!.solution;
 
-for (const c of CHAPTERS.filter((x) => x.id >= from)) {
+for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
+  const opponents = c.opponents.filter((o) => !process.env.STORY_STYLE || o.style === process.env.STORY_STYLE);
+  if (!opponents.length) continue;
   let ptsBase = 0, ptsAns = 0;
   const rows: string[] = [];
-  for (const o of c.opponents) {
+  for (const o of opponents) {
     const run = (t: Tactics) => {
       let w = 0, d = 0;
       for (let i = 0; i < N; i++) {
@@ -37,7 +27,7 @@ for (const c of CHAPTERS.filter((x) => x.id >= from)) {
       return { w: w / N, d: d / N };
     };
     const b = run(DEFAULT_TACTICS);
-    const a = run(ANSWER[o.style]);
+    const a = run(answer(o.style));
     // cup は引き分けを PK で五分とみなす
     const val = (r: { w: number; d: number }) => (c.format === 'cup' ? r.w + r.d / 2 : r.w * 3 + r.d);
     ptsBase += c.format === 'cup' ? Math.log(val(b)) : val(b);
