@@ -27,3 +27,15 @@ npm run dev
 | `npx tsx scripts/solve.ts <ステージ> 24 40` | 攻略の鍵を満たす戦術をランダムに作り、最もよく勝つ模範解答の候補を探す |
 
 エンジン(`src/engine/`)はDOMに依存せず、シードが同じなら同じ試合になります。
+
+選手の基準位置は、DFLの実測トラッキング7試合から抽出した匿名統計を使用します。ボール位置（12×8セル）、保持・非保持・奪取後・喪失後、フォーメーション系統と役割を条件に補間し、その上にライン高・幅・密集度・SB・役割の戦術変形と個別判断を重ねます。生の軌跡を再生する方式ではありません。
+
+出典: Bassek, M., Rein, R., Weber, H. & Memmert, D. (2025), *An integrated dataset of spatiotemporal and event data in elite soccer*, Scientific Data 12, 195. [論文](https://doi.org/10.1038/s41597-025-04505-y) / [DFL・IDSSEデータ](https://doi.org/10.6084/m9.figshare.28196177)。ライセンスは [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。`src/data/tracking.json` は座標の正規化、間引き、集約を行った派生物です。実在選手の氏名と生データは含みません。
+
+```bash
+# Python標準ライブラリだけで再抽出（元XMLはリポジトリ外に置く）
+python3 scripts/data/extract_tracking.py --input /path/to/idsse
+NODE_USE_SYSTEM_CA=0 node --import tsx scripts/compare-real.ts 6 --check
+```
+
+比較の定義・実行結果・残る差は [トラッキング検証記録](docs/validation/tracking/README.md) を参照してください。

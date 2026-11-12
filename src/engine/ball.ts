@@ -67,10 +67,12 @@ export function giveBall(m: MatchState, p: Player) {
   setPossession(m, p.team);
 }
 
-export function setPossession(m: MatchState, side: Side) {
+export function setPossession(m: MatchState, side: Side, openPlay = true) {
+  if (!openPlay) m.turnoverAt = -1e9;
   if (m.possession !== side) {
     m.possession = side;
     m.possessionSince = m.t;
+    if (openPlay) m.turnoverAt = m.t;
   }
 }
 
@@ -86,7 +88,7 @@ function startDead(m: MatchState, kind: DeadKind, team: Side, at: Vec, delay: nu
   b.vz = 0;
   b.z = 0;
   b.pos = { ...at };
-  setPossession(m, team);
+  setPossession(m, team, false);
   let taker = -1;
   let best = 1e9;
   for (const p of m.players) {
@@ -103,7 +105,7 @@ function startDead(m: MatchState, kind: DeadKind, team: Side, at: Vec, delay: nu
     }
   }
   m.dead = { kind, team, at: { ...at }, until: m.t + delay, maxUntil: m.t + delay + MAX_EXTRA_WAIT[kind], taker };
-  if (kind === 'corner') m.setPieceUntil = m.t + delay + MAX_EXTRA_WAIT.corner + 3;
+  m.setPieceUntil = kind === 'corner' ? m.t + delay + MAX_EXTRA_WAIT.corner + 3 : 0;
 }
 
 export function freeKick(m: MatchState, team: Side, at: Vec) {

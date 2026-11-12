@@ -18,7 +18,7 @@ export function attackerMove(m: MatchState, p: Player) {
     return;
   }
 
-  const sinceWin = m.t - m.possessionSince;
+  const sinceWin = m.t - m.turnoverAt;
   const counter = t.onWin === 'counter' && sinceWin < 6;
   const carrier = m.ball.owner >= 0 ? m.players[m.ball.owner] : null;
   // パスの移動中は、次にボールを持つ受け手を基準にサポートする

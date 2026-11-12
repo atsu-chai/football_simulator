@@ -1,3 +1,4 @@
+import { TRACKING_MOTION } from './tracking';
 import { FORMATIONS } from '../data/formations';
 import { assignMarks, teamDefense } from './defending';
 import { dist, mulberry32, relX, toAbs, toRel, vec } from './geometry';
@@ -53,7 +54,7 @@ export function createMatch(cfg: MatchConfig): MatchState {
     cfg, t: 0, half: 1, finished: false, atHalftime: false,
     players: makePlayers(cfg), ball,
     tactics: [{ ...cfg.teams[0].tactics }, { ...cfg.teams[1].tactics }],
-    possession: 0, possessionSince: 0, frames: [{ ...frame }, { ...frame }],
+    possession: 0, possessionSince: 0, turnoverAt: -1e9, frames: [{ ...frame }, { ...frame }],
     lineDrop: [0, 0], energy: [1, 1], lastLine: [30, 30], dead: null, setPieceUntil: 0, score: [0, 0],
     stats: [emptyStats(), emptyStats()], shots: [], events: [], frames_rec: [],
     firedScripts: new Set(), firedHints: new Set(), coachNextAt: 15,
@@ -77,7 +78,9 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
   m.ball.shot = null;
   m.possession = team;
   m.possessionSince = m.t;
+  m.turnoverAt = -1e9;
   m.lineDrop = [0, 0];
+  m.setPieceUntil = 0;
   updateLastLines(m);
   for (const p of m.players) {
     const slot = FORMATIONS[m.tactics[p.team].formation][p.slot];
@@ -98,6 +101,16 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
   const taker = m.players
     .filter((p) => p.team === team && (p.role === 'st' || p.role === 'f9' || p.role === 'am' || p.role === 'cm'))
     .sort((a, b) => relX(team, b.pos.x) - relX(team, a.pos.x))[0];
+  // キックオフは配置し直した状態から開始する。キッカーを後から瞬間移動させない。
+  taker.pos = vec(PITCH_W / 2, PITCH_H / 2);
+  taker.prev = { ...taker.pos };
+  taker.target = { ...taker.pos };
+  taker.moveTarget = { ...taker.pos };
+  for (const p of m.players) if (p.team !== team && dist(p.pos, taker.pos) < 9.15) {
+    const r = toRel(p.team, p.pos);
+    r.x = Math.min(r.x, PITCH_W / 2 - 9.15);
+    p.pos = toAbs(p.team, r); p.prev = { ...p.pos }; p.target = { ...p.pos }; p.moveTarget = { ...p.pos };
+  }
   m.dead = { kind: 'kickoff', team, at: vec(PITCH_W / 2, PITCH_H / 2), until: m.t + delay, maxUntil: m.t + delay, taker: taker.id };
   m.markingDirty = [true, true];
 }
@@ -135,9 +148,9 @@ function movePlayer(m: MatchState, p: Player) {
   const stunned = m.t < p.stunnedUntil;
   const isCarrier = m.ball.owner === p.id;
   const urgent = isCarrier || p.pressing || p.urgency >= 0.9;
-  // 追走・保持時は反応を優先し、持ち場の調整は約0.5秒かけて追従する。
+  // 追走・保持時は反応を優先し、持ち場の調整は実測の横移動の遅れに応じて平滑化する。
   const target = p.moveTarget;
-  const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : 0.5));
+  const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : TRACKING_MOTION.response));
   if (dist(target, p.target) > (urgent ? 0.15 : 0.7)) {
     target.x += (p.target.x - target.x) * blend;
     target.y += (p.target.y - target.y) * blend;
@@ -155,7 +168,9 @@ function movePlayer(m: MatchState, p: Player) {
     // 守備者がすぐ近くにいる時は、ボールを守りながらなので速く運べない
     else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
   }
-  const top = (isCarrier ? carry : 1 + 6.6 * p.urgency ** 6) * (stunned ? 0.35 : 1);
+  // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
+  const recovery = Math.min(TRACKING_MOTION.running, 0.65 + d * 0.26) * (0.7 + p.urgency * 0.3);
+  const top = (isCarrier ? carry : urgent ? 1 + (TRACKING_MOTION.sprint - 1) * p.urgency ** 4.5 : recovery) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
   // 到着前に減速する。位置の微調整で走り続けない。
   const remaining = Math.max(0, d - (urgent ? 0.15 : 0.8));
@@ -176,7 +191,7 @@ function movePlayer(m: MatchState, p: Player) {
   // 加速・旋回を制限する。押し戻しを足しても最高速度を超えない。
   const desired = Math.hypot(vx, vy);
   if (desired > top * tired) { vx *= top * tired / desired; vy *= top * tired / desired; }
-  const maxDv = (urgent ? 3.5 : 2.5) * TICK;
+  const maxDv = (urgent ? TRACKING_MOTION.acceleration : TRACKING_MOTION.adjustmentAcceleration) * TICK;
   const ax = vx - p.vel.x;
   const ay = vy - p.vel.y;
   const a = Math.hypot(ax, ay);
@@ -213,6 +228,7 @@ function stepDead(m: MatchState) {
     taker.pos = { ...d.at };
     taker.prev = { ...d.at };
     m.ball.pos = { ...d.at };
+    m.setPieceUntil = d.kind === 'corner' ? m.t + 3 : 0;
     m.dead = null;
     restartWith(m, taker);
     if (d.kind === 'goalkick') taker.decideAt = m.t + 0.1;
@@ -235,6 +251,7 @@ const BOX_SPOTS: Vec[] = [
 ];
 
 function setPieceTarget(m: MatchState, p: Player, kind: string): Vec | null {
+  if (kind === 'kickoff') return { ...p.target };
   if (kind !== 'corner' && m.t >= m.setPieceUntil) return null;
   if (p.role === 'gk') return null;
   const t = m.tactics[p.team];

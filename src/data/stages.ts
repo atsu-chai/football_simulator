@@ -72,7 +72,7 @@ export const STAGES: Stage[] = [
   {
     id: 3, title: 'ハーフスペースの鍵', concept: 'ハーフスペース攻略',
     opponent: opp('セブン・ウォール', { formation: '5-4-1', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.3),
-    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'long', tempo: 'slow', width: 'wide', fullbacks: 'overlap', pressHeight: 'high', onLoss: 'counterpress' }),
+    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, buildUp: 'long', tempo: 'slow', width: 'wide', fullbacks: 'stay', pressHeight: 'mid', onLoss: 'counterpress' }),
     brief: '相手は5-4-1のブロックで中央を固め、奪えば速攻を狙います。5バックの間、ハーフスペースが崩しの入口です。',
     scouting: ['最終ラインが5枚で、背後のスペースは小さい', '中盤4枚と最終ラインの間は狭いが空く', '奪われると1トップへ素早く長いボールが来る'],
     hints: ['ウイングを「インサイドWG」にして、5バックの間(ハーフスペース)に立たせよう', '幅を「広い」にしてSBで大外を取り、内側のレーンを広げよう', '奪われたら即時奪回。相手の速攻を出させない'],
@@ -289,7 +289,7 @@ export function lessonSkillMod(id: number, weakness: number): TeamSetup['skillMo
 }
 for (const s of STAGES) {
   // 攻略の鍵の効果が出にくい相手は、弱点を強めて学びと結果を結び付ける。
-  const overrides: Record<number, number> = { 1: 0.85, 2: 0.75, 3: 0.75, 5: 0.8, 6: 0.8, 7: 0.8, 8: 0.75, 9: 0.85, 10: 0.9, 11: 0.85, 12: 0.9 };
+  const overrides: Record<number, number> = { 1: 0.85, 2: 0.75, 3: 0.8, 4: 0.8, 5: 0.9, 6: 0.8, 7: 0.8, 8: 0.75, 9: 0.85, 10: 0.9, 11: 0.85, 12: 0.9 };
   const weakness = overrides[s.id] ?? WEAKNESS;
   s.opponent.skillMod = lessonSkillMod(s.id, weakness);
 }

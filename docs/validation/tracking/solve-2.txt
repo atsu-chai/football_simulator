@@ -1,0 +1,5 @@
+STAGE 2 base 50
+  W90 gap 40 g2.80 {"formation":"5-4-1","buildUp":"short","tempo":"fast","width":"wide","fullbacks":"stay","pressHeight":"high","pressIntensity":"normal","lineHeight":"high","compactness":"normal","onLoss":"regroup","onWin":"keep"}
+  W85 gap 35 g2.95 {"formation":"4-3-3","buildUp":"short","tempo":"normal","width":"wide","fullbacks":"stay","pressHeight":"high","pressIntensity":"high","lineHeight":"high","compactness":"normal","onLoss":"counterpress","onWin":"counter"}
+  W80 gap 30 g2.75 {"formation":"3-4-3","buildUp":"short","tempo":"slow","width":"wide","fullbacks":"stay","pressHeight":"high","pressIntensity":"high","lineHeight":"high","compactness":"normal","onLoss":"counterpress","onWin":"keep"}
+  W70 gap 20 g4.40 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw"},"buildUp":"long","tempo":"fast","width":"wide","fullbacks":"invert","pressHeight":"high","pressIntensity":"normal","lineHeight":"high","compactness":"normal","onLoss":"counterpress","onWin":"counter"}

@@ -1,0 +1,24 @@
+
+> football-tactics-simulator@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 /Users/ooshitaatsushinin/project/football_simulator
+
+ ✓ src/engine/tracking.test.ts (4 tests) 33ms
+ ✓ src/game/story.test.ts (10 tests) 14ms
+ ✓ src/game/progress.test.ts (14 tests) 15ms
+ ✓ src/engine/engine.test.ts (20 tests) 6492ms
+   ✓ 決定論 > 同じシードなら同じ試合になる 927ms
+   ✓ 決定論 > シードが違えば試合は変わる 761ms
+   ✓ オフサイド > 試合全体で数字が破綻しない 393ms
+   ✓ 指標 > 保持率は合計100%になり、説明文が生成される 417ms
+   ✓ 進行 > スクリプトで相手の戦術が変わる 409ms
+   ✓ 進行 > 全チームが1試合走り切れる 3015ms
+   ✓ 敗因の診断 > 負けた試合では悪かった点が挙がる 369ms
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  21:15:47
+   Duration  7.00s (transform 365ms, setup 0ms, collect 942ms, tests 6.55s, environment 0ms, prepare 234ms)
+

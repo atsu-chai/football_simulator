@@ -1,0 +1,8 @@
+DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-J03WMX.xml sampled {'firstHalf': 9402, 'secondHalf': 7572}
+DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-J03WN1.xml sampled {'firstHalf': 10257, 'secondHalf': 7572}
+DFL_04_03_positions_raw_observed_DFL-COM-000002_DFL-MAT-J03WOH.xml sampled {'firstHalf': 17794, 'secondHalf': 14363}
+DFL_04_03_positions_raw_observed_DFL-COM-000002_DFL-MAT-J03WOY.xml sampled {'firstHalf': 25301, 'secondHalf': 22040}
+DFL_04_03_positions_raw_observed_DFL-COM-000002_DFL-MAT-J03WPY.xml sampled {'firstHalf': 34510, 'secondHalf': 29053}
+DFL_04_03_positions_raw_observed_DFL-COM-000002_DFL-MAT-J03WQQ.xml sampled {'firstHalf': 43911, 'secondHalf': 31751}
+DFL_04_03_positions_raw_observed_DFL-COM-000002_DFL-MAT-J03WR9.xml sampled {'firstHalf': 52752, 'secondHalf': 39923}
+written src/data/tracking.json 140914 bytes

@@ -261,6 +261,8 @@ export interface MatchState {
   tactics: [Tactics, Tactics];
   possession: Side;
   possessionSince: number;
+  /** インプレー中に保持が相手から移った時刻。再開は含めない。 */
+  turnoverAt: number;
   frames: [TeamFrame, TeamFrame];
   lineDrop: [number, number];
   /** チームの体力(1→0)。プレスで減り、選手の速度が落ちる。 */

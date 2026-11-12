@@ -1,0 +1,5 @@
+STAGE 3 base 50
+  W90 gap 40 g2.25 {"formation":"4-3-3","roles":{"8":"iw","9":"f9","10":"iw"},"buildUp":"long","tempo":"slow","width":"wide","fullbacks":"stay","pressHeight":"mid","pressIntensity":"normal","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"keep"}
+  W70 gap 20 g2.25 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw"},"buildUp":"long","tempo":"fast","width":"wide","fullbacks":"overlap","pressHeight":"high","pressIntensity":"high","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"keep"}
+  W65 gap 15 g3.55 {"formation":"3-4-2-1","buildUp":"mixed","tempo":"normal","width":"wide","fullbacks":"stay","pressHeight":"high","pressIntensity":"normal","lineHeight":"high","compactness":"normal","onLoss":"counterpress","onWin":"counter"}
+  W60 gap 10 g1.90 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw","10":"f9"},"buildUp":"short","tempo":"slow","width":"wide","fullbacks":"invert","pressHeight":"mid","pressIntensity":"high","lineHeight":"normal","compactness":"tight","onLoss":"counterpress","onWin":"keep"}

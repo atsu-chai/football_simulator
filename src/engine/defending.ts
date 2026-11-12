@@ -13,7 +13,7 @@ export function teamDefense(m: MatchState, side: Side) {
   const ball = toRel(side, m.ball.pos);
   const opp = (1 - side) as Side;
   const carrier = m.ball.owner >= 0 ? m.players[m.ball.owner] : null;
-  const since = m.t - m.possessionSince;
+  const since = m.t - m.turnoverAt;
   const team = m.players.filter((p) => p.team === side);
 
   // ボール保持者がフリーで前を向いていれば、最終ラインは下がる。

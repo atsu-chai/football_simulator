@@ -1,5 +1,6 @@
 // 固定シードで移動を計測する。距離は圧縮された90分への換算値と実際の移動距離を併記する。
 // 使い方: npx tsx scripts/movement.ts [試合数] [--check]
+import tracking from '../src/data/tracking.json';
 import { tactic } from '../src/data/formations';
 import { createMatch, resume, step } from '../src/engine/match';
 import { BASE_PLAYBACK, MATCH_SECONDS, TICK } from '../src/engine/types';
@@ -38,4 +39,6 @@ for (let seed = 0; seed < n; seed++) {
 const mean = distance / (ticks * TICK);
 const result = { matches: n, playback: BASE_PLAYBACK, minutesPerMatch: MATCH_SECONDS / BASE_PLAYBACK / 60, meanSpeed: mean, screenSpeed: mean * BASE_PLAYBACK, sprintPct: 100 * sprint / ticks, walkStandPct: 100 * slow / ticks, standPct: 100 * stand / ticks, turnsPerSimMinute: turns / (ticks * TICK / 60), meanAcceleration: acceleration / ticks, targetJumpsPerSimMinute: jumps / (ticks * TICK / 60), motionTargetJumpsPerSimMinute: motionJumps / (ticks * TICK / 60), kmPer90Equivalent: allDistance / (allTicks * TICK) * 5400 / 1000, kmActuallyPerMatch: allDistance / (n * 20) / 1000 };
 console.log(JSON.stringify({ ...result, players: perPlayer.flatMap((p, id) => p.ticks ? [{ id, meanSpeed: p.distance / (p.ticks * TICK), kmPer90Equivalent: p.distance / (p.ticks * TICK) * 5.4 }] : []) }, null, 2));
-if (process.argv.includes('--check') && (result.screenSpeed > 5 || result.meanAcceleration > 3 || result.sprintPct > 3 || result.walkStandPct < 50 || result.kmPer90Equivalent > 13)) process.exitCode = 1;
+// 粗い破綻の検知。実測への一致判定ではない。総距離の差はcompare-realで別に報告する。
+// 旧来の歩行・静止50%以上という条件は、今回の実測44.6%自体を落としてしまうため置き換える。
+if (process.argv.includes('--check') && (result.screenSpeed > 5 || result.meanAcceleration > 3 || result.sprintPct > 3 || Math.abs(result.meanSpeed / tracking.kinematics.meanSpeed - 1) > 0.25 || result.kmPer90Equivalent > tracking.kinematics.distanceKmPer90 * 1.4)) process.exitCode = 1;

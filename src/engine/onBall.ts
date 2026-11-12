@@ -5,7 +5,8 @@ import { addEvent, gameMinute } from './events';
 import { offsideLimit } from './teamShape';
 
 const SPRINT = 7.6;
-export const XG_SCALE = 1.3;
+// 実測のブロック配置へ置き換えた後の試合集計で、シュートの期待値を再校正する。
+export const XG_SCALE = 1.55;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -104,7 +105,7 @@ export function decideOnBall(m: MatchState, p: Player) {
   const rel = toRel(side, p.pos);
   const pressure = nearestOpp(m, side, p.pos);
   const sinceWin = m.t - m.possessionSince;
-  const counter = t.onWin === 'counter' && sinceWin < 6;
+  const counter = t.onWin === 'counter' && m.t - m.turnoverAt < 6;
   const safeMode = t.onWin === 'keep' && sinceWin < 4;
   const skill = m.skillNow[side];
   const noise = (0.016 + (pressure < 3 ? 0.03 : 0)) / skill;
