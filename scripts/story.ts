@@ -1,5 +1,6 @@
 // ストーリーの各章が、初期設定のままでは厳しく、相手に合わせた戦術なら突破できるかを確かめる。
 // 使い方: npx tsx scripts/story.ts [試合数] [開始章] [終了章]
+import { writeFileSync } from 'node:fs';
 import { DEFAULT_TACTICS } from '../src/data/formations';
 import { MY_COLOR, STAGES } from '../src/data/stages';
 import { CHAPTERS, opponentSetup, StyleId, STYLE_STAGE } from '../src/data/story';
@@ -12,6 +13,7 @@ const to = Number(process.argv[4] ?? CHAPTERS.length);
 // ステージで検証した攻略戦術を使い、検証専用の対策が古いまま残るのを防ぐ。
 const answer = (style: StyleId) => STAGES.find((s) => s.id === STYLE_STAGE[style])!.solution;
 
+const results = [];
 for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
   const opponents = c.opponents.filter((o) => !process.env.STORY_STYLE || o.style === process.env.STORY_STYLE);
   if (!opponents.length) continue;
@@ -53,4 +55,7 @@ for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
   console.log(`第${c.id}章 ${c.league}: 初期 ${fmt(ptsBase)} | 対策 ${fmt(ptsAns)}`);
   if (!process.env.STORY_STYLE) console.log(`  章突破率(独立分布による推計): 初期 ${(100 * clear(ptsBase, distBase)).toFixed(1)}% / 対策 ${(100 * clear(ptsAns, distAns)).toFixed(1)}%`);
   rows.forEach((r) => console.log(r));
+  results.push({ chapter: c.id, league: c.league, target: c.target, base: clear(ptsBase, distBase), answer: clear(ptsAns, distAns), ptsBase, ptsAns, distBase, distAns });
 }
+
+if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N, results }, null, 2) + '\n');

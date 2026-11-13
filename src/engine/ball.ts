@@ -104,6 +104,10 @@ function startDead(m: MatchState, kind: DeadKind, team: Side, at: Vec, delay: nu
       taker = p.id;
     }
   }
+  // 実測は停止時間44.6%、停止中平均1.12m/s。配置が整った瞬間に毎回再開せず、
+  // ボールの回収・セットを待つ。インプレーの速度を落として距離だけ合わせない。
+  const setup = { kickoff: 1, throw: 14, free: 16, goalkick: 20, corner: 18 }[kind];
+  delay = Math.max(delay, setup);
   m.dead = { kind, team, at: { ...at }, until: m.t + delay, maxUntil: m.t + delay + MAX_EXTRA_WAIT[kind], taker };
   m.setPieceUntil = kind === 'corner' ? m.t + delay + MAX_EXTRA_WAIT.corner + 3 : 0;
 }

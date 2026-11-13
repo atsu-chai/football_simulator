@@ -31,7 +31,7 @@ export function teamDefense(m: MatchState, side: Side) {
   if (ball.x < reach) pressers = Math.max(1, PRESS_COUNT[t.pressIntensity] - (energy < 0.45 ? 1 : 0) - (energy < 0.2 ? 1 : 0));
   // ゴール前では引いたチームでも、シュートコースを消しに寄せる
   if (ball.x < 32) pressers = Math.max(pressers, 1);
-  const transition = since < 3.5;
+  const transition = since < 3;
   if (transition && t.onLoss === 'counterpress') pressers = 3;
   else if (transition && t.onLoss === 'regroup' && ball.x > 38) pressers = Math.min(pressers, 1);
   if (m.ball.owner < 0 && !m.ball.pass) pressers = Math.max(pressers, 1);
@@ -42,7 +42,7 @@ export function teamDefense(m: MatchState, side: Side) {
     .sort((a, b) => a.d - b.d);
   const pressSet = new Set<number>();
   for (let i = 0; i < ranked.length && pressSet.size < pressers; i++) {
-    const limit = transition && t.onLoss === 'counterpress' ? 14 : 24;
+    const limit = transition && t.onLoss === 'counterpress' ? 22 : 24;
     if (ranked[i].d < limit || i === 0) pressSet.add(ranked[i].p.id);
   }
 
@@ -60,7 +60,13 @@ export function teamDefense(m: MatchState, side: Side) {
       continue;
     }
     p.pressing = false;
-    defenderMove(m, p);
+    if (transition) {
+      // 即時奪回は近い3人が追い、残りもボール側の出口を閉じる。帰陣も散開せずブロックへ戻る。
+      const base = toRel(side, shapeTarget(m, p));
+      const close = t.onLoss === 'counterpress' ? 0.6 : 0.45;
+      p.target = toAbs(side, { x: Math.min(base.x, base.x + (ball.x - 5 - base.x) * close), y: base.y + (ball.y - base.y) * close });
+      p.urgency = dist(p.pos, p.target) > 6 ? 0.94 : 0.75;
+    } else defenderMove(m, p);
   }
 
   // 最終ラインを横一線に揃える。誰かが下がれば全員下がり、裏で相手をオンサイドにしない
@@ -96,7 +102,7 @@ function defenderMove(m: MatchState, p: Player) {
     const dx = -1.8;
     const dy = (34 - oRel.y) * 0.04 + (ball.y - oRel.y) * 0.05;
     p.target = toAbs(side, { x: clamp(oRel.x + dx, 2, PITCH_W - 2), y: clamp(oRel.y + dy, 2, 66) });
-    p.urgency = 0.95;
+    p.urgency = dist(p.pos, p.target) > 12 ? 0.9 : 0.72;
     return;
   }
 

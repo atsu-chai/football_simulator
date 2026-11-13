@@ -20,7 +20,7 @@ function computeFrame(m: MatchState, side: Side): TeamFrame {
   // スロットの端が0/1でないことと、サポート・寄せによる縮みを全試合比較で補正する。
   const base = learnedShape(t.formation, trackingPhase(m, side), ball.x, ball.y);
   // データの基準形に戦術の変形を重ねる。守備ラインとプレス開始位置は別々に調整する。
-  let line = base[1] + (hasBall ? 3 : 2) + LINE_ADJ[t.lineHeight] * (hasBall ? 0.8 : 1);
+  let line = base[1] + (hasBall ? (trackingPhase(m, side) === 'win' ? 5 : 3) : 2) + LINE_ADJ[t.lineHeight] * (hasBall ? 0.8 : 1);
   if (!hasBall) line += PRESS_ADJ[t.pressHeight] - m.lineDrop[side];
   line = hasBall ? clamp(line, 8, 65) : clamp(line, 5, Math.max(5, Math.min(65, ball.x - 1.5)));
   const opponent = m.tactics[(1 - side) as Side];
@@ -127,7 +127,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         break;
       }
       case 'dm':
-        x = Math.min(x, f.line + 15);
+        x = Math.min(x + 8, f.line + 26);
         break;
       case 'cm':
         x += 5;

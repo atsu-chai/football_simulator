@@ -12,7 +12,7 @@ const play = (s: StoryState, rs: MatchResult[]) => rs.reduce((acc, r) => recordS
 
 describe('ストーリーの進行', () => {
   it('JFL で目標の勝ち点に届けば J3 へ進む', () => {
-    const r = play(emptyStory(), ['W', 'W', 'D', 'L']);
+    const r = play(emptyStory(), ['W', 'W', 'L', 'L']);
     expect(r.event.kind).toBe('cleared');
     expect(r.next.chapter).toBe(2);
     expect(r.next.results).toEqual([]);
@@ -26,9 +26,9 @@ describe('ストーリーの進行', () => {
   });
 
   it('残り試合で届かなくなった時点で失敗が決まる', () => {
-    const r = play(emptyStory(), ['L', 'L']);
+    const r = play(emptyStory(), ['L', 'L', 'L']);
     expect(r.event.kind).toBe('failed');
-    expect(leagueStatus(CHAPTERS[0], ['L']).dead).toBe(false);
+    expect(leagueStatus(CHAPTERS[0], ['L', 'L']).dead).toBe(false);
   });
 
   it('勝ち抜き戦は負けたら終わり、全勝で優勝', () => {

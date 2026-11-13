@@ -46,7 +46,7 @@ def main():
     team_cells = defaultdict(Mean); grids = defaultdict(Mean); roles = defaultdict(Mean); metrics = defaultdict(Mean)
     hist = defaultdict(lambda: [0]*121); bands = [0]*6; manifest = []; formation_counts = defaultdict(int)
     counts = defaultdict(int); acceleration = [0]*121; positive_accel = [0]*121; negative_accel = [0]*121; turns = [0]*181; role_motion = defaultdict(Mean)
-    restarts = defaultdict(Mean); full_motion = defaultdict(Mean); lag_pairs = [Mean() for _ in range(16)]; exclusions = defaultdict(int)
+    restarts = defaultdict(Mean); full_motion = defaultdict(Mean); status_motion = defaultdict(Mean); lag_pairs = [Mean() for _ in range(16)]; exclusions = defaultdict(int)
     paths = sorted(root.glob('DFL_04_03*.xml'))
     if not paths: ap.error('入力ディレクトリにトラッキングXMLがありません')
     for path in paths:
@@ -117,7 +117,10 @@ def main():
                         prev_v = (vx,vy)
                     else: prev_v = None
                     frames[n].append((tid,role,x,y,s,a,turn)); prev = (n,x,y,s)
-                    if role != 'gk' and abs(x)<53 and abs(y)<35: full_motion[role].add([s])
+                    if role != 'gk' and abs(x)<53 and abs(y)<35:
+                        full_motion[role].add([s])
+                        status = ball_frames.get(n)
+                        if status is not None: status_motion['live' if status[3] else 'dead'].add([s])
             last = None; changed = -1e9; last_n = -100; valid = 0; lateral = {}
             for n,b in sorted(ball_frames.items()):
                 bx,by,pos,active,timestamp = b
@@ -216,7 +219,7 @@ def main():
         'cells':{'|'.join(map(str,k)):[v.n,*v.result()] for k,v in sorted(grids.items())},
         'roles':{'|'.join(k):[v.n,*v.result()] for k,v in sorted(roles.items())},
         'validation':{k:{'n':v.n,'values':v.result()} for k,v in sorted(metrics.items())},
-        'kinematics':{'bands':BANDS,'shares':[round(n/sum(bands),5) for n in bands], 'meanSpeed':round(sum(v.s[0] for v in role_motion.values())/sum(v.n for v in role_motion.values()),4),'distanceKmPer90':round(sum(v.s[0] for v in full_motion.values())/sum(v.n for v in full_motion.values())*5.4,4),'fullDistanceByRole':{r:round(v.result()[0]*5.4,3) for r,v in full_motion.items()},'responseLagSeconds':round(best_lag,2),'responseCorrelation':[round(v,4) for v in correlations],'speedP999':quantile(hist['speed'],.999),'speedP95':quantile(hist['speed'],.95),'speedP99':quantile(hist['speed'],.99),'accelP90':quantile(acceleration,.90),'accelP99':quantile(acceleration,.99),'positiveAccelP90':quantile(positive_accel,.9),'decelerationP90':quantile(negative_accel,.9),'turnP90DegreesPerSample':quantile(turns,.9,1),'byRole':{r:v.result()[0] for r,v in sorted(role_motion.items())}},
+        'kinematics':{'statusMotion':{k:{'n':v.n,'meanSpeed':v.result()[0]} for k,v in status_motion.items()},'bands':BANDS,'shares':[round(n/sum(bands),5) for n in bands], 'meanSpeed':round(sum(v.s[0] for v in role_motion.values())/sum(v.n for v in role_motion.values()),4),'distanceKmPer90':round(sum(v.s[0] for v in full_motion.values())/sum(v.n for v in full_motion.values())*5.4,4),'fullDistanceByRole':{r:round(v.result()[0]*5.4,3) for r,v in full_motion.items()},'responseLagSeconds':round(best_lag,2),'responseCorrelation':[round(v,4) for v in correlations],'speedP999':quantile(hist['speed'],.999),'speedP95':quantile(hist['speed'],.95),'speedP99':quantile(hist['speed'],.99),'accelP90':quantile(acceleration,.90),'accelP99':quantile(acceleration,.99),'positiveAccelP90':quantile(positive_accel,.9),'decelerationP90':quantile(negative_accel,.9),'turnP90DegreesPerSample':quantile(turns,.9,1),'byRole':{r:v.result()[0] for r,v in sorted(role_motion.items())}},
         'restarts':{k:{'n':v.n,'lengthWidth':v.result()} for k,v in restarts.items()}}
     out = Path(args.output); out.parent.mkdir(parents=True,exist_ok=True)
     out.write_text(json.dumps(output,ensure_ascii=False,separators=(',',':'))+'\n')

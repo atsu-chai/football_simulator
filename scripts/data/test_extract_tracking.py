@@ -36,6 +36,8 @@ class TrackingExtractionTest(unittest.TestCase):
             subprocess.run([sys.executable,str(SCRIPT),'--input',str(root),'--output',str(output)],check=True,capture_output=True)
             data = json.loads(output.read_text())
             self.assertEqual(data['kinematics']['meanSpeed'],2)
+            self.assertEqual(data['kinematics']['statusMotion']['dead'], {'n':20,'meanSpeed':2})
+            self.assertEqual(data['kinematics']['statusMotion']['live'], {'n':600,'meanSpeed':2})
             self.assertAlmostEqual(data['kinematics']['distanceKmPer90'],10.8)
             self.assertEqual(data['excluded']['deadOrUnknown'],1)
             self.assertEqual(data['samples']['firstHalf'],30)

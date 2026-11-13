@@ -60,7 +60,7 @@ export const STAGES: Stage[] = [
   },
   {
     id: 2, title: '幅で揺さぶる', concept: '幅とサイドチェンジ',
-    opponent: opp('ダイヤモンド・シティ', { formation: '4-1-2-1-2', width: 'narrow', compactness: 'tight' }, 1.2),
+    opponent: opp('ダイヤモンド・シティ', { formation: '4-1-2-1-2', width: 'narrow', compactness: 'tight' }, 1.6),
     solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'long', tempo: 'fast', width: 'wide', fullbacks: 'invert', pressHeight: 'high', lineHeight: 'high', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は中央に人を集めるダイヤモンド型。その代わり、サイドには人がいません。',
     scouting: ['中央に5人以上が密集する', 'サイドを守るのはSBだけ', '横に振ると中盤のスライドが間に合わない'],
@@ -104,11 +104,11 @@ export const STAGES: Stage[] = [
   },
   {
     id: 6, title: 'ウイングバックの裏', concept: '幅の守備の弱点',
-    opponent: opp('トライデント', { formation: '3-5-2', pressHeight: 'mid' }, 1.25),
-    solution: tactic({ formation: '4-4-2', buildUp: 'long', width: 'wide', fullbacks: 'invert', pressHeight: 'high', pressIntensity: 'high', compactness: 'tight', onLoss: 'counterpress' }),
+    opponent: opp('トライデント', { formation: '3-5-2', pressHeight: 'mid' }, 1.6),
+    solution: tactic({ formation: '5-3-2', buildUp: 'short', tempo: 'fast', width: 'wide', fullbacks: 'invert', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は3バック。大外を守るのはウイングバック1人で、その背後はCBが見るには遠い場所です。',
     scouting: ['WBが高い位置を取ると、その裏が空く', 'CB3枚の幅は広くない', '中盤は3枚で厚い'],
-    hints: ['4-4-2のウイングを大外に張らせて、幅を「広い」にしよう', '相手のCB3枚を横に広げ、2トップで間を突く', '中盤より前で奪えばWBの裏は空いたまま'],
+    hints: ['ウイングやWBを大外に張らせて、幅を「広い」にしよう', '相手のCB3枚を横に広げ、2トップで間を突く', '中盤より前で奪えばWBの裏は空いたまま'],
     lessonWin: '3バックの弱点はCBの外側です。WBが出た瞬間にそこを突けば、CBが引き出されて中央も空きます。',
     objectives: [shots(12), margin2],
     coachHints: [{ id: 'st6', when: 'wingFree', text: 'WBの背後が空きました。ここへ出せばCBが釣り出されます。', overlay: 'space' }],
@@ -146,7 +146,7 @@ export const STAGES: Stage[] = [
   },
   {
     id: 10, title: '5レーンを塞ぐ', concept: '3-2-5への対抗',
-    opponent: opp('ファイブ・レーンズ', { formation: '4-3-3', fullbacks: 'invert', width: 'wide', pressHeight: 'high', lineHeight: 'high', onLoss: 'counterpress', buildUp: 'short' }, 1.45),
+    opponent: opp('ファイブ・レーンズ', { formation: '4-3-3', fullbacks: 'invert', width: 'wide', pressHeight: 'high', lineHeight: 'high', onLoss: 'counterpress', buildUp: 'short' }, 1.8),
     solution: tactic({ formation: '3-4-2-1', buildUp: 'long', fullbacks: 'overlap', pressHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は攻撃時に5レーンすべてへ人を置きます。4バックでは大外とハーフスペースを同時に守り切れません。',
     scouting: ['SBが内側に入り、後方は3-2の形になる', '前線5人が全レーンに立つ', 'ボールを失うと後方は5人だけ'],
@@ -289,7 +289,7 @@ export function lessonSkillMod(id: number, weakness: number): TeamSetup['skillMo
 }
 for (const s of STAGES) {
   // 攻略の鍵の効果が出にくい相手は、弱点を強めて学びと結果を結び付ける。
-  const overrides: Record<number, number> = { 1: 0.85, 2: 0.75, 3: 0.8, 4: 0.8, 5: 0.9, 6: 0.8, 7: 0.8, 8: 0.75, 9: 0.85, 10: 0.9, 11: 0.85, 12: 0.9 };
+  const overrides: Record<number, number> = { 1: 0.85, 2: 0.93, 3: 0.8, 4: 0.8, 5: 0.9, 6: 0.95, 7: 0.8, 8: 0.75, 9: 0.85, 10: 0.9, 11: 0.85, 12: 0.95 };
   const weakness = overrides[s.id] ?? WEAKNESS;
   s.opponent.skillMod = lessonSkillMod(s.id, weakness);
 }

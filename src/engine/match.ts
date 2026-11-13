@@ -147,7 +147,7 @@ function movePlayer(m: MatchState, p: Player) {
   p.prev = { ...p.pos };
   const stunned = m.t < p.stunnedUntil;
   const isCarrier = m.ball.owner === p.id;
-  const urgent = isCarrier || p.pressing || p.urgency >= 0.9;
+  const urgent = !m.dead && (isCarrier || p.pressing || p.urgency >= 0.9);
   // 追走・保持時は反応を優先し、持ち場の調整は実測の横移動の遅れに応じて平滑化する。
   const target = p.moveTarget;
   const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : TRACKING_MOTION.response));
@@ -169,11 +169,14 @@ function movePlayer(m: MatchState, p: Player) {
     else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
   }
   // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
-  const recovery = Math.min(TRACKING_MOTION.running, 0.65 + d * 0.26) * (0.7 + p.urgency * 0.3);
-  const top = (isCarrier ? carry : urgent ? 1 + (TRACKING_MOTION.sprint - 1) * p.urgency ** 4.5 : recovery) * (stunned ? 0.35 : 1);
+  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : 0.23)) * (0.7 + p.urgency * 0.3);
+  // 裏抜け・パスへの追走だけスプリントし、寄せや帰陣の高緊急度と区別する。
+  const sprintAction = p.runTarget !== null || m.ball.pass?.to === p.id;
+  const chaseSpeed = (sprintAction ? TRACKING_MOTION.sprint : 5.8) * p.urgency;
+  const top = (isCarrier ? carry : urgent ? chaseSpeed : recovery) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
   // 到着前に減速する。位置の微調整で走り続けない。
-  const remaining = Math.max(0, d - (urgent ? 0.15 : 0.8));
+  const remaining = Math.max(0, d - (urgent || m.dead?.taker === p.id ? 0.15 : m.dead ? 0.8 : 1.2));
   const speed = Math.min(top * tired, remaining * (urgent ? 2.2 : 1.2), Math.sqrt(2 * 3 * remaining));
   let vx = d > 0.05 ? (dx / d) * speed : 0;
   let vy = d > 0.05 ? (dy / d) * speed : 0;

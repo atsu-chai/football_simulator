@@ -27,6 +27,16 @@ export function attackerMove(m: MatchState, p: Player) {
   const rel = toRel(side, p.pos);
   const lim = offsideLimit(m, side);
 
+  // 奪取直後は守備の密集を保つ。速攻だけ前線が出口を作り、保持では近くの支援を残す。
+  if (sinceWin < 3) {
+    const b = toRel(side, base);
+    const forward = p.role === 'st' || p.role === 'wg' || p.role === 'iw' || p.role === 'am';
+    p.runTarget = null; p.spot = null;
+    p.target = toAbs(side, { x: Math.min(lim - 0.5, b.x + (counter && forward ? 10 : 0)), y: b.y });
+    p.urgency = counter && forward ? 0.95 : 0.78;
+    return;
+  }
+
   // 走り出している選手
   if (p.runTarget && p.runUntil > m.t) {
     p.target = p.runTarget;
@@ -99,8 +109,10 @@ export function attackerMove(m: MatchState, p: Player) {
       p.spotOwner = hub.id;
     }
     const tgt = toRel(side, { x: hub.pos.x + p.spot.x, y: hub.pos.y + p.spot.y });
-    p.target = toAbs(side, { x: clamp(tgt.x, 2, Math.min(lim - 0.4, PITCH_W - 3)), y: clamp(tgt.y, 2, 66) });
-    p.urgency = 0.75;
+    // 中盤が毎回保持者の後方へ下がらず、前進するチームの接続点を保つ。
+    const supportFloor = p.role === 'dm' || p.role === 'cm' ? Math.min(toRel(side, base).x - 2, lim - 1) : 2;
+    p.target = toAbs(side, { x: clamp(tgt.x, supportFloor, Math.min(lim - 0.4, PITCH_W - 3)), y: clamp(tgt.y, 2, 66) });
+    p.urgency = 0.65;
     return;
   }
 

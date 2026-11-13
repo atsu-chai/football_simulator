@@ -107,7 +107,7 @@ export interface Chapter {
 
 export const CHAPTERS: Chapter[] = [
   {
-    id: 1, league: 'JFL', title: '町クラブの挑戦', format: 'league', target: 7, mySkill: 1.05,
+    id: 1, league: 'JFL', title: '町クラブの挑戦', format: 'league', target: 6, mySkill: 1.05,
     intro: '地域リーグから上がってきたばかりのクラブに、あなたは監督として招かれた。スタンドは身内ばかり、予算も最下位。それでも戦術なら、どのクラブにも負けない。まずは JFL を勝ち抜き、J3 への切符をつかもう。',
     clear: 'JFL を突破し、J3 昇格が決まった。町の商店街に、クラブの旗が並び始めた。',
     fail: '勝ち点が足りず、昇格を逃した。相手の形をもう一度よく見て、来季こそ。',
