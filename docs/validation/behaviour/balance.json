@@ -1,0 +1,90 @@
+{
+  "matchesPerSettingPerStage": 100,
+  "universal": false,
+  "results": [
+    {
+      "stage": 1,
+      "baseWin": 41,
+      "answerWin": 89,
+      "gap": 48,
+      "goals": 2.68
+    },
+    {
+      "stage": 2,
+      "baseWin": 33,
+      "answerWin": 97,
+      "gap": 64,
+      "goals": 4.56
+    },
+    {
+      "stage": 3,
+      "baseWin": 20,
+      "answerWin": 68,
+      "gap": 48,
+      "goals": 2.0
+    },
+    {
+      "stage": 4,
+      "baseWin": 32,
+      "answerWin": 75,
+      "gap": 43,
+      "goals": 2.54
+    },
+    {
+      "stage": 5,
+      "baseWin": 48,
+      "answerWin": 91,
+      "gap": 43,
+      "goals": 3.01
+    },
+    {
+      "stage": 6,
+      "baseWin": 33,
+      "answerWin": 95,
+      "gap": 62,
+      "goals": 3.34
+    },
+    {
+      "stage": 7,
+      "baseWin": 33,
+      "answerWin": 84,
+      "gap": 51,
+      "goals": 2.36
+    },
+    {
+      "stage": 8,
+      "baseWin": 55,
+      "answerWin": 78,
+      "gap": 23,
+      "goals": 3.23
+    },
+    {
+      "stage": 9,
+      "baseWin": 41,
+      "answerWin": 89,
+      "gap": 48,
+      "goals": 2.89
+    },
+    {
+      "stage": 10,
+      "baseWin": 38,
+      "answerWin": 82,
+      "gap": 44,
+      "goals": 2.18
+    },
+    {
+      "stage": 11,
+      "baseWin": 37,
+      "answerWin": 80,
+      "gap": 43,
+      "goals": 2.68
+    },
+    {
+      "stage": 12,
+      "baseWin": 49,
+      "answerWin": 87,
+      "gap": 38,
+      "goals": 3.06
+    }
+  ]
+}

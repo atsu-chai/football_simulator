@@ -83,6 +83,9 @@ export interface Player {
   target: Vec;
   /** 移動用の目標。戦術上の目標の細かな揺れを吸収する。 */
   moveTarget: Vec;
+  /** 受球直後の逆向きへの蹴り返しには、向き直る時間が必要。 */
+  receiveDir: Vec | null;
+  receivedAt: number;
   urgency: number;
   decideAt: number;
   stunnedUntil: number;
@@ -258,6 +261,8 @@ export interface MatchState {
   atHalftime: boolean;
   players: Player[];
   ball: Ball;
+  /** ボールの2秒傾向。短いパスの瞬間速度で全員を動かさない。 */
+  movementBallVel: Vec;
   tactics: [Tactics, Tactics];
   possession: Side;
   possessionSince: number;

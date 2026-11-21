@@ -1,0 +1,5 @@
+STAGE 3 base 17
+  W73 gap 57 g2.20 {"formation":"4-3-3","roles":{"8":"iw","10":"iw"},"buildUp":"mixed","tempo":"fast","width":"wide","fullbacks":"stay","pressHeight":"mid","pressIntensity":"normal","lineHeight":"normal","compactness":"tight","onLoss":"counterpress","onWin":"counter"}
+  W73 gap 57 g2.53 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw"},"buildUp":"long","tempo":"normal","width":"wide","fullbacks":"overlap","pressHeight":"mid","pressIntensity":"high","lineHeight":"high","compactness":"tight","onLoss":"counterpress","onWin":"keep"}
+  W70 gap 53 g2.40 {"formation":"4-3-3","roles":{"8":"iw","9":"f9","10":"iw"},"buildUp":"mixed","tempo":"fast","width":"wide","fullbacks":"overlap","pressHeight":"mid","pressIntensity":"normal","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"counter"}
+  W70 gap 53 g2.30 {"formation":"4-3-3","roles":{"8":"iw","9":"f9","10":"iw"},"buildUp":"mixed","tempo":"fast","width":"wide","fullbacks":"overlap","pressHeight":"high","pressIntensity":"normal","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"counter"}

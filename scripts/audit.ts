@@ -1,6 +1,7 @@
 // 試合の数字を、欧州主要リーグの平均的な値と並べて比べる。
 // 目安の値は 2018〜2024 年ごろの主要リーグ(Opta / FBref 系の公開集計)の典型値で、厳密な出典値ではない。
 // 使い方: npx tsx scripts/audit.ts [試合数]
+import { writeFileSync } from 'node:fs';
 import { tactic } from '../src/data/formations';
 import { createMatch, resume, step } from '../src/engine/match';
 import { Tactics } from '../src/engine/types';
@@ -66,3 +67,16 @@ const REAL: Record<string, string> = {
 const mean = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
 console.log('項目'.padEnd(22), 'シミュ', '  現実の目安');
 for (const k of Object.keys(REAL)) console.log(k.padEnd(22), (acc[k] ? mean(acc[k]).toFixed(acc[k] && mean(acc[k]) < 1 ? 3 : 1) : '-').padStart(6), '  ', REAL[k]);
+
+// 今回の受入範囲は、参考値の表示とは分けて明示的に判定する。
+const measured = Object.fromEntries(Object.entries(acc).map(([k, xs]) => [k, mean(xs)]));
+const checks = {
+  goals: measured['得点(両チーム合計)'] >= 2.5 && measured['得点(両チーム合計)'] <= 3.5,
+  shots: measured['シュート(1チーム)'] >= 11 && measured['シュート(1チーム)'] <= 16,
+  pass: measured['パス成功率%'] >= 80 && measured['パス成功率%'] <= 87,
+};
+if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N * pairs.length, perPair: N, measured, checks }, null, 2) + '\n');
+if (process.argv.includes('--check')) {
+  console.log('受入判定', checks);
+  if (Object.values(checks).some(v => !v)) process.exitCode = 1;
+}

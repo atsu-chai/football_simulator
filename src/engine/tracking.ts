@@ -1,4 +1,5 @@
 import data from '../data/tracking.json';
+import behaviour from '../data/behaviour-response.json';
 import { clamp } from './geometry';
 import { FormationId, MatchState, RoleId, Side } from './types';
 
@@ -45,18 +46,28 @@ export function learnedShape(formation: FormationId, phase: TrackingPhase, x: nu
 }
 
 /** 役割の前後関係は実測、同じ役割の左右と人数は編成スロットで保持する。 */
-export function learnedRoleX(formation: FormationId, phase: TrackingPhase, role: RoleId, slotX: number): number {
+export function learnedRoleX(formation: FormationId, phase: TrackingPhase, role: RoleId, slotX: number, ballX?: number): number {
   const baseRole = role === 'iw' ? 'wg' : role === 'f9' ? 'st' : role;
   const global = roles[`all|${phase}|${baseRole}`];
   const local = roles[`${family(formation)}|${phase}|${baseRole}`];
   const confidence = local ? local[0] / (local[0] + 1000) : 0;
   const x = (local?.[1] ?? global?.[1] ?? slotX) * confidence + (global?.[1] ?? slotX) * (1 - confidence);
+  if (ballX !== undefined) {
+    const gx = clamp(ballX / 105 * 6 - .5, 0, 5), ix = Math.floor(gx), f = gx - ix;
+    const phaseKey = phase === 'loss' ? 'defend' : phase === 'win' ? 'attack' : phase;
+    const profiles: Record<string, number[]> = behaviour.roleCells;
+    const a = profiles[`${phaseKey}|${ix}|${baseRole}`], b = profiles[`${phaseKey}|${Math.min(5, ix + 1)}|${baseRole}`];
+    const localX = a && b ? a[1] * (1 - f) + b[1] * f : x;
+    return localX * 0.85 + slotX * 0.15;
+  }
   return x * 0.65 + slotX * 0.35;
 }
 
 // 実測速度の上位域と加速度分布で制限し、緊急でない持ち場の調整は別の反応時間を使う。
 export const TRACKING_MOTION = {
   running: data.kinematics.speedP95,
+  recoverySprint: data.kinematics.speedP99,
+  ballSpeedLimit: behaviour.ballSpeedLimit,
   sprint: Math.min(8, Math.max(7.2, data.kinematics.speedP999)),
   acceleration: Math.min(3.5, Math.max(2.5, data.kinematics.accelP99)),
   adjustmentAcceleration: Math.min(2.5, Math.max(1.5, data.kinematics.accelP90)),
@@ -74,3 +85,11 @@ export const TRACKING_TACTICS = {
   defensiveWidth: clamp(styleSpan(2) / data.validation.defend.values[2], 0.1, 0.25),
   attackingWidth: clamp((data.styleVariation.attack.p90[2] - data.styleVariation.attack.p10[2]) / data.validation.attack.values[2], 0.12, 0.25),
 };
+
+/** V(t+1)=a+b*位置誤差+c*球速+d*V(t) の持続応答 c/(1-d)。5試合学習・2試合検証。 */
+export function learnedBallResponse(role: RoleId): number {
+  const line = role === 'cb' || role === 'fb' || role === 'wb' ? 0 : role === 'dm' || role === 'cm' ? 1 : 2;
+  const key = `defend${line}` as const;
+  const c = behaviour.response[key].coefficients;
+  return c[2] / (1 - c[3]);
+}

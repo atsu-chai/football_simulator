@@ -1,0 +1,47 @@
+{
+  "baselineCommit": "da2ab42f96f522c31de5b57d82b995df91b2bc9a",
+  "engineSha256": "710b807d8be77cd7d2d91eed79093ac96ab5e6a71422cae3facdee5e34397125",
+  "stageConfigSha256": "d33e5448b9af1033354b6d7173cc81ace73b0d8348e6a265d09f0fe30dbbd408",
+  "storyConfigSha256": "e579aa8bf1be0130c6bef634f95c0594b1c397940ed92b577cb53fe07191ecaa",
+  "realMatches": 7,
+  "realMoments": 14355,
+  "before": {
+    "matches": 60,
+    "moments": 33712,
+    "seedStart": 9001
+  },
+  "after": {
+    "matches": 60,
+    "moments": 35418,
+    "seedStart": 9001,
+    "behaviourChecksPassed": 18
+  },
+  "separateSeeds": {
+    "matches": 60,
+    "moments": 36659,
+    "seedStart": 9101,
+    "behaviourChecksPassed": 18
+  },
+  "tacticChecks": {
+    "counterpress": true,
+    "counter": true,
+    "line": true,
+    "compact": true,
+    "width": true,
+    "press": true
+  },
+  "auditChecks": {
+    "goals": true,
+    "shots": true,
+    "pass": true
+  },
+  "stageChecksPassed": 12,
+  "stageMatchesPerSetting": 100,
+  "storyMatchesPerOpponentPerTactic": 30,
+  "storyExpertClearRatesDescending": true,
+  "npmTestsPassed": 58,
+  "pythonTestsPassed": 3,
+  "buildPassed": true,
+  "browserVisualInspection": false,
+  "sourceHashesMatchExistingTracking": true
+}

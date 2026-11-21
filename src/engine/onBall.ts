@@ -6,7 +6,7 @@ import { offsideLimit } from './teamShape';
 
 const SPRINT = 7.6;
 // 実測のブロック配置へ置き換えた後の試合集計で、シュートの期待値を再校正する。
-export const XG_SCALE = 1.55;
+export const XG_SCALE = 2.1;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -124,7 +124,7 @@ export function decideOnBall(m: MatchState, p: Player) {
     const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
     const longRange = d > 18 ? 0.05 + (d - 18) * 0.008 : 0;
     const inBox = rel.x > PITCH_W - 16.5 && Math.abs(rel.y - 34) < 20.16;
-    if (xg > 0.012 && d < 32) options.push({ score: xg * 5.5 + 0.12 + (inBox ? 0.07 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
+    if (xg > 0.012 && d < 32) options.push({ score: (xg / XG_SCALE * 1.55) * 10 + 0.2 + (inBox ? 0.22 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
   }
 
   // パス
@@ -242,8 +242,14 @@ export function decideOnBall(m: MatchState, p: Player) {
     }
     // 大きなサイドチェンジ。幅を取るチームほど狙う。
     if (t.width === 'wide' && Math.abs(pr.y - rel.y) > 26) value += 0.05;
+    // 余裕がある受球直後は、入ってきた方向へ即座に蹴り返すより向き直ってつなぐ。
+    // 圧力下の落としやカウンターは妨げない。
+    const facing = p.receiveDir;
+    const passLength = dist(p.pos, point);
+    const turn = facing && pressure > 5 && !counter && m.t - p.receivedAt < 1.4
+      ? Math.max(0, -(facing.x * (point.x - p.pos.x) + facing.y * (point.y - p.pos.y)) / passLength) * 0.1 : 0;
     const score =
-      Math.pow(safeFinal, riskPow) * value - (1 - safeFinal) * lossCost + (m.rand() - 0.5) * noise * 2;
+      Math.pow(safeFinal, riskPow) * value - turn - (1 - safeFinal) * lossCost + (m.rand() - 0.5) * noise * 2;
     options.push({
       score,
       run: () => makePass(m, p, q, point, lofted, cross, through),

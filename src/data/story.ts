@@ -131,7 +131,7 @@ export const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 3, league: 'J2', title: '長いシーズン', format: 'league', target: 10, mySkill: 1.12,
+    id: 3, league: 'J2', title: '長いシーズン', format: 'league', target: 11, mySkill: 1.12,
     intro: 'J2 は1年が長く、相手は研究してくる。あなたのクラブの戦い方も、もう知られている。相手ごとに戦術を変える監督だけが、J1 への階段を上れる。',
     clear: 'J2 を勝ち抜き、悲願の J1 昇格。満員のスタジアムに、あなたの名前が響いた。',
     fail: '昇格争いから脱落した。相手ごとの弱点を突けていたか、振り返ってみよう。',
@@ -144,7 +144,7 @@ export const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 4, league: 'J1', title: '頂点への挑戦', format: 'league', target: 12, mySkill: 1.15,
+    id: 4, league: 'J1', title: '頂点への挑戦', format: 'league', target: 10, mySkill: 1.15,
     intro: '日本の頂点、J1。相手の多くは代表選手をそろえ、戦術も洗練されている。優勝しなければ、アジアへの扉は開かない。',
     clear: 'J1 優勝。昇格組の快進撃に国中が沸き、アジアへの挑戦権を手にした。',
     fail: '優勝には届かなかった。強豪の型を見抜き、もう一度シーズンに挑もう。',

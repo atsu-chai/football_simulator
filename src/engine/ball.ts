@@ -377,9 +377,17 @@ function takeControl(m: MatchState, p: Player) {
     b.pass = null;
     if (attemptHeader(m, p, header)) return;
   }
+  const incoming = Math.hypot(b.vel.x, b.vel.y);
+  p.receiveDir = incoming > 2 ? { x: b.vel.x / incoming, y: b.vel.y / incoming } : null;
+  p.receivedAt = m.t;
   b.pass = null;
   giveBall(m, p);
-  p.decideAt = m.t + 0.25;
+  // 受球後の判断までの間隔をテンポに合わせ、追走の目標からコントロールへ切り替える。
+  // パスのたびに即座に逆向きへ蹴り返し、全体が往復するのを防ぐ。
+  const control = { slow: 0.7, normal: 0.5, fast: 0.35 }[m.tactics[p.team].tempo];
+  p.decideAt = m.t + control;
+  p.target = { x: p.pos.x + p.vel.x * 0.25, y: p.pos.y + p.vel.y * 0.25 };
+  p.urgency = 0.55;
 }
 
 export function onBallWon(m: MatchState, p: Player) {

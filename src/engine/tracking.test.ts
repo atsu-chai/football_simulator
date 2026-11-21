@@ -56,6 +56,25 @@ describe('実測の位置モデル', () => {
     expect(dist(m.players[d.taker].pos, d.at)).toBeLessThan(1);
     expect(m.t).toBeLessThan(d.maxUntil);
   });
+  it('SBがサイドの相手に出る深さを、CBの高さへ強制的に戻さない', () => {
+    const m = makeTestMatch();
+    m.dead = null; m.t = 20; m.turnoverAt = -100; m.possession = 1;
+    m.ball.pos = { x: 55, y: 34 }; m.ball.owner = 21;
+    for (const p of m.players) {
+      if (p.team === 1) p.pos = { x: 80, y: 34 };
+      else if (p.role !== 'gk') p.pos = { x: 90, y: 34 };
+    }
+    m.players[21].pos = { ...m.ball.pos };
+    m.players[5].pos = { x: 54, y: 34 };
+    m.players[1].pos = { x: 40, y: 8 }; m.players[4].pos = { x: 40, y: 60 };
+    m.players[2].pos = { x: 30, y: 24 }; m.players[3].pos = { x: 30, y: 44 };
+    m.players[18].pos = { x: 45, y: 8 }; m.players[20].pos = { x: 45, y: 60 };
+    updateFrames(m); teamDefense(m, 0);
+    const cb = Math.max(m.players[2].target.x, m.players[3].target.x);
+    expect(m.players[1].target.x).toBeGreaterThan(cb + 2);
+    expect(dist(m.players[1].target, m.players[18].pos)).toBeLessThan(10);
+    expect(Math.abs(m.players[2].target.x - m.players[3].target.x)).toBeLessThanOrEqual(1.5);
+  });
   it('疎な局面とピッチの端でも有限値になり、セル境界で飛ばない', () => {
     for (const phase of ['attack', 'defend', 'win', 'loss'] as const) {
       for (let x = 0; x <= 105; x += 105 / 24) for (let y = 0; y <= 68; y += 68 / 16) {

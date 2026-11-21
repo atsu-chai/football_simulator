@@ -60,12 +60,22 @@ function run(t: Tactics, adapt = false) {
 }
 
 const base = run(DEFAULT_TACTICS);
+// 現在の答えの局所変更を先に比べ、守備的すぎる/攻撃的すぎる答えを調整する。
+const nearby: Partial<Tactics>[] = [{ fullbacks: 'overlap' }, { pressHeight: 'high' }, { lineHeight: 'high' },
+  { fullbacks: 'overlap', pressHeight: 'high' }, { pressHeight: 'high', lineHeight: 'high' }];
+// 他の教材で実際に使う設定も候補にする。攻略の鍵を満たすものだけを共通シードで比較する。
 const cands: Tactics[] = [s.solution];
+for (const over of nearby) {
+  const t = tactic({ ...s.solution, ...over });
+  if (cands.length < K && keys.every(k => k.check(t, stub(false))) && !cands.some(c => JSON.stringify(c) === JSON.stringify(t))) cands.push(t);
+}
+for (const stage of STAGES) if (cands.length < K && keys.every(k => k.check(stage.solution, stub(false)))
+  && !cands.some(t => JSON.stringify(t) === JSON.stringify(stage.solution))) cands.push(stage.solution);
 while (cands.length < K) {
   const t = randomTactics();
   if (keys.every((k) => k.check(t, stub(false)))) cands.push(t);
 }
-const res = cands.map((t) => ({ t, ...run(t, true) })).sort((a, b) => b.w - a.w);
+const res = cands.map((t) => ({ t, ...run(t, true) })).sort((a, b) => Number(b.g >= 2 && b.g <= 5 && b.w - base.w >= 20) - Number(a.g >= 2 && a.g <= 5 && a.w - base.w >= 20) || b.w - a.w);
 console.log(`STAGE ${id} base ${base.w.toFixed(0)}`);
 for (const r of res.slice(0, 4)) {
   const { formation, roles, buildUp, tempo, width, fullbacks, pressHeight, pressIntensity, lineHeight, compactness, onLoss, onWin } = r.t;

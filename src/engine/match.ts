@@ -1,4 +1,4 @@
-import { TRACKING_MOTION } from './tracking';
+import { TRACKING_MOTION, learnedBallResponse } from './tracking';
 import { FORMATIONS } from '../data/formations';
 import { assignMarks, teamDefense } from './defending';
 import { dist, mulberry32, relX, toAbs, toRel, vec } from './geometry';
@@ -35,7 +35,7 @@ function makePlayers(cfg: MatchConfig): Player[] {
     FORMATIONS[t.formation].forEach((slot, i) => {
       out.push({
         id: out.length, team: side, slot: i, role: t.roles?.[i] ?? slot.role, number: NUMBERS[i],
-        pos: vec(0, 0), prev: vec(0, 0), vel: vec(0, 0), target: vec(0, 0), moveTarget: vec(0, 0), urgency: 0.5,
+        pos: vec(0, 0), prev: vec(0, 0), vel: vec(0, 0), target: vec(0, 0), moveTarget: vec(0, 0), receiveDir: null, receivedAt: -1e9, urgency: 0.5,
         decideAt: 0, stunnedUntil: 0, runUntil: 0, runTarget: null, nextSpotAt: 0, spot: null, spotOwner: -1,
         markTarget: -1, pressing: false,
       });
@@ -52,7 +52,7 @@ export function createMatch(cfg: MatchConfig): MatchState {
   const frame = { hasBall: false, line: 30, length: 30, width: 40, cy: 34 };
   const m: MatchState = {
     cfg, t: 0, half: 1, finished: false, atHalftime: false,
-    players: makePlayers(cfg), ball,
+    players: makePlayers(cfg), ball, movementBallVel: vec(0, 0),
     tactics: [{ ...cfg.teams[0].tactics }, { ...cfg.teams[1].tactics }],
     possession: 0, possessionSince: 0, turnoverAt: -1e9, frames: [{ ...frame }, { ...frame }],
     lineDrop: [0, 0], energy: [1, 1], lastLine: [30, 30], dead: null, setPieceUntil: 0, score: [0, 0],
@@ -80,6 +80,7 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
   m.possessionSince = m.t;
   m.turnoverAt = -1e9;
   m.lineDrop = [0, 0];
+  m.movementBallVel = vec(0, 0);
   m.setPieceUntil = 0;
   updateLastLines(m);
   for (const p of m.players) {
@@ -93,6 +94,7 @@ export function kickoff(m: MatchState, team: Side, delay: number) {
     p.target = { ...a };
     p.moveTarget = { ...a };
     p.runTarget = null;
+    p.receiveDir = null; p.receivedAt = -1e9;
     p.spot = null;
     p.spotOwner = -1;
     p.stunnedUntil = 0;
@@ -147,7 +149,13 @@ function movePlayer(m: MatchState, p: Player) {
   p.prev = { ...p.pos };
   const stunned = m.t < p.stunnedUntil;
   const isCarrier = m.ball.owner === p.id;
-  const urgent = !m.dead && (isCarrier || p.pressing || p.urgency >= 0.9);
+  const back = p.role === 'cb' || p.role === 'fb' || p.role === 'wb';
+  const sign = p.team === 0 ? 1 : -1;
+  const approach = Math.max(0, -m.movementBallVel.x * sign);
+  // 2秒以内に背後へ入る球には、通常のスライドでなく帰陣の走行へ切り替える。
+  const recoveryThreat = !m.dead && m.possession !== p.team && back && !p.pressing && approach > 1
+    && (p.target.x - p.pos.x) * sign < -3 && (m.ball.pos.x - p.pos.x) * sign < Math.max(6, approach * 2);
+  const urgent = !m.dead && (isCarrier || p.pressing || p.urgency >= 0.9 || recoveryThreat);
   // 追走・保持時は反応を優先し、持ち場の調整は実測の横移動の遅れに応じて平滑化する。
   const target = p.moveTarget;
   const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : TRACKING_MOTION.response));
@@ -169,17 +177,23 @@ function movePlayer(m: MatchState, p: Player) {
     else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
   }
   // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
-  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : 0.23)) * (0.7 + p.urgency * 0.3);
+  // 帰陣と押し上げを同じ速さにしない。帰陣のゲインは行動分布で校正した値（回帰係数ではない）。
+  const recovering = !m.dead && m.possession !== p.team && back && (target.x - p.pos.x) * (p.team === 0 ? 1 : -1) < -2;
+  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : recovering ? 0.8 : 0.23)) * (0.7 + p.urgency * 0.3);
   // 裏抜け・パスへの追走だけスプリントし、寄せや帰陣の高緊急度と区別する。
   const sprintAction = p.runTarget !== null || m.ball.pass?.to === p.id;
-  const chaseSpeed = (sprintAction ? TRACKING_MOTION.sprint : 5.8) * p.urgency;
-  const top = (isCarrier ? carry : urgent ? chaseSpeed : recovery) * (stunned ? 0.35 : 1);
+  const chaseSpeed = recoveryThreat ? TRACKING_MOTION.recoverySprint : (sprintAction ? TRACKING_MOTION.sprint : 5.9) * p.urgency;
+  const retreatResponse = recovering ? Math.max(0, -m.movementBallVel.x * sign) * learnedBallResponse(p.role) : 0;
+  const recoverySpeed = Math.min(TRACKING_MOTION.running, recovery + retreatResponse);
+  const top = (isCarrier ? carry : urgent ? chaseSpeed : recoverySpeed) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
   // 到着前に減速する。位置の微調整で走り続けない。
   const remaining = Math.max(0, d - (urgent || m.dead?.taker === p.id ? 0.15 : m.dead ? 0.8 : 1.2));
   const speed = Math.min(top * tired, remaining * (urgent ? 2.2 : 1.2), Math.sqrt(2 * 3 * remaining));
   let vx = d > 0.05 ? (dx / d) * speed : 0;
   let vy = d > 0.05 ? (dy / d) * speed : 0;
+  // 実測で推定した球速への応答。目標そのものの差分は追わず、守備で後退する時だけ使う。
+  if (!urgent && retreatResponse > 0) vx -= sign * retreatResponse * Math.min(1, remaining / 3);
   // 味方と重ならないように少し離れる
   for (const o of m.players) {
     if (o.id === p.id || o.team !== p.team) continue;
@@ -303,6 +317,11 @@ export function step(m: MatchState) {
   runScript(m);
   if (Math.round(m.t / TICK) % 50 === 0) refreshSkill(m);
   updateLastLines(m);
+  const motionBlend = 1 - Math.exp(-TICK / 1);
+  for (const axis of ['x', 'y'] as const) {
+    const bv = m.dead ? 0 : Math.max(-TRACKING_MOTION.ballSpeedLimit, Math.min(TRACKING_MOTION.ballSpeedLimit, (m.ball.owner >= 0 ? m.players[m.ball.owner].vel[axis] : m.ball.vel[axis])));
+    m.movementBallVel[axis] += (bv - m.movementBallVel[axis]) * motionBlend;
+  }
   updateFrames(m);
   for (const side of [0, 1] as Side[]) if (m.markingDirty[side]) assignMarks(m, side);
 

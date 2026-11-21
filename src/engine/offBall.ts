@@ -32,7 +32,7 @@ export function attackerMove(m: MatchState, p: Player) {
     const b = toRel(side, base);
     const forward = p.role === 'st' || p.role === 'wg' || p.role === 'iw' || p.role === 'am';
     p.runTarget = null; p.spot = null;
-    p.target = toAbs(side, { x: Math.min(lim - 0.5, b.x + (counter && forward ? 10 : 0)), y: b.y });
+    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 10 : !counter && forward ? Math.min(b.x, rel.x - 3) : b.x), y: b.y });
     p.urgency = counter && forward ? 0.95 : 0.78;
     return;
   }

@@ -1,0 +1,6 @@
+dead 35.7%  goals/match 2.25
+kickoff   n  51  wait 3.2s  taker-to-ball 0.0m  mean-off 0.0m  >5m 0.0人
+throw     n  50  wait 13.9s  taker-to-ball 0.4m  mean-off 1.4m  >5m 0.0人
+goalkick  n 149  wait 19.9s  taker-to-ball 0.8m  mean-off 1.3m  >5m 0.0人
+corner    n  48  wait 17.9s  taker-to-ball 0.8m  mean-off 1.4m  >5m 0.1人
+free      n  24  wait 15.9s  taker-to-ball 0.7m  mean-off 1.3m  >5m 0.0人

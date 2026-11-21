@@ -1,0 +1,26 @@
+
+ RUN  v2.1.9 /Users/ooshitaatsushinin/project/football_simulator
+
+ ❯ src/engine/regression-before.test.ts (8 tests | 1 failed | 7 skipped) 7ms
+   × 実測の位置モデル > SBがサイドの相手に出る深さを、CBの高さへ強制的に戻さない 7ms
+     → expected 34.20608624295181 to be greater than 37.20608624295181
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/engine/regression-before.test.ts > 実測の位置モデル > SBがサイドの相手に出る深さを、CBの高さへ強制的に戻さない
+AssertionError: expected 34.20608624295181 to be greater than 37.20608624295181
+ ❯ src/engine/regression-before.test.ts:74:35
+     72|     updateFrames(m); teamDefense(m, 0);
+     73|     const cb = Math.max(m.players[2].target.x, m.players[3].target.x);
+     74|     expect(m.players[1].target.x).toBeGreaterThan(cb + 2);
+       |                                   ^
+     75|     expect(dist(m.players[1].target, m.players[18].pos)).toBeLessThan(…
+     76|     expect(Math.abs(m.players[2].target.x - m.players[3].target.x)).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 skipped (8)
+   Start at  15:08:42
+   Duration  901ms (transform 193ms, setup 0ms, collect 377ms, tests 7ms, environment 0ms, prepare 81ms)
+

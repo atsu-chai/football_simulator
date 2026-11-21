@@ -5,7 +5,7 @@ import { shapeTarget } from './teamShape';
 import { MatchState, PITCH_W, Player, Side, TICK, Vec } from './types';
 
 const PRESS_LIMIT = { low: 40, mid: 66, high: 106 };
-const PRESS_COUNT = { low: 1, normal: 2, high: 3 };
+const PRESS_COUNT = { low: 1, normal: 1, high: 3 };
 
 /** 守備チーム全体の判断を1ティック分行う。 */
 export function teamDefense(m: MatchState, side: Side) {
@@ -43,10 +43,32 @@ export function teamDefense(m: MatchState, side: Side) {
   const pressSet = new Set<number>();
   for (let i = 0; i < ranked.length && pressSet.size < pressers; i++) {
     const limit = transition && t.onLoss === 'counterpress' ? 22 : 24;
-    if (ranked[i].d < limit || i === 0) pressSet.add(ranked[i].p.id);
+    const p = ranked[i].p;
+    const back = p.role === 'cb' || p.role === 'fb' || p.role === 'wb';
+    // 背後へ運ばれた最終ラインは横から追い続けず、内側へ戻ってカバーを作る。
+    if (back && toRel(side, p.pos).x > ball.x + 2 && ranked[i].d > 6) continue;
+    if (ranked[i].d < limit || i === 0) pressSet.add(p.id);
   }
 
+  // ゾーン内の担当を重複させない。同じ相手へ中盤が何人も吸い寄せられないようにする。
+  const zoneMarks = new Map<number, Player>();
+  if (t.marking === 'zone' && !transition) {
+    const candidates: { p: Player; o: Player; d: number }[] = [];
+    for (const p of team) if (p.role !== 'gk' && !pressSet.has(p.id)) {
+      const base = shapeTarget(m, p);
+      for (const o of m.players) if (o.team !== side && o.role !== 'gk' && o.id !== carrier?.id) {
+        const d = dist(base, o.pos);
+        if (d < 18) candidates.push({ p, o, d: d * 0.55 + dist(p.pos, o.pos) * 0.45 - (p.markTarget === o.id ? 2 : 0) });
+      }
+    }
+    candidates.sort((a, b) => a.d - b.d);
+    const used = new Set<number>();
+    for (const { p, o } of candidates) if (!zoneMarks.has(p.id) && !used.has(o.id)) {
+      zoneMarks.set(p.id, o); used.add(o.id);
+    }
+  }
   for (const p of team) {
+    if (t.marking === 'zone' && !transition) p.markTarget = zoneMarks.get(p.id)?.id ?? -1;
     if (p.role === 'gk') {
       goalkeeper(m, p);
       continue;
@@ -66,11 +88,11 @@ export function teamDefense(m: MatchState, side: Side) {
       const close = t.onLoss === 'counterpress' ? 0.6 : 0.45;
       p.target = toAbs(side, { x: Math.min(base.x, base.x + (ball.x - 5 - base.x) * close), y: base.y + (ball.y - base.y) * close });
       p.urgency = dist(p.pos, p.target) > 6 ? 0.94 : 0.75;
-    } else defenderMove(m, p);
+    } else defenderMove(m, p, zoneMarks.get(p.id));
   }
 
-  // 最終ラインを横一線に揃える。誰かが下がれば全員下がり、裏で相手をオンサイドにしない
-  const back = team.filter((p) => !pressSet.has(p.id) && (p.role === 'cb' || p.role === 'fb' || p.role === 'wb'));
+  // CB同士の深さを揃える。SB/WBが相手へ出る動きまでCBの高さへ戻さない。
+  const back = team.filter((p) => !pressSet.has(p.id) && p.role === 'cb');
   // ただし裏へ走る相手に付いて下がった選手は基準にしない(全員がゴール前まで下がらないように)
   if (back.length >= 2 && t.marking === 'zone') {
     const frameLine = m.frames[side].line;
@@ -88,7 +110,7 @@ export function teamDefense(m: MatchState, side: Side) {
   }
 }
 
-function defenderMove(m: MatchState, p: Player) {
+function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
   const side = p.team;
   const t = m.tactics[side];
   const base = shapeTarget(m, p);
@@ -107,24 +129,15 @@ function defenderMove(m: MatchState, p: Player) {
   }
 
   // ゾーン: 自分の持ち場の近くにいる相手を、ゴール側から牽制する
-  let mark: Player | null = null;
-  let best = 10;
-  for (const o of m.players) {
-    if (o.team === side || o.role === 'gk') continue;
-    const d = dist(o.pos, base);
-    if (d < best) {
-      best = d;
-      mark = o;
-    }
-  }
+  const mark = zoneMark;
   const isBack = p.role === 'cb' || p.role === 'fb' || p.role === 'wb';
   let target: Vec = baseRel;
   if (mark) {
     const r = toRel(side, mark.pos);
     // ゾーンでは持ち場を大きく離れない。近くの相手に少し寄せて、パスコースを狭める程度にとどめる
-    const pull = isBack ? 0.35 : 0.3;
-    // 最終ラインは横には寄るが、縦はラインの高さを保つ(手前に立つFWに引かれて下がり続けないため)
-    const pullX = isBack ? 0 : pull;
+    const pull = dist(p.pos, mark.pos) > 10 ? 0.7 : 0.5;
+    // CBの縦の追従は小さくし、SB/WBはサイドの相手へ前後にも出られるようにする。
+    const pullX = p.role === 'cb' ? 0.15 : pull;
     target = {
       x: baseRel.x + (r.x - 1.5 - baseRel.x) * pullX,
       y: baseRel.y + (r.y - baseRel.y) * pull + (ball.y - r.y) * 0.05,
@@ -133,7 +146,12 @@ function defenderMove(m: MatchState, p: Player) {
 
   // 最終ラインは背後を取られない
   if (isBack) {
-    target.x = Math.min(target.x, m.frames[side].line + (mark ? 0 : 1));
+    // CBは深さを揃え、SB/WBは実測の一段前の持ち場からサイドの相手へ出る。
+    // 全員をCBの高さへ固定すると、SBが相手のWGから10m以上離れてしまう。
+    const ceiling = p.role === 'cb' ? m.frames[side].line + (mark ? 1.5 : 1) : baseRel.x + 3;
+    target.x = Math.min(target.x, ceiling);
+    // 自陣深くでは、出遅れてから帰る判定を繰り返さず、先にゴール側のカバーへ戻る。
+    if (ball.x < 40) target.x = Math.min(target.x, ball.x - 1.5);
     // 裏へ走り出した相手にだけ付いていく。ラインの手前に立つだけの相手や、
     // オフサイドの位置に残った相手まで追うと、ラインがゴール前まで下がり続けてしまう。
     const actualLine = deepestOutfield(m, side);
@@ -142,7 +160,10 @@ function defenderMove(m: MatchState, p: Player) {
       const r = toRel(side, o.pos);
       const running = o.runUntil > m.t && o.runTarget !== null;
       // オフサイドの位置に残っている相手には付かず、ラインを上げて置き去りにする
-      if (running && r.x > actualLine - 14 && dist(o.pos, p.pos) < 12) {
+      // 高いラインは走者だけに釣られず、背後へ実際に出された球に対応する。
+      const releasedBehind = m.ball.pass !== null && toRel(side, m.ball.pass.point).x < actualLine + 3;
+      const holdHighLine = t.lineHeight === 'high' && !releasedBehind;
+      if (running && !holdHighLine && r.x > actualLine - 14 && dist(o.pos, p.pos) < 12) {
         target = { x: Math.max(r.x - 2, 3), y: r.y };
         break;
       }

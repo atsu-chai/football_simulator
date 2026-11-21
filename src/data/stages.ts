@@ -72,7 +72,7 @@ export const STAGES: Stage[] = [
   {
     id: 3, title: 'ハーフスペースの鍵', concept: 'ハーフスペース攻略',
     opponent: opp('セブン・ウォール', { formation: '5-4-1', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.3),
-    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, buildUp: 'long', tempo: 'slow', width: 'wide', fullbacks: 'stay', pressHeight: 'mid', onLoss: 'counterpress' }),
+    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, buildUp: 'mixed', tempo: 'fast', width: 'wide', fullbacks: 'overlap', pressHeight: 'mid', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は5-4-1のブロックで中央を固め、奪えば速攻を狙います。5バックの間、ハーフスペースが崩しの入口です。',
     scouting: ['最終ラインが5枚で、背後のスペースは小さい', '中盤4枚と最終ラインの間は狭いが空く', '奪われると1トップへ素早く長いボールが来る'],
     hints: ['ウイングを「インサイドWG」にして、5バックの間(ハーフスペース)に立たせよう', '幅を「広い」にしてSBで大外を取り、内側のレーンを広げよう', '奪われたら即時奪回。相手の速攻を出させない'],

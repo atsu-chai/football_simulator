@@ -3,7 +3,7 @@ import { FORMATIONS } from '../data/formations';
 import { clamp, relX, toAbs, toRel } from './geometry';
 import { MatchState, PITCH_H, PITCH_W, Player, Side, Tactics, TeamFrame, Vec } from './types';
 
-const LINE_ADJ = { deep: -TRACKING_TACTICS.line, normal: 0, high: TRACKING_TACTICS.line };
+const LINE_ADJ = { deep: -TRACKING_TACTICS.line * 1.25, normal: 0, high: TRACKING_TACTICS.line * 1.25 };
 const PRESS_ADJ = { low: -TRACKING_TACTICS.press, mid: 0, high: TRACKING_TACTICS.press };
 const LENGTH_SCALE = { loose: 1 + TRACKING_TACTICS.length, normal: 1, tight: 1 - TRACKING_TACTICS.length };
 const WIDTH_SCALE = { loose: 1 + TRACKING_TACTICS.defensiveWidth, normal: 1, tight: 1 - TRACKING_TACTICS.defensiveWidth };
@@ -28,7 +28,7 @@ function computeFrame(m: MatchState, side: Side): TeamFrame {
   return {
     hasBall, line,
     length: base[2] * (hasBall ? 0.92 : 1) * LENGTH_SCALE[t.compactness],
-    width: base[3] * 1.15 * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
+    width: base[3] * (hasBall ? 1.15 : trackingPhase(m, side) === 'loss' ? 1.265 : 1.31) * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
     cy: base[4] + (hasBall ? (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0) : 0),
   };
 }
@@ -84,7 +84,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
     return { x: clamp(ball.x * 0.14 + 1, 1.5, f.hasBall ? sweep + 4 : sweep), y: 34 + (ball.y - 34) * 0.17 };
   }
   const sideSign = slot.y < 0.5 ? -1 : 1;
-  let x = f.line + learnedRoleX(t.formation, trackingPhase(m, p.team), p.role, slot.x) * f.length;
+  let x = f.line + learnedRoleX(t.formation, trackingPhase(m, p.team), p.role, slot.x, toRel(p.team, m.ball.pos).x) * f.length;
   let y = f.cy + (slot.y - 0.5) * f.width;
 
   if (f.hasBall) {

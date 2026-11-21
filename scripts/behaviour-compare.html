@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>実測とシミュレーション：90秒の行動比較</title>
+<style>body{margin:0;background:#111b20;color:#eaf0f1;font:15px system-ui,sans-serif}main{max-width:1450px;margin:auto;padding:24px}h1{font-size:23px}p{line-height:1.7;color:#bacbd0}.w{display:grid;grid-template-columns:1fr 1fr;gap:16px}canvas{width:100%;background:#285a3c;display:block;border:1px solid #79958c}h2{font-size:17px}label,button,select{margin:0 12px 0 0}button,select{padding:8px;background:#22383f;color:#fff;border:1px solid #80969c;border-radius:4px}input{width:min(55vw,600px);vertical-align:middle}footer{font-size:12px;color:#a8bbc0;margin-top:20px}a{color:#a5dcff}@media(max-width:750px){.w{grid-template-columns:1fr}main{padding:12px}}</style>
+<main><h1>実測とシミュレーション — 90秒の動きを比較</h1>
+<p>青と赤はチーム、黄はボール。選手は役割だけの匿名表示。青の攻撃方向を右へ揃え、両方とも実時間の1倍速・5Hzで表示します。別の試合なので、同じ攻撃場面の再現ではありません。</p>
+<div><button id="play">一時停止</button><input id="seek" aria-label="再生時刻" type="range" min="0" max="89.8" step="0.2" value="0"><output id="time">0.0 / 90秒</output>
+<label>軌跡 <select id="trail"><option value="8">8秒</option><option value="2">2秒</option><option value="0">なし</option></select></label><label>速度 <select id="speed"><option>1</option><option>0.5</option><option>2</option></select></label></div>
+<div class="w"><section><h2>実測：試合1・前半5:00〜6:30</h2><canvas id="a" width="630" height="408" aria-label="実測ピッチ"></canvas></section><section><h2>修正後：seed 9002・{{SIM_RANGE}}秒</h2><canvas id="b" width="630" height="408" aria-label="シミュレーションピッチ"></canvas></section></div>
+<p>見るポイント：守備ラインと中盤の段差、ボール前進時の帰陣、全員が一斉に移動していないか、相手への寄せ方。停止中の位置調整も表示します。{{LIVE_SHARES}}。simは実測とインプレー割合が近い90秒を選び、得点・ハーフタイムの配置リセットを跨がない区間です。</p>
+<footer>実測データの匿名派生：Bassek, Rein, Weber &amp; Memmert (2025), DFL / IDSSE。
+<a href="https://doi.org/10.6084/m9.figshare.28196177">データセット</a> /
+<a href="https://doi.org/10.1038/s41597-025-04505-y">論文</a> / <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。座標変換・1Hz行動集計・5Hz匿名クリップを作成。選手名・識別子は含みません。</footer></main>
+<script>
+const R=/*REAL_DATA*/null;
+const S=/*SIM_DATA*/null;
+let trail=8,playing=true,time=0,last=performance.now();
+function draw(id,clip,t){const c=document.getElementById(id),x=c.getContext('2d'),k=6;x.clearRect(0,0,630,408);
+x.strokeStyle='#fff7';x.lineWidth=1;x.strokeRect(0,0,630,408);x.beginPath();x.moveTo(315,0);x.lineTo(315,408);x.stroke();x.beginPath();x.arc(315,204,9.15*k,0,7);x.stroke();
+x.strokeRect(0,(34-20.16)*k,16.5*k,40.32*k);x.strokeRect(630-16.5*k,(34-20.16)*k,16.5*k,40.32*k);
+const n=clip.frames.length,f=Math.min(n-1.001,t*5),i=Math.floor(f),u=f-i,A=clip.frames[i],B=clip.frames[i+1];
+const L=(p,q)=>[p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u];
+// 過去の軌跡
+clip.meta.forEach((m,j)=>{x.strokeStyle=m.team==1?'#5af6':'#f666';x.beginPath();for(let s=Math.max(0,i-trail*5);s<=i;s++){const p=clip.frames[s].p[j];s==Math.max(0,i-trail*5)?x.moveTo(p[0]*k,p[1]*k):x.lineTo(p[0]*k,p[1]*k)}x.stroke();
+const p=L(A.p[j],B.p[j]);x.fillStyle=m.team==1?'#5af':'#f66';x.beginPath();x.arc(p[0]*k,p[1]*k,5,0,7);x.fill();x.fillStyle='#fff';x.font='10px sans-serif';x.fillText(m.role,p[0]*k+6,p[1]*k-5)});
+const b=L(A.b,B.b);x.fillStyle='#ff0';x.beginPath();x.arc(b[0]*k,b[1]*k,3.5,0,7);x.fill();
+x.fillStyle=A.live?'#fff':'#f90';x.font='12px sans-serif';x.fillText((A.live?'インプレー':'停止中')+'  '+t.toFixed(1)+'s',6,14);}
+
+function seek(t){time=t;draw('a',R,t);draw('b',S,t);document.getElementById('seek').value=t;document.getElementById('time').textContent=t.toFixed(1)+' / 90秒';}
+document.getElementById('play').onclick=()=>{playing=!playing;document.getElementById('play').textContent=playing?'一時停止':'再生';};
+document.getElementById('seek').oninput=e=>seek(+e.target.value);
+document.getElementById('trail').onchange=e=>{trail=+e.target.value;seek(time);};
+(function loop(now){let dt=(now-last)/1000;last=now;if(playing)seek((time+Math.min(.2,dt)*+document.getElementById('speed').value)%89.8);requestAnimationFrame(loop);})(last);
+</script></html>
