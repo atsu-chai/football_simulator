@@ -30,6 +30,7 @@ class BehaviourExtractionTest(unittest.TestCase):
             self.assertEqual({r['section'] for r in rows},{'firstHalf','secondHalf'})
             self.assertEqual(rows[0]['b'],[42.5,39])
             self.assertEqual(rows[0]['poss'],1)
+            self.assertEqual(set(rows[0]['lateral'].values()),{'centre'})
             self.assertEqual(rows[0]['p'][0][2],'gk')
             self.assertEqual(rows[0]['p'][1][2],'cb')
             self.assertNotIn('private-',output.read_text())

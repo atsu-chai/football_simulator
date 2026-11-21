@@ -1,0 +1,426 @@
+{
+  "runtimeVelocityApproximation": "training: 2s displacement velocity; runtime: 1s EWMA; holdout validates the regression, not the closed-loop controller",
+  "split": "first 5 matches train, last 2 holdout; shipped model refit on all 7; both halves scanned, 11v11 only; lateral identity from half-average position; dm/cm pooled; predict backs 3s and midfield/front 4s ahead during stable possession and uninterrupted play",
+  "validation": {
+    "attack|am|right": {
+      "train": 478,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|fb|right": {
+      "train": 6813,
+      "test": 3072,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.43028519772885,
+        7.126442179621286
+      ],
+      "rmse": [
+        9.43028519772885,
+        7.126442179621286
+      ]
+    },
+    "attack|st|centre": {
+      "train": 6746,
+      "test": 6132,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.197016388224017,
+        10.492087915916192
+      ],
+      "rmse": [
+        7.197016388224017,
+        10.492087915916192
+      ]
+    },
+    "attack|fb|left": {
+      "train": 7192,
+      "test": 2780,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        10.67913948217942,
+        6.345771980055636
+      ],
+      "rmse": [
+        10.67913948217942,
+        6.345771980055636
+      ]
+    },
+    "attack|cb|left": {
+      "train": 5867,
+      "test": 3577,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.450311355948035,
+        7.766829915098497
+      ],
+      "rmse": [
+        7.450311355948035,
+        7.766829915098497
+      ]
+    },
+    "attack|wg|right": {
+      "train": 6048,
+      "test": 2869,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.964966784552665,
+        9.746134950177828
+      ],
+      "rmse": [
+        9.964966784552665,
+        9.746134950177828
+      ]
+    },
+    "attack|cm|centre": {
+      "train": 12885,
+      "test": 6189,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.07342712064733,
+        9.163444842427916
+      ],
+      "rmse": [
+        9.07342712064733,
+        9.163444842427916
+      ]
+    },
+    "attack|wg|left": {
+      "train": 6419,
+      "test": 3210,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.509228627522713,
+        10.590730475307407
+      ],
+      "rmse": [
+        9.509228627522713,
+        10.590730475307407
+      ]
+    },
+    "attack|cb|right": {
+      "train": 5159,
+      "test": 3719,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.81613814498305,
+        7.252978490214454
+      ],
+      "rmse": [
+        8.81613814498305,
+        7.252978490214454
+      ]
+    },
+    "defend|am|centre": {
+      "train": 4654,
+      "test": 2381,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.833024011234555,
+        7.9834597448155336
+      ],
+      "rmse": [
+        8.833024011234555,
+        7.9834597448155336
+      ]
+    },
+    "defend|st|centre": {
+      "train": 6516,
+      "test": 5516,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.369495478092533,
+        11.046628843615265
+      ],
+      "rmse": [
+        8.369495478092533,
+        11.046628843615265
+      ]
+    },
+    "defend|cm|centre": {
+      "train": 12408,
+      "test": 5410,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.487316197618481,
+        8.657356475776862
+      ],
+      "rmse": [
+        8.487316197618481,
+        8.657356475776862
+      ]
+    },
+    "defend|wg|right": {
+      "train": 5960,
+      "test": 3072,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        10.359324311624487,
+        7.2650041634172275
+      ],
+      "rmse": [
+        10.359324311624487,
+        7.2650041634172275
+      ]
+    },
+    "defend|wg|left": {
+      "train": 6163,
+      "test": 3822,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        11.112864029896057,
+        6.947856828823271
+      ],
+      "rmse": [
+        11.112864029896057,
+        6.947856828823271
+      ]
+    },
+    "defend|cb|left": {
+      "train": 4959,
+      "test": 3917,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        6.529661643945852,
+        6.042244046125498
+      ],
+      "rmse": [
+        6.529661643945852,
+        6.042244046125498
+      ]
+    },
+    "defend|fb|left": {
+      "train": 7192,
+      "test": 2142,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.939305688553378,
+        5.326631112579084
+      ],
+      "rmse": [
+        7.939305688553378,
+        5.326631112579084
+      ]
+    },
+    "defend|cb|right": {
+      "train": 5271,
+      "test": 3114,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        6.804172041784151,
+        5.5434164301262205
+      ],
+      "rmse": [
+        6.804172041784151,
+        5.5434164301262205
+      ]
+    },
+    "defend|fb|right": {
+      "train": 6747,
+      "test": 2869,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.188798965279169,
+        4.923744864761144
+      ],
+      "rmse": [
+        7.188798965279169,
+        4.923744864761144
+      ]
+    },
+    "defend|am|right": {
+      "train": 849,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|am|centre": {
+      "train": 4968,
+      "test": 1366,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.18841163160731,
+        14.20884692992218
+      ],
+      "rmse": [
+        9.18841163160731,
+        14.20884692992218
+      ]
+    },
+    "attack|am|left": {
+      "train": 678,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|cb|centre": {
+      "train": 4170,
+      "test": 2043,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.706607182421875,
+        10.578875808694665
+      ],
+      "rmse": [
+        8.706607182421875,
+        10.578875808694665
+      ]
+    },
+    "defend|st|right": {
+      "train": 2649,
+      "test": 188,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        11.33548280604716,
+        10.81670788235442
+      ],
+      "rmse": [
+        11.33548280604716,
+        10.81670788235442
+      ]
+    },
+    "defend|wg|centre": {
+      "train": 513,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "defend|cb|centre": {
+      "train": 4970,
+      "test": 2743,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        6.528280796153802,
+        7.682149675925728
+      ],
+      "rmse": [
+        6.528280796153802,
+        7.682149675925728
+      ]
+    },
+    "defend|fb|centre": {
+      "train": 641,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "defend|cm|right": {
+      "train": 562,
+      "test": 675,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        14.32700345236857,
+        10.300141838055287
+      ],
+      "rmse": [
+        14.32700345236857,
+        10.300141838055287
+      ]
+    },
+    "defend|am|left": {
+      "train": 509,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|st|right": {
+      "train": 1634,
+      "test": 528,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.63791747324023,
+        10.49279584146164
+      ],
+      "rmse": [
+        7.63791747324023,
+        10.49279584146164
+      ]
+    },
+    "attack|wg|centre": {
+      "train": 335,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|fb|centre": {
+      "train": 764,
+      "test": 0,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": null,
+      "rmse": null
+    },
+    "attack|cm|right": {
+      "train": 290,
+      "test": 878,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        14.155731721256156,
+        11.506296553802832
+      ],
+      "rmse": [
+        14.155731721256156,
+        11.506296553802832
+      ]
+    },
+    "defend|cm|left": {
+      "train": 786,
+      "test": 1357,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        13.075668955910482,
+        8.027798741985015
+      ],
+      "rmse": [
+        13.075668955910482,
+        8.027798741985015
+      ]
+    },
+    "attack|cm|left": {
+      "train": 786,
+      "test": 1013,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        11.069299377695986,
+        8.90470027149327
+      ],
+      "rmse": [
+        11.069299377695986,
+        8.90470027149327
+      ]
+    },
+    "attack|st|left": {
+      "train": 688,
+      "test": 94,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        12.80542806022006,
+        11.029045033580445
+      ],
+      "rmse": [
+        12.80542806022006,
+        11.029045033580445
+      ]
+    },
+    "defend|st|left": {
+      "train": 571,
+      "test": 264,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.04529098841707,
+        6.401199152524275
+      ],
+      "rmse": [
+        9.04529098841707,
+        6.401199152524275
+      ]
+    }
+  }
+}

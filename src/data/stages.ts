@@ -61,7 +61,7 @@ export const STAGES: Stage[] = [
   {
     id: 2, title: '幅で揺さぶる', concept: '幅とサイドチェンジ',
     opponent: opp('ダイヤモンド・シティ', { formation: '4-1-2-1-2', width: 'narrow', compactness: 'tight' }, 1.6),
-    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'long', tempo: 'fast', width: 'wide', fullbacks: 'invert', pressHeight: 'high', lineHeight: 'high', onLoss: 'counterpress', onWin: 'counter' }),
+    solution: tactic({ formation: '3-4-3', buildUp: 'short', width: 'wide', fullbacks: 'invert', pressHeight: 'high', compactness: 'tight' }),
     brief: '相手は中央に人を集めるダイヤモンド型。その代わり、サイドには人がいません。',
     scouting: ['中央に5人以上が密集する', 'サイドを守るのはSBだけ', '横に振ると中盤のスライドが間に合わない'],
     hints: ['幅を「広い」に設定しよう', 'SBを上げてサイドで2対1を作ろう', '5レーンのオーバーレイで大外の使い方を見よう'],
@@ -105,7 +105,7 @@ export const STAGES: Stage[] = [
   {
     id: 6, title: 'ウイングバックの裏', concept: '幅の守備の弱点',
     opponent: opp('トライデント', { formation: '3-5-2', pressHeight: 'mid' }, 1.6),
-    solution: tactic({ formation: '5-3-2', buildUp: 'short', tempo: 'fast', width: 'wide', fullbacks: 'invert', pressHeight: 'high', pressIntensity: 'high', lineHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
+    solution: tactic({ formation: '5-3-2', buildUp: 'short', tempo: 'fast', width: 'wide', fullbacks: 'invert', pressHeight: 'high', pressIntensity: 'normal', lineHeight: 'high', compactness: 'tight', onLoss: 'counterpress', onWin: 'keep' }),
     brief: '相手は3バック。大外を守るのはウイングバック1人で、その背後はCBが見るには遠い場所です。',
     scouting: ['WBが高い位置を取ると、その裏が空く', 'CB3枚の幅は広くない', '中盤は3枚で厚い'],
     hints: ['ウイングやWBを大外に張らせて、幅を「広い」にしよう', '相手のCB3枚を横に広げ、2トップで間を突く', '中盤より前で奪えばWBの裏は空いたまま'],

@@ -28,10 +28,17 @@ describe('実測の位置モデル', () => {
       const p = m.players[10];
       p.runTarget = { x: 98, y: 34 }; p.runUntil = 25;
       updateFrames(m); attackerMove(m, p);
-      expect(p.runTarget).toBeNull();
+      if(onWin==='keep')expect(p.runTarget).toBeNull();
+      else {expect(p.target.x).toBeLessThan(90);expect(p.runUntil).toBeLessThan(m.t+1);}
       return p.target.x;
     };
     expect(target('counter')).toBeGreaterThan(target('keep') + 5);
+  });
+  it('保持の前線支援は現在位置から毎tick後退せず、学習位置からの固定偏差を保つ',()=>{
+    const m=makeTestMatch(tactic({onWin:'keep'}));m.dead=null;m.t=20;m.turnoverAt=19;m.ball.pos={x:45,y:34};m.lastLine=[30,20];
+    const p=m.players[10];p.pos={x:20,y:34};updateFrames(m);attackerMove(m,p);
+    const target={...p.target};expect(target.x).toBeGreaterThan(p.pos.x+5);
+    p.pos.x-=2;attackerMove(m,p);expect(p.target).toEqual(target);
   });
   it('喪失後は近い選手が即時奪回し、遠いCBをボールより前へ釣り出さない', () => {
     const count = (onLoss: 'regroup' | 'counterpress') => {

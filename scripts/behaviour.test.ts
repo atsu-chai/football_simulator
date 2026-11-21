@@ -34,4 +34,11 @@ describe('連続した行動の共通計測',()=>{
     const m=new Measure();sequence().forEach(f=>{if(f.t>=10)f.p[1][0]=100;m.feed(f);});
     expect(m.result().moments).toBe(4);
   });
+  it('新しい連動指標は人数が安定した10対11も測り、旧指標の11対11条件は維持する',()=>{
+    const m=new Measure();sequence().forEach(f=>{f.p=f.p.filter(p=>p[0]!==4);m.feed(f);});
+    const r=m.result();expect(r.moments).toBe(0);expect(r.coordinationSampling.moments).toBe(12);
+    expect(r.coordinationSampling.sections).toBe(1);expect(r.coordinationSampling.reducedStrengthMoments).toBe(12);
+    expect(r.metrics.nearestTeammate_defend.n).toBeGreaterThan(0);expect(r.metrics.stranded).toBeUndefined();
+  });
+
 });

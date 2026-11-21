@@ -1,0 +1,337 @@
+{
+  "engineSha256": "dcaa75b2ec78e09f22ba661abf91d480035de5796da439df5334e9d9374700ef",
+  "comparisons": {
+    "before": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 7.545431012415948,
+      "centroidPositionRMSE": 3.144306468020684,
+      "spreadRMSE": 3.1559595780780243,
+      "correlationRMSE": {
+        "velocity": 0.16978286116871164,
+        "coupling": 0.33904453807195606,
+        "centroidLag": 0.19123575415494762
+      }
+    },
+    "after": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 6.960542904916892,
+      "centroidPositionRMSE": 3.174628310763941,
+      "spreadRMSE": 3.102294283591895,
+      "correlationRMSE": {
+        "velocity": 0.14700726061961705,
+        "coupling": 0.2218922860253758,
+        "centroidLag": 0.1248017186988693
+      }
+    },
+    "alternate": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 7.3330773648960825,
+      "centroidPositionRMSE": 3.214106732336115,
+      "spreadRMSE": 3.136881192936139,
+      "correlationRMSE": {
+        "velocity": 0.14835167627886145,
+        "coupling": 0.23109625490670258,
+        "centroidLag": 0.12707060754298435
+      }
+    }
+  },
+  "equalStrengthComparisons": {
+    "before": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 7.578153566529955,
+      "centroidPositionRMSE": 3.2257634381158997,
+      "spreadRMSE": 3.16586139615615,
+      "correlationRMSE": {
+        "velocity": 0.17662201038937608,
+        "coupling": 0.3394417190036883,
+        "centroidLag": 0.1916894160667294
+      }
+    },
+    "after": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 6.966523085411972,
+      "centroidPositionRMSE": 3.2209643405949295,
+      "spreadRMSE": 3.098159411744413,
+      "correlationRMSE": {
+        "velocity": 0.1533822177458131,
+        "coupling": 0.22109931125901536,
+        "centroidLag": 0.12446768363721285
+      }
+    },
+    "alternate": {
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 7.314865025549111,
+      "centroidPositionRMSE": 3.264753744573652,
+      "spreadRMSE": 3.12920428304796,
+      "correlationRMSE": {
+        "velocity": 0.15468505130960683,
+        "coupling": 0.23020434362043363,
+        "centroidLag": 0.1265546631200004
+      }
+    }
+  },
+  "roleErrors": {
+    "before": {
+      "defend|am": {
+        "referenceExposure": 12676,
+        "cells": 9,
+        "ballRMSE": 3.8176107558856165,
+        "centroidRMSE": 3.96380885957413
+      },
+      "defend|fb": {
+        "referenceExposure": 30120,
+        "cells": 9,
+        "ballRMSE": 3.8193816548582493,
+        "centroidRMSE": 2.7755488607663614
+      },
+      "defend|st": {
+        "referenceExposure": 23725,
+        "cells": 9,
+        "ballRMSE": 7.95978491803899,
+        "centroidRMSE": 2.3107677942475537
+      },
+      "defend|cb": {
+        "referenceExposure": 38062,
+        "cells": 9,
+        "ballRMSE": 4.321915730406137,
+        "centroidRMSE": 2.18427425926925
+      },
+      "defend|wg": {
+        "referenceExposure": 29056,
+        "cells": 9,
+        "ballRMSE": 8.494627857853686,
+        "centroidRMSE": 2.799637839988489
+      },
+      "defend|cm": {
+        "referenceExposure": 33497,
+        "cells": 9,
+        "ballRMSE": 7.080615535525339,
+        "centroidRMSE": 1.9800923937148456
+      },
+      "attack|am": {
+        "referenceExposure": 11747,
+        "cells": 9,
+        "ballRMSE": 15.005414969282901,
+        "centroidRMSE": 7.938187069207328
+      },
+      "attack|st": {
+        "referenceExposure": 23762,
+        "cells": 9,
+        "ballRMSE": 5.764429518057019,
+        "centroidRMSE": 2.6587474169496246
+      },
+      "attack|cm": {
+        "referenceExposure": 34134,
+        "cells": 9,
+        "ballRMSE": 6.411922120638045,
+        "centroidRMSE": 3.2922183421260196
+      },
+      "attack|wg": {
+        "referenceExposure": 28644,
+        "cells": 9,
+        "ballRMSE": 8.08135135139965,
+        "centroidRMSE": 2.06085738451361
+      },
+      "attack|cb": {
+        "referenceExposure": 37463,
+        "cells": 9,
+        "ballRMSE": 6.442169437643919,
+        "centroidRMSE": 2.0278452212754945
+      },
+      "attack|fb": {
+        "referenceExposure": 31524,
+        "cells": 9,
+        "ballRMSE": 11.489585639393127,
+        "centroidRMSE": 4.5539699028906435
+      }
+    },
+    "after": {
+      "defend|am": {
+        "referenceExposure": 12676,
+        "cells": 9,
+        "ballRMSE": 2.7946759627248925,
+        "centroidRMSE": 3.079961219180836
+      },
+      "defend|fb": {
+        "referenceExposure": 30120,
+        "cells": 9,
+        "ballRMSE": 4.815241585577308,
+        "centroidRMSE": 1.6293249313735554
+      },
+      "defend|st": {
+        "referenceExposure": 23725,
+        "cells": 9,
+        "ballRMSE": 5.764148908097726,
+        "centroidRMSE": 2.84681325523345
+      },
+      "defend|cb": {
+        "referenceExposure": 38062,
+        "cells": 9,
+        "ballRMSE": 3.7356104285424756,
+        "centroidRMSE": 1.6234414528351084
+      },
+      "defend|wg": {
+        "referenceExposure": 29056,
+        "cells": 9,
+        "ballRMSE": 3.6351755416862996,
+        "centroidRMSE": 2.118797970528378
+      },
+      "defend|cm": {
+        "referenceExposure": 33497,
+        "cells": 9,
+        "ballRMSE": 3.8692486668046624,
+        "centroidRMSE": 1.628078454183106
+      },
+      "attack|am": {
+        "referenceExposure": 11747,
+        "cells": 9,
+        "ballRMSE": 13.239180912914438,
+        "centroidRMSE": 5.54666558305231
+      },
+      "attack|st": {
+        "referenceExposure": 23762,
+        "cells": 9,
+        "ballRMSE": 5.838354760081484,
+        "centroidRMSE": 4.543854902290918
+      },
+      "attack|cm": {
+        "referenceExposure": 34134,
+        "cells": 9,
+        "ballRMSE": 7.027804775978501,
+        "centroidRMSE": 2.5396659938129713
+      },
+      "attack|wg": {
+        "referenceExposure": 28644,
+        "cells": 9,
+        "ballRMSE": 10.585733500553058,
+        "centroidRMSE": 3.4704485334798467
+      },
+      "attack|cb": {
+        "referenceExposure": 37463,
+        "cells": 9,
+        "ballRMSE": 5.383662474190664,
+        "centroidRMSE": 2.7566069175333023
+      },
+      "attack|fb": {
+        "referenceExposure": 31524,
+        "cells": 9,
+        "ballRMSE": 11.745872333071388,
+        "centroidRMSE": 5.508101852218086
+      }
+    },
+    "alternate": {
+      "defend|am": {
+        "referenceExposure": 12676,
+        "cells": 9,
+        "ballRMSE": 2.7981905631760617,
+        "centroidRMSE": 3.1274149006792564
+      },
+      "defend|fb": {
+        "referenceExposure": 30120,
+        "cells": 9,
+        "ballRMSE": 4.944302926287627,
+        "centroidRMSE": 1.4130862925193657
+      },
+      "defend|st": {
+        "referenceExposure": 23725,
+        "cells": 9,
+        "ballRMSE": 6.441035660800896,
+        "centroidRMSE": 2.9709703599113295
+      },
+      "defend|cb": {
+        "referenceExposure": 38062,
+        "cells": 9,
+        "ballRMSE": 3.9936199807708683,
+        "centroidRMSE": 1.5164410611219115
+      },
+      "defend|wg": {
+        "referenceExposure": 29056,
+        "cells": 9,
+        "ballRMSE": 4.038262780336341,
+        "centroidRMSE": 2.176469442095255
+      },
+      "defend|cm": {
+        "referenceExposure": 33497,
+        "cells": 9,
+        "ballRMSE": 4.1794135071702865,
+        "centroidRMSE": 1.4745905700793602
+      },
+      "attack|am": {
+        "referenceExposure": 11747,
+        "cells": 9,
+        "ballRMSE": 14.039888221667168,
+        "centroidRMSE": 5.7416294864778905
+      },
+      "attack|st": {
+        "referenceExposure": 23762,
+        "cells": 9,
+        "ballRMSE": 6.139435778257187,
+        "centroidRMSE": 4.528304900737568
+      },
+      "attack|cm": {
+        "referenceExposure": 34134,
+        "cells": 9,
+        "ballRMSE": 7.23201001646953,
+        "centroidRMSE": 2.4815416807061084
+      },
+      "attack|wg": {
+        "referenceExposure": 28644,
+        "cells": 9,
+        "ballRMSE": 10.737387674620319,
+        "centroidRMSE": 3.7000759990199192
+      },
+      "attack|cb": {
+        "referenceExposure": 37463,
+        "cells": 9,
+        "ballRMSE": 6.068585972012976,
+        "centroidRMSE": 2.844780251766534
+      },
+      "attack|fb": {
+        "referenceExposure": 31524,
+        "cells": 9,
+        "ballRMSE": 12.362896313257954,
+        "centroidRMSE": 5.584245600666089
+      }
+    }
+  },
+  "checkCounts": {
+    "old": 18,
+    "new": 34
+  }
+}

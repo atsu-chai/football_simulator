@@ -87,9 +87,9 @@ export const TRACKING_TACTICS = {
 };
 
 /** V(t+1)=a+b*位置誤差+c*球速+d*V(t) の持続応答 c/(1-d)。5試合学習・2試合検証。 */
-export function learnedBallResponse(role: RoleId): number {
+export function learnedBallResponse(role: RoleId, attacking = false, lateral = false): number {
   const line = role === 'cb' || role === 'fb' || role === 'wb' ? 0 : role === 'dm' || role === 'cm' ? 1 : 2;
-  const key = `defend${line}` as const;
+  const key = `${attacking ? 'attack' : 'defend'}${line}${lateral ? 'y' : ''}` as const;
   const c = behaviour.response[key].coefficients;
   return c[2] / (1 - c[3]);
 }

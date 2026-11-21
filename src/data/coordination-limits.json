@@ -1,0 +1,136 @@
+{
+  "method": "Engineering acceptance bounds, not confidence intervals. Freeze before full 60-match validation. Conditional errors weight common role/third/lane cells by real exposure (real n>=40, sim n>=20); report coverage independently. Correlations are Pearson over all uninterrupted windows, stable role-unit membership (CB/FB/WB; DM/CM; AM/WG/ST) over each window; backs include all 4/5 defenders.",
+  "metrics": [
+    [
+      "backFlatness",
+      "mean",
+      1.5
+    ],
+    [
+      "gap_def_mid",
+      "mean",
+      3
+    ],
+    [
+      "gap_mid_fwd",
+      "mean",
+      3
+    ],
+    [
+      "adjacent0",
+      "mean",
+      3
+    ],
+    [
+      "adjacent1",
+      "mean",
+      3
+    ],
+    [
+      "adjacent2",
+      "mean",
+      3
+    ],
+    [
+      "nearestTeammate_attack",
+      "p50",
+      2
+    ],
+    [
+      "nearestTeammate_defend",
+      "p50",
+      2
+    ],
+    [
+      "nearestTeammate_attack",
+      "p90",
+      3
+    ],
+    [
+      "nearestTeammate_defend",
+      "p90",
+      3
+    ],
+    [
+      "hull_attack",
+      "mean",
+      300
+    ],
+    [
+      "hull_defend",
+      "mean",
+      250
+    ],
+    [
+      "options15",
+      "mean",
+      0.6
+    ],
+    [
+      "supportWidth",
+      "mean",
+      4
+    ],
+    [
+      "supportDepth",
+      "mean",
+      4
+    ],
+    [
+      "width_fb",
+      "mean",
+      4
+    ],
+    [
+      "width_wg",
+      "mean",
+      4
+    ],
+    [
+      "movingWithCentroid_attack",
+      "mean",
+      0.1
+    ],
+    [
+      "movingWithCentroid_defend",
+      "mean",
+      0.1
+    ],
+    [
+      "lag0",
+      "mean",
+      3
+    ],
+    [
+      "lag1",
+      "mean",
+      3
+    ],
+    [
+      "lag2",
+      "mean",
+      3
+    ],
+    [
+      "nearestTeammate_attack",
+      "p10",
+      1.5
+    ],
+    [
+      "nearestTeammate_defend",
+      "p10",
+      1.5
+    ]
+  ],
+  "errors": {
+    "ballPositionRMSE": 8,
+    "centroidPositionRMSE": 6,
+    "spreadRMSE": 4
+  },
+  "correlationRMSE": {
+    "velocity": 0.2,
+    "coupling": 0.25,
+    "centroidLag": 0.25
+  },
+  "minimumCoverage": 0.9
+}

@@ -1,0 +1,95 @@
+{
+  "dateJST": "2026-11-22",
+  "baseCommit": "42aaae02aff6dba7228224223d4f30fd2a55602d",
+  "engineSha256": "dcaa75b2ec78e09f22ba661abf91d480035de5796da439df5334e9d9374700ef",
+  "sourceSha256": {
+    "scripts/behaviour.ts": "b0c468f6b2bbd063f2cf19052e5a8b71a0269a8f28ccb044502f1e58d8c93524",
+    "scripts/coordination.ts": "9f862cb36a74e178dc389e173d22d91056b580b2e726c21e721fe809a9f2ec67",
+    "scripts/fit-positioning.ts": "29d00e5654d66fbd36d5b6ce5651b89feedb7f1e6bf8aa9c48d82fa8870ec2d3",
+    "scripts/fit-response.ts": "3deda66bae73aa21094640081ab5440c6f2d15ba64a9754ee636d1c5bb6e2a5e",
+    "scripts/data/extract_behaviour.py": "e0aa2f28001ad9f8aaaddcf9c9ce82269db50c2a2c480c9a1e88c3c8834ef2c4",
+    "scripts/compare-real.ts": "9748ad8920204f2b90ffca6e998009c933fea247ad17fa1369cd5141859bf76e",
+    "scripts/tactic-geometry.ts": "73aa7ede6d975979a51d9a5820ed1708915452dfc92c9fece81293b4ad5fe985",
+    "src/data/stages.ts": "88a1ac01b6aa4c6a30ddfaf972b162d59e11f610c28fd467444dcf35e1be2db2",
+    "src/data/story.ts": "e579aa8bf1be0130c6bef634f95c0594b1c397940ed92b577cb53fe07191ecaa",
+    "src/data/behaviour.json": "535a29c9c59c865685d67e9c2510d61a7b5da879b434e3cd309bd3122f942a77",
+    "src/data/coordination-limits.json": "8d9356d234b904af549a0412021493e1920f2fc5194c0158612db914db091bb2"
+  },
+  "behaviour": {
+    "matchesPerSeedGroup": 60,
+    "seedStarts": [
+      9001,
+      12345
+    ],
+    "oldChecks": 18,
+    "newChecks": 34,
+    "passedPerGroup": [
+      52,
+      52
+    ]
+  },
+  "real": {
+    "matches": 7,
+    "halves": 14,
+    "oldWindows11v11": 14355,
+    "coordinationWindows": 16845,
+    "reducedStrengthWindows": 2490
+  },
+  "audit": {
+    "pairs": 3,
+    "matchesPerPair": 20,
+    "allThreeChecksPass": true
+  },
+  "compareReal": {
+    "matchesPerSetting": 12,
+    "originalTacticChecks": 6,
+    "originalMotionChecks": 4,
+    "additionalMatchedGeometryChecks": 3,
+    "allPass": true
+  },
+  "balance": {
+    "stages": 12,
+    "matchesPerTacticPerStage": 100,
+    "totalMatches": 2400,
+    "allPass": true,
+    "goalBandAppliesTo": "solution, as defined in existing scripts/balance.ts"
+  },
+  "story": {
+    "matchesPerOpponentPerTactic": 30,
+    "totalMatches": 1440,
+    "execution": "chapters 1–6 parallel; equivalent to scripts/story.ts 30",
+    "thresholdsChanged": false,
+    "note": "estimated chapter clear probabilities from independent opponent distributions; cup draws 50% PK"
+  },
+  "movementMatches": 6,
+  "restartMatches": 12,
+  "testsPassed": 80,
+  "pythonTestsPassed": 3,
+  "buildPassed": true,
+  "clip": {
+    "seed": 9002,
+    "seconds": 90,
+    "hz": 5,
+    "framesEach": 450,
+    "playersEach": 22,
+    "simStartSeconds": 808,
+    "realLiveFrames": 441,
+    "simLiveFrames": 438,
+    "checkerPassed": true
+  },
+  "commandsExitZero": [
+    "behaviour60",
+    "behaviour60-seed12345",
+    "audit20--check",
+    "compare-real12--check",
+    "movement6--check",
+    "restarts12",
+    "balance-par100-UNIVERSAL0",
+    "story30-chapters1..6",
+    "npm test",
+    "npm run build",
+    "python-unittest",
+    "check-behaviour-page"
+  ],
+  "committedOrPushed": false
+}

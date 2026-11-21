@@ -1,0 +1,8 @@
+{ realLiveFrames: 441, simLiveFrames: 438, startSeconds: 808 }
+{
+  realFrames: 450,
+  simFrames: 450,
+  realPlayers: 22,
+  simPlayers: 22,
+  sampledTimes: [ 0, 8, 30, 60, 89.8 ]
+}

@@ -1,3 +1,4 @@
+import { coordinateUnits } from './coordination';
 import { TRACKING_MOTION, learnedBallResponse } from './tracking';
 import { FORMATIONS } from '../data/formations';
 import { assignMarks, teamDefense } from './defending';
@@ -49,7 +50,7 @@ export function createMatch(cfg: MatchConfig): MatchState {
     pos: vec(PITCH_W / 2, PITCH_H / 2), prev: vec(PITCH_W / 2, PITCH_H / 2), z: 0, vel: vec(0, 0),
     vz: 0, owner: -1, lastTouch: 0, pass: null, shot: null,
   };
-  const frame = { hasBall: false, line: 30, length: 30, width: 40, cy: 34 };
+  const frame = { referenceBack: 30, hasBall: false, line: 30, length: 30, width: 40, cy: 34 };
   const m: MatchState = {
     cfg, t: 0, half: 1, finished: false, atHalftime: false,
     players: makePlayers(cfg), ball, movementBallVel: vec(0, 0),
@@ -178,12 +179,15 @@ function movePlayer(m: MatchState, p: Player) {
   }
   // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
   // 帰陣と押し上げを同じ速さにしない。帰陣のゲインは行動分布で校正した値（回帰係数ではない）。
-  const recovering = !m.dead && m.possession !== p.team && back && (target.x - p.pos.x) * (p.team === 0 ? 1 : -1) < -2;
-  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : recovering ? 0.8 : 0.23)) * (0.7 + p.urgency * 0.3);
+  const lateralCover = m.t-m.turnoverAt<3 && ['fb','wb','wg','iw'].includes(p.role)
+    && Math.abs(dy)>2 && dy*(m.frames[p.team].cy-p.pos.y)>0;
+  const retreatingX = (target.x-p.pos.x)*sign < -2;
+  const recovering = !m.dead && m.possession !== p.team && (retreatingX || lateralCover);
+  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : recovering ? (back ? 0.8 : 0.6) : 0.23)) * (0.7 + p.urgency * 0.3);
   // 裏抜け・パスへの追走だけスプリントし、寄せや帰陣の高緊急度と区別する。
   const sprintAction = p.runTarget !== null || m.ball.pass?.to === p.id;
   const chaseSpeed = recoveryThreat ? TRACKING_MOTION.recoverySprint : (sprintAction ? TRACKING_MOTION.sprint : 5.9) * p.urgency;
-  const retreatResponse = recovering ? Math.max(0, -m.movementBallVel.x * sign) * learnedBallResponse(p.role) : 0;
+  const retreatResponse = recovering && retreatingX ? Math.max(0, -m.movementBallVel.x * sign) * learnedBallResponse(p.role) : 0;
   const recoverySpeed = Math.min(TRACKING_MOTION.running, recovery + retreatResponse);
   const top = (isCarrier ? carry : urgent ? chaseSpeed : recoverySpeed) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
@@ -194,6 +198,12 @@ function movePlayer(m: MatchState, p: Player) {
   let vy = d > 0.05 ? (dy / d) * speed : 0;
   // 実測で推定した球速への応答。目標そのものの差分は追わず、守備で後退する時だけ使う。
   if (!urgent && retreatResponse > 0) vx -= sign * retreatResponse * Math.min(1, remaining / 3);
+  if (!m.dead && !urgent && p.role !== 'gk') {
+    vy += m.movementBallVel.y * learnedBallResponse(p.role, m.possession === p.team, true) * .6 * Math.min(1, remaining / 3);
+    if (m.possession === p.team && dx * m.movementBallVel.x > 0) {
+      vx += m.movementBallVel.x * learnedBallResponse(p.role, true) * .6 * Math.min(1, remaining / 3);
+    }
+  }
   // 味方と重ならないように少し離れる
   for (const o of m.players) {
     if (o.id === p.id || o.team !== p.team) continue;
@@ -357,6 +367,7 @@ export function step(m: MatchState) {
         decideOnBall(m, c);
       }
     }
+    coordinateUnits(m);
     resolveTackles(m);
   }
   for (const p of m.players) movePlayer(m, p);

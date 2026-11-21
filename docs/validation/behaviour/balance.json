@@ -1,90 +1,115 @@
 {
-  "matchesPerSettingPerStage": 100,
+  "matchesPerTacticPerStage": 100,
   "universal": false,
+  "engineSha256": "dcaa75b2ec78e09f22ba661abf91d480035de5796da439df5334e9d9374700ef",
   "results": [
     {
       "stage": 1,
-      "baseWin": 41,
-      "answerWin": 89,
-      "gap": 48,
-      "goals": 2.68
+      "defaultWinPct": 36,
+      "solutionWinPct": 96,
+      "gapPoints": 60,
+      "defaultGoals": 2.55,
+      "solutionGoals": 3.28,
+      "pass": true
     },
     {
       "stage": 2,
-      "baseWin": 33,
-      "answerWin": 97,
-      "gap": 64,
-      "goals": 4.56
+      "defaultWinPct": 20,
+      "solutionWinPct": 93,
+      "gapPoints": 73,
+      "defaultGoals": 2.94,
+      "solutionGoals": 3.19,
+      "pass": true
     },
     {
       "stage": 3,
-      "baseWin": 20,
-      "answerWin": 68,
-      "gap": 48,
-      "goals": 2.0
+      "defaultWinPct": 33,
+      "solutionWinPct": 65,
+      "gapPoints": 32,
+      "defaultGoals": 1.97,
+      "solutionGoals": 2.5,
+      "pass": true
     },
     {
       "stage": 4,
-      "baseWin": 32,
-      "answerWin": 75,
-      "gap": 43,
-      "goals": 2.54
+      "defaultWinPct": 35,
+      "solutionWinPct": 64,
+      "gapPoints": 29,
+      "defaultGoals": 2.42,
+      "solutionGoals": 2.44,
+      "pass": true
     },
     {
       "stage": 5,
-      "baseWin": 48,
-      "answerWin": 91,
-      "gap": 43,
-      "goals": 3.01
+      "defaultWinPct": 28,
+      "solutionWinPct": 93,
+      "gapPoints": 65,
+      "defaultGoals": 2.45,
+      "solutionGoals": 4.01,
+      "pass": true
     },
     {
       "stage": 6,
-      "baseWin": 33,
-      "answerWin": 95,
-      "gap": 62,
-      "goals": 3.34
+      "defaultWinPct": 26,
+      "solutionWinPct": 96,
+      "gapPoints": 70,
+      "defaultGoals": 2.78,
+      "solutionGoals": 4.36,
+      "pass": true
     },
     {
       "stage": 7,
-      "baseWin": 33,
-      "answerWin": 84,
-      "gap": 51,
-      "goals": 2.36
+      "defaultWinPct": 31,
+      "solutionWinPct": 87,
+      "gapPoints": 56,
+      "defaultGoals": 1.9100000000000001,
+      "solutionGoals": 3.24,
+      "pass": true
     },
     {
       "stage": 8,
-      "baseWin": 55,
-      "answerWin": 78,
-      "gap": 23,
-      "goals": 3.23
+      "defaultWinPct": 37,
+      "solutionWinPct": 71,
+      "gapPoints": 34,
+      "defaultGoals": 3.67,
+      "solutionGoals": 3.4,
+      "pass": true
     },
     {
       "stage": 9,
-      "baseWin": 41,
-      "answerWin": 89,
-      "gap": 48,
-      "goals": 2.89
+      "defaultWinPct": 44,
+      "solutionWinPct": 97,
+      "gapPoints": 53,
+      "defaultGoals": 1.96,
+      "solutionGoals": 3.61,
+      "pass": true
     },
     {
       "stage": 10,
-      "baseWin": 38,
-      "answerWin": 82,
-      "gap": 44,
-      "goals": 2.18
+      "defaultWinPct": 20,
+      "solutionWinPct": 88,
+      "gapPoints": 68,
+      "defaultGoals": 3.29,
+      "solutionGoals": 3.39,
+      "pass": true
     },
     {
       "stage": 11,
-      "baseWin": 37,
-      "answerWin": 80,
-      "gap": 43,
-      "goals": 2.68
+      "defaultWinPct": 24,
+      "solutionWinPct": 94,
+      "gapPoints": 70,
+      "defaultGoals": 2.6100000000000003,
+      "solutionGoals": 3.13,
+      "pass": true
     },
     {
       "stage": 12,
-      "baseWin": 49,
-      "answerWin": 87,
-      "gap": 38,
-      "goals": 3.06
+      "defaultWinPct": 39,
+      "solutionWinPct": 92,
+      "gapPoints": 53,
+      "defaultGoals": 2.7,
+      "solutionGoals": 3.28,
+      "pass": true
     }
   ]
 }

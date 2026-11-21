@@ -5,21 +5,25 @@
 
  RUN  v2.1.9 /Users/ooshitaatsushinin/project/football_simulator
 
- ✓ scripts/behaviour.test.ts (6 tests) 12ms
- ✓ src/engine/tracking.test.ts (8 tests) 52ms
- ✓ src/game/story.test.ts (10 tests) 12ms
- ✓ src/game/progress.test.ts (14 tests) 14ms
- ✓ src/engine/engine.test.ts (20 tests) 9123ms
-   ✓ 決定論 > 同じシードなら同じ試合になる 1308ms
-   ✓ 決定論 > シードが違えば試合は変わる 1017ms
-   ✓ オフサイド > 試合全体で数字が破綻しない 546ms
-   ✓ 指標 > 保持率は合計100%になり、説明文が生成される 597ms
-   ✓ 進行 > スクリプトで相手の戦術が変わる 556ms
-   ✓ 進行 > 全チームが1試合走り切れる 4329ms
-   ✓ 敗因の診断 > 負けた試合では悪かった点が挙がる 473ms
+ ✓ scripts/coordination.test.ts (6 tests) 14ms
+ ✓ src/game/story.test.ts (10 tests) 18ms
+ ✓ src/game/progress.test.ts (14 tests) 18ms
+ ✓ src/engine/coordination.test.ts (12 tests) 105ms
+ ✓ scripts/behaviour.test.ts (7 tests) 138ms
+ ✓ src/engine/tracking.test.ts (9 tests) 291ms
+ ✓ scripts/tactic-geometry.test.ts (2 tests) 3ms
+ ✓ src/engine/engine.test.ts (20 tests) 62460ms
+   ✓ 決定論 > 同じシードなら同じ試合になる 7649ms
+   ✓ 決定論 > シードが違えば試合は変わる 7209ms
+   ✓ オフサイド > 試合全体で数字が破綻しない 3533ms
+   ✓ 指標 > 保持率は合計100%になり、説明文が生成される 3952ms
+   ✓ 進行 > ハーフタイムで止まり resume で再開する 1822ms
+   ✓ 進行 > スクリプトで相手の戦術が変わる 3542ms
+   ✓ 進行 > 全チームが1試合走り切れる 31032ms
+   ✓ 敗因の診断 > 負けた試合では悪かった点が挙がる 3676ms
 
- Test Files  5 passed (5)
-      Tests  58 passed (58)
-   Start at  15:53:31
-   Duration  9.87s (transform 579ms, setup 0ms, collect 1.59s, tests 9.21s, environment 1ms, prepare 697ms)
+ Test Files  8 passed (8)
+      Tests  80 passed (80)
+   Start at  02:38:36
+   Duration  64.42s (transform 1.39s, setup 0ms, collect 6.39s, tests 63.05s, environment 1ms, prepare 1.45s)
 

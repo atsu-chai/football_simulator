@@ -1,3 +1,4 @@
+import { matchedGeometry, type GeometryCell } from './tactic-geometry';
 // 同じ定義・5Hz・GK除外で実測とシミュレーションを比較する。戦術差は同じシード群で比較する。
 import { readFileSync, writeFileSync } from 'node:fs';
 import real from '../src/data/tracking.json';
@@ -12,6 +13,7 @@ const phases: TrackingPhase[] = ['attack', 'defend', 'win', 'loss'];
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 function measure(t: Tactics, n = N, both = true) {
   const sums = Object.fromEntries(phases.map((p) => [p, { n: 0, ballX: 0, values: Array<number>(10).fill(0) }])) as Record<TrackingPhase, { n: number; ballX: number; values: number[] }>;
+  const geometryCells: Record<string,GeometryCell> = {};
   const bands = Array<number>(6).fill(0);
   const conditioned = Object.fromEntries(phases.map(p => [p, Array<number>(7).fill(0)])) as Record<TrackingPhase, number[]>;
   let deadDistance = 0, deadTicks = 0, totalTicks = 0;
@@ -40,6 +42,9 @@ function measure(t: Tactics, n = N, both = true) {
         values.forEach((v, i) => s.values[i] += v);
         const ball = toRel(side, m.ball.pos);
         const key = `all|${phase}|${Math.min(11, Math.floor(ball.x / 105 * 12))}|${Math.min(7, Math.floor(ball.y / 68 * 8))}`;
+        const geometryKey=key.replace('all|','');
+        const geometry=geometryCells[geometryKey]??={n:0,values:Array<number>(10).fill(0)};
+        geometry.n++;values.forEach((v,i)=>geometry.values[i]+=v);
         const cell = (real.cells as Record<string, number[]>)[key];
         if (cell) { conditioned[phase][0]++; for (let i = 1; i < 7; i++) conditioned[phase][i] += cell[i + 1] - values[i]; }
         if (m.possession !== side) { pressers += players.filter((p) => p.pressing).length; defenseSamples++; }
@@ -56,7 +61,8 @@ function measure(t: Tactics, n = N, both = true) {
     }
   }
   for (const s of Object.values(sums)) { s.values = s.values.map((v) => v / Math.max(1, s.n)); s.ballX /= Math.max(1, s.n); }
-  return { conditioned, deadShare: deadTicks / totalTicks, deadKmPer90: deadDistance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, phases: sums, meanSpeed: speedSum / samples, shares: bands.map((v) => v / samples), kmPer90: distance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, liveKmPer90: speedSum / samples * 5.4, pressure: pressure / carriers, pressers: pressers / defenseSamples };
+  for(const cell of Object.values(geometryCells))cell.values=cell.values.map(v=>v/cell.n);
+  return { geometryCells, conditioned, deadShare: deadTicks / totalTicks, deadKmPer90: deadDistance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, phases: sums, meanSpeed: speedSum / samples, shares: bands.map((v) => v / samples), kmPer90: distance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, liveKmPer90: speedSum / samples * 5.4, pressure: pressure / carriers, pressers: pressers / defenseSamples };
 }
 const sim = measure(tactic({ formation: '4-2-3-1' }));
 console.log(`実測7試合 / シミュレーション${N}試合、インプレー5Hz・GK除外。ライン=後方4人/中間3人/前方3人の平均x。`);
@@ -100,23 +106,41 @@ for (const [label, over] of [
   const d = r.phases.defend.values;
   console.log(`${label} | ${d[4].toFixed(2)} | ${d[1].toFixed(2)} | ${d[2].toFixed(2)} | ${r.phases.attack.values[2].toFixed(2)} | ${r.pressers.toFixed(2)} | ${r.phases.loss.values[7].toFixed(2)} | ${r.phases.loss.values[2].toFixed(2)} | ${r.phases.win.values[6].toFixed(2)}`);
 }
-if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N, sim, effects }, null, 2) + '\n');
+const geometryContrasts = {
+  line: matchedGeometry(effects['高ライン'].geometryCells,effects['低ライン'].geometryCells,'defend',4),
+  length: matchedGeometry(effects['緩い'].geometryCells,effects['密集'].geometryCells,'defend',1),
+  width: matchedGeometry(effects['広い'].geometryCells,effects['狭い'].geometryCells,'attack',2),
+};
+console.log('同じ球位置12×8セル・実位置の戦術差（重み=min両群標本数、各群25標本以上）', geometryContrasts);
+// Per-cell accumulators are temporary; persist observed summaries and matched contrasts.
+const summary = (r: ReturnType<typeof measure>) => ({ ...r, geometryCells: undefined });
+if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N, sim: summary(sim), effects: Object.fromEntries(Object.entries(effects).map(([key,r])=>[key,summary(r)])), geometryContrasts }, null, 2) + '\n');
 
 if (process.argv.includes('--check')) {
   const checks = {
     即時奪回: effects['即時奪回'].phases.loss.values[7] - effects['帰陣'].phases.loss.values[7] > 0.1,
     速攻: effects['速攻'].phases.win.values[6] - effects['保持'].phases.win.values[6] > 1,
-    ライン高: effects['高ライン'].phases.defend.values[4] - effects['低ライン'].phases.defend.values[4] > 5,
-    密集度: effects['緩い'].phases.defend.values[1] - effects['密集'].phases.defend.values[1] > 3,
-    攻撃幅: effects['広い'].phases.attack.values[2] - effects['狭い'].phases.attack.values[2] > 5,
+    ライン高: effects['高ライン'].phases.defend.values[4]-effects['低ライン'].phases.defend.values[4]>5,
+    密集度: effects['緩い'].phases.defend.values[1]-effects['密集'].phases.defend.values[1]>3,
+    攻撃幅: effects['広い'].phases.attack.values[2]-effects['狭い'].phases.attack.values[2]>5,
     プレス: effects['高プレス'].pressers - effects['低プレス'].pressers > 0.2,
   };
+  const geometryCoverage=Object.values(geometryContrasts).every(c=>c.cells>=12&&Math.min(c.firstCoverage,c.secondCoverage)>=.4);
   const motionChecks = {
     停止込み距離: Math.abs(sim.kmPer90 / real.kinematics.distanceKmPer90 - 1) < 0.15,
     高速帯: Math.abs(sim.shares[4] - real.kinematics.shares[4]) < 0.02,
     喪失後長さ: Math.abs(sim.phases.loss.values[1] - real.validation.loss.values[1]) < 4,
     喪失後幅: Math.abs(sim.phases.loss.values[2] - real.validation.loss.values[2]) < 5,
   };
+  const geometryChecks = {
+    ライン高: geometryContrasts.line.delta>5,
+    密集度: geometryContrasts.length.delta>3,
+    攻撃幅: geometryContrasts.width.delta>5,
+  };
+  console.log('球位置条件付きの追加判定',geometryChecks);
+  if(Object.values(geometryChecks).some(v=>!v))process.exitCode=1;
+  console.log('共通球セル被覆判定',geometryCoverage);
+  if(!geometryCoverage||sim.conditioned.loss[0]/sim.phases.loss.n<.9)process.exitCode=1;
   console.log('移動・切替判定', motionChecks);
   if (Object.values(motionChecks).some(v => !v)) process.exitCode = 1;
   console.log('戦術差判定', checks);

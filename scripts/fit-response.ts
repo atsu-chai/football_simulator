@@ -30,6 +30,13 @@ for await(const line of createInterface({input:createReadStream(process.argv[2])
    const l=lines.map(xs=>mean(xs.slice(a,b)));
    const x=[1,base[5+i]-l[2],Math.max(-12,Math.min(12,(rx(current.b[0])-rx(hist[0].b[0]))/2)),l[2]-l[1]];
    (datasets[`${phase}${i}`]??=[]).push({x,y:l[3]-l[2],test:matches.size>5});
+   // Keep the same current ranked unit identities while measuring lateral velocity.
+   const ids=hist[2].p.filter(p=>p[1]===team&&p[2]!=='gk').sort((p,q)=>rx(p[3])-rx(q[3])).slice(a,b).map(p=>p[0]);
+   if(hist.every(g=>ids.every(id=>g.p.some(p=>p[0]===id)))) {
+    const y=hist.map(g=>mean(ids.map(id=>{const p=g.p.find(p=>p[0]===id)!;return sign===1?p[4]:68-p[4];})));
+    const by=(sign===1?current.b[1]-hist[0].b[1]:hist[0].b[1]-current.b[1])/2;
+    (datasets[`${phase}${i}y`]??=[]).push({x:[1,base[4]-y[2],Math.max(-12,Math.min(12,by)),y[2]-y[1]],y:y[3]-y[2],test:matches.size>5});
+   }
   });
  }
 }

@@ -27,12 +27,12 @@ export function attackerMove(m: MatchState, p: Player) {
   const rel = toRel(side, p.pos);
   const lim = offsideLimit(m, side);
 
-  // 奪取直後は守備の密集を保つ。速攻だけ前線が出口を作り、保持では近くの支援を残す。
+  // 奪取直後も学習位置を基準にする。保持の支援は4mの固定偏差とし、毎tick「現在位置−3m」へ後退し続けない。
   if (sinceWin < 3) {
     const b = toRel(side, base);
     const forward = p.role === 'st' || p.role === 'wg' || p.role === 'iw' || p.role === 'am';
-    p.runTarget = null; p.spot = null;
-    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 10 : !counter && forward ? Math.min(b.x, rel.x - 3) : b.x), y: b.y });
+    p.runTarget = null; p.runUntil = 0; p.spot = null;
+    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 10 : !counter && forward ? b.x - 4 : b.x), y: b.y });
     p.urgency = counter && forward ? 0.95 : 0.78;
     return;
   }
@@ -135,7 +135,7 @@ export function attackerMove(m: MatchState, p: Player) {
   p.urgency = dist(p.pos, base) > 9 ? 0.75 : 0.5;
 }
 
-const SUPPORTERS = 3;
+const SUPPORTERS = 2;
 
 /** 保持者に近い順で上位の味方か。GK と、前線で相手の最終ラインを押し下げる CF は除く。 */
 const HOLDERS = new Set(['gk', 'st', 'wg', 'iw', 'wb']);

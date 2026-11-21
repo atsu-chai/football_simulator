@@ -1,3 +1,4 @@
+import { learnedPosition } from './positioning';
 import { learnedRoleX, learnedShape, TRACKING_TACTICS, trackingPhase } from './tracking';
 import { FORMATIONS } from '../data/formations';
 import { clamp, relX, toAbs, toRel } from './geometry';
@@ -5,11 +6,14 @@ import { MatchState, PITCH_H, PITCH_W, Player, Side, Tactics, TeamFrame, Vec } f
 
 const LINE_ADJ = { deep: -TRACKING_TACTICS.line * 1.25, normal: 0, high: TRACKING_TACTICS.line * 1.25 };
 const PRESS_ADJ = { low: -TRACKING_TACTICS.press, mid: 0, high: TRACKING_TACTICS.press };
-const LENGTH_SCALE = { loose: 1 + TRACKING_TACTICS.length, normal: 1, tight: 1 - TRACKING_TACTICS.length };
+const LENGTH_SCALE = { loose: 1 + TRACKING_TACTICS.length * 1.5, normal: 1, tight: 1 - TRACKING_TACTICS.length * 1.5 };
 const WIDTH_SCALE = { loose: 1 + TRACKING_TACTICS.defensiveWidth, normal: 1, tight: 1 - TRACKING_TACTICS.defensiveWidth };
 const ATTACK_WIDTH = { narrow: 1 - TRACKING_TACTICS.attackingWidth, normal: 1, wide: 1 + TRACKING_TACTICS.attackingWidth };
 
+const targetCache = new WeakMap<MatchState, Map<number, Vec>>();
+
 export function updateFrames(m: MatchState) {
+  targetCache.delete(m);
   for (const side of [0, 1] as Side[]) m.frames[side] = computeFrame(m, side);
 }
 
@@ -26,9 +30,9 @@ function computeFrame(m: MatchState, side: Side): TeamFrame {
   const opponent = m.tactics[(1 - side) as Side];
   const pulled = hasBall ? 0 : (ATTACK_WIDTH[opponent.width] - 1) * base[3] * 0.45;
   return {
-    hasBall, line,
+    hasBall, line, referenceBack: base[1],
     length: base[2] * (hasBall ? 0.92 : 1) * LENGTH_SCALE[t.compactness],
-    width: base[3] * (hasBall ? 1.15 : trackingPhase(m, side) === 'loss' ? 1.265 : 1.31) * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
+    width: base[3] * (hasBall ? 1.15 : trackingPhase(m, side) === 'loss' ? 1.10 : 1.65) * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
     cy: base[4] + (hasBall ? (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0) : 0),
   };
 }
@@ -63,6 +67,10 @@ export function offsideLimit(m: MatchState, side: Side): number {
 
 /** 局面と役割から決まる、その選手の基準位置(絶対座標)。 */
 export function shapeTarget(m: MatchState, p: Player): Vec {
+  let cache = targetCache.get(m);
+  if (!cache) { cache = new Map(); targetCache.set(m, cache); }
+  const cached = cache.get(p.id);
+  if (cached) return { ...cached };
   const t = m.tactics[p.team];
   const f = m.frames[p.team];
   const rel = shapeRel(m, p, t, f);
@@ -73,7 +81,9 @@ export function shapeTarget(m: MatchState, p: Player): Vec {
   }
   rel.x = clamp(rel.x, 2, PITCH_W - 2);
   rel.y = clamp(rel.y, 1.5, PITCH_H - 1.5);
-  return toAbs(p.team, rel);
+  const result = toAbs(p.team, rel);
+  cache.set(p.id, result);
+  return { ...result };
 }
 
 function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
@@ -86,6 +96,9 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
   const sideSign = slot.y < 0.5 ? -1 : 1;
   let x = f.line + learnedRoleX(t.formation, trackingPhase(m, p.team), p.role, slot.x, toRel(p.team, m.ball.pos).x) * f.length;
   let y = f.cy + (slot.y - 0.5) * f.width;
+  const observed = learnedPosition(m, p);
+  x = f.hasBall ? x * .5 + observed.x * .5 : f.line + (observed.x - f.referenceBack) * LENGTH_SCALE[t.compactness];
+  y = y * .5 + observed.y * .5;
 
   if (f.hasBall) {
     const lim = oppLineX(m, p.team);
@@ -101,8 +114,8 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
           x = f.line + f.length * 0.34;
           y = 34 + sideSign * 10;
         } else {
-          // 残る場合も、CBより一段前で幅を取ってビルドアップに参加する
-          x += 3;
+          // 残るSBは実測混合スタイルの基準から7m低く、CBの前で出口を保つ。
+          x -= 4;
         }
         if (deepBuild && t.fullbacks !== 'invert') {
           x = Math.max(x, 30);
@@ -111,7 +124,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         break;
       case 'wb':
         // 同じ選手が攻守の幅を担うので、SBの上がりより一段低い位置までにする
-        x = f.line + f.length * 0.56;
+        x += 4;
         y = 34 + sideSign * Math.min(edge + 2, 32);
         break;
       case 'cb': {
@@ -121,16 +134,16 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         }
         if (deepBuild) {
           // 中央のCB(3バックの真ん中)は残り、両脇はペナルティエリアの角の外へ開く
-          y = 34 + (slot.y - 0.5) * 2 * 17;
+          y = 34 + (observed.y - 34) * WIDTH_SCALE[t.compactness] * ATTACK_WIDTH[t.width] + (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0);
           x = Math.max(x, 8);
         }
         break;
       }
       case 'dm':
-        x = Math.min(x + 8, f.line + 26);
+        x = Math.min(x + 5, f.line + 26);
         break;
       case 'cm':
-        x += 5;
+        x += 3;
         y = y * 0.65 + (34 + sideSign * 12) * 0.35;
         break;
       case 'am':
@@ -139,7 +152,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         break;
       case 'wg':
         x = Math.min(x + 2, lim - 3);
-        y = 34 + sideSign * Math.min(edge, 31);
+        y = observed.y * .4 + (34 + sideSign * Math.min(edge, 31)) * .6;
         break;
       case 'iw':
         x = Math.min(x + 4, lim - 2);
@@ -155,14 +168,17 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
     }
     x = Math.min(x, lim - 0.5);
   } else {
+    if (p.role === 'dm' || p.role === 'cm') y = f.cy + (y - f.cy) * .85;
+    if (p.role === 'st' || p.role === 'f9') x += 6;
     // 最終ラインは中盤ほどボールサイドへ寄らず、逆サイドのCBは中央に絞って残る
     if (p.role === 'cb' || p.role === 'fb' || p.role === 'wb') {
       const ball = toRel(p.team, m.ball.pos);
-      y = 34 + (ball.y - 34) * 0.2 + (slot.y - 0.5) * f.width * 0.92;
+      y = observed.y * .5 + (34 + (ball.y - 34) * 0.2 + (slot.y - 0.5) * f.width * 0.92) * .5;
+      if (p.role === 'cb') { const cy=34+(ball.y-34)*.2; y=cy+(y-cy)*1.12; }
     }
     switch (p.role) {
       case 'wb':
-        x = f.line + 1;
+        x += 1;
         y = 34 + (y - 34) * 1.35;
         y = clamp(y, 4, 64);
         break;
@@ -177,7 +193,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
       case 'wg':
       case 'iw':
         // 高いプレス以外では、ウイングも中盤まで戻って守る
-        if (t.pressHeight !== 'high') x = Math.min(x, f.line + f.length * 0.62);
+        if (t.pressHeight !== 'high') x = Math.min(x, f.line + f.length * 0.72);
         break;
     }
   }

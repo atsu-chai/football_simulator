@@ -63,8 +63,14 @@ def extract(root, output):
                 for team in [0,1]:
                     keepers=[p for ps in positions.values() for p in ps if p[1]==team and p[2]=='gk']
                     if keepers: directions[team]=1 if sum(p[3] for p in keepers)/len(keepers)<52.5 else -1
+                # 左右は瞬間位置で入れ替えず、ハーフ平均から固定する。IDは一時JSONL内だけ。
+                lateral = {}
+                for pid, ps in positions.items():
+                    y = sum(p[4] if directions[p[1]] == 1 else 68-p[4] for p in ps)/len(ps)
+                    lateral[pid] = 'left' if y < 29 else 'right' if y > 39 else 'centre'
                 for n,f in rows:
                     f['directions']=directions
+                    f['lateral'] = {p[0]: lateral[p[0]] for p in f['p']}
                     if not f['b']: continue
                     for p in f['p']: p[2] = roles[p[0]]
                     out.write(json.dumps(dict(match=path.stem, section=section, t=n/25, **f),separators=(',',':'))+'\n')

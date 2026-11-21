@@ -147,6 +147,8 @@ export interface DeadBall {
 }
 
 export interface TeamFrame {
+  /** Unmodified observed back anchor, shared by every slot in this tick. */
+  referenceBack: number;
   hasBall: boolean;
   line: number;
   length: number;

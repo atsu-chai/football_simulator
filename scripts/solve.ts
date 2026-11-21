@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 // ステージの攻略の鍵をすべて満たす戦術をランダムに作り、今のエンジンで最もよく勝つものを探す(模範解答の調整用)。
 // 使い方: npx tsx scripts/solve.ts <ステージ番号> [候補数] [試合数]
 import { DEFAULT_TACTICS, FORMATION_IDS, tactic } from '../src/data/formations';
@@ -61,7 +62,7 @@ function run(t: Tactics, adapt = false) {
 
 const base = run(DEFAULT_TACTICS);
 // 現在の答えの局所変更を先に比べ、守備的すぎる/攻撃的すぎる答えを調整する。
-const nearby: Partial<Tactics>[] = [{ fullbacks: 'overlap' }, { pressHeight: 'high' }, { lineHeight: 'high' },
+const nearby: Partial<Tactics>[] = [{ tempo: 'normal' }, { tempo: 'slow' }, { onWin: 'keep' }, { fullbacks: 'overlap' }, { pressHeight: 'high' }, { lineHeight: 'high' },
   { fullbacks: 'overlap', pressHeight: 'high' }, { pressHeight: 'high', lineHeight: 'high' }];
 // 他の教材で実際に使う設定も候補にする。攻略の鍵を満たすものだけを共通シードで比較する。
 const cands: Tactics[] = [s.solution];
@@ -76,6 +77,7 @@ while (cands.length < K) {
   if (keys.every((k) => k.check(t, stub(false)))) cands.push(t);
 }
 const res = cands.map((t) => ({ t, ...run(t, true) })).sort((a, b) => Number(b.g >= 2 && b.g <= 5 && b.w - base.w >= 20) - Number(a.g >= 2 && a.g <= 5 && a.w - base.w >= 20) || b.w - a.w);
+if(process.env.RESULT_JSON)writeFileSync(process.env.RESULT_JSON,JSON.stringify({stage:id,matches:N,candidates:K,base,results:res},null,2)+'\n');
 console.log(`STAGE ${id} base ${base.w.toFixed(0)}`);
 for (const r of res.slice(0, 4)) {
   const { formation, roles, buildUp, tempo, width, fullbacks, pressHeight, pressIntensity, lineHeight, compactness, onLoss, onWin } = r.t;

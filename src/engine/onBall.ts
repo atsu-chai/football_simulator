@@ -6,7 +6,7 @@ import { offsideLimit } from './teamShape';
 
 const SPRINT = 7.6;
 // 実測のブロック配置へ置き換えた後の試合集計で、シュートの期待値を再校正する。
-export const XG_SCALE = 2.1;
+export const XG_SCALE = 2.8;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -124,7 +124,7 @@ export function decideOnBall(m: MatchState, p: Player) {
     const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
     const longRange = d > 18 ? 0.05 + (d - 18) * 0.008 : 0;
     const inBox = rel.x > PITCH_W - 16.5 && Math.abs(rel.y - 34) < 20.16;
-    if (xg > 0.012 && d < 32) options.push({ score: (xg / XG_SCALE * 1.55) * 10 + 0.2 + (inBox ? 0.22 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
+    if (xg > 0.012 && d < 32) options.push({ score: (xg / XG_SCALE * 1.8) * 10 + 0.2 + (inBox ? 0.22 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
   }
 
   // パス
