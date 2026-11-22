@@ -127,7 +127,7 @@ export function decideOnBall(m: MatchState, p: Player) {
     const longRange = Math.max(0, d - 20) * .012;
     const facingGoal = (PITCH_W-rel.x)/Math.max(1,d);
     const inBox=rel.x>88.5&&Math.abs(rel.y-34)<20.16;
-    const opportunity=inBox?.47:.35*clamp((pressure-1)/4,.25,1);
+    const opportunity=inBox?.47:.48*clamp((pressure-1)/4,.25,1);
     if (xg > 0.004 && d < 32) options.push({ score: xg * 5 + opportunity*facingGoal - longRange + (m.rand() - 0.5) * 0.12, run: () => shoot(m, p, xg, false) });
   }
 
@@ -299,8 +299,11 @@ export function decideOnBall(m: MatchState, p: Player) {
 
   // キープ: 圧力がなければその場で味方の動きを待つ
   if (pressure > 7) {
+    // In a settled deep build-up, use the first seconds after receiving to
+    // survey and let the outlets open. The value expires, so play cannot freeze.
+    const survey = rel.x < 35 && !counter ? clamp(1 - (m.t - p.receivedAt) / 3, 0, 1) : 0;
     options.push({
-      score: hereValue * 0.5,
+      score: hereValue * 0.5 + survey * (hereValue * .5 + .12),
       run: () => {
         p.target = { ...p.pos };
         p.urgency = 0.3;

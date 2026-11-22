@@ -1,0 +1,78 @@
+{
+  "engineSha256": "927b2744dc48f336babeec776cec08ec6cfbee4c0ad86aa571b00c24ec67b35d",
+  "stageDataSha256": "5244f8ac5e8e27347e001b52a27f8f1f5626941601fc8d5c41cc5af1639de1cd",
+  "validation": {
+    "behaviour": {
+      "matchesPerCohort": 24,
+      "seedStarts": [
+        9001,
+        12345,
+        55555
+      ],
+      "checksPerCohort": 125
+    },
+    "offball": {
+      "matches": 12,
+      "seedStart": 9001,
+      "checks": 21
+    },
+    "audit": {
+      "perPair": 36,
+      "matches": 108,
+      "checks": 10
+    },
+    "compareReal": {
+      "matchesPerTactic": 12
+    },
+    "balance": {
+      "matchesPerTacticPerStage": 100,
+      "stages": 12,
+      "universal": false
+    },
+    "story": {
+      "matchesPerFixture": 30,
+      "chapters": 6,
+      "execution": "scripts/story.ts 30 <chapter> <chapter>, partitioned by chapter with identical seeds"
+    },
+    "tests": 133
+  },
+  "completedExitCodes": {
+    "behaviour": 0,
+    "behaviour-12345": 0,
+    "behaviour-55555": 0,
+    "offball": 0,
+    "audit": 0,
+    "compare-real": 0,
+    "movement": 0,
+    "restarts": 0,
+    "determinism": 0,
+    "tests": 0,
+    "build": 0,
+    "clip": 0,
+    "page-check": 0,
+    "balance-3": 0,
+    "balance-8": 0,
+    "story-initial-chapters": 0,
+    "story-bus": 0,
+    "story-manmark": 0,
+    "story-recombination": 0,
+    "solve-3": 0,
+    "solve-8": 0,
+    "tests-final": 0,
+    "build-final": 0
+  },
+  "initialStageDataSha256": "d2ab836cb72c2641029d602d1f84c419f644cb06364b4097b61556d563ba07a6",
+  "answerAdjustments": {
+    "3": {
+      "candidates": 6,
+      "pilotMatches": 32
+    },
+    "8": {
+      "candidates": 8,
+      "pilotMatches": 32
+    }
+  },
+  "balanceInitialBatchExitCode": 1,
+  "balanceFinalPasses": 12,
+  "storyRemeasuredFixtures": 5
+}

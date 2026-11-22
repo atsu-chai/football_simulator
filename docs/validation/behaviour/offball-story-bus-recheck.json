@@ -1,0 +1,169 @@
+{
+  "matches": 30,
+  "results": [
+    {
+      "chapter": 1,
+      "league": "JFL",
+      "target": 6,
+      "base": 0,
+      "answer": 0,
+      "ptsBase": 2.666666666666667,
+      "ptsAns": 2.833333333333333,
+      "distBase": [
+        0.06666666666666664,
+        0.06666666666666667,
+        0,
+        0.8666666666666667
+      ],
+      "distAns": [
+        0.03333333333333332,
+        0.03333333333333333,
+        0,
+        0.9333333333333333
+      ],
+      "fixtures": [
+        {
+          "style": "bus",
+          "skill": 0.87,
+          "mySkill": 1.05,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.8666666666666667,
+            "d": 0.06666666666666667
+          },
+          "answer": {
+            "w": 0.9333333333333333,
+            "d": 0.03333333333333333
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "league": "J2",
+      "target": 11,
+      "base": 0,
+      "answer": 0,
+      "ptsBase": 2.8666666666666667,
+      "ptsAns": 2.8666666666666667,
+      "distBase": [
+        -1.3877787807814457e-17,
+        0.06666666666666667,
+        0,
+        0.9333333333333333
+      ],
+      "distAns": [
+        -1.3877787807814457e-17,
+        0.06666666666666667,
+        0,
+        0.9333333333333333
+      ],
+      "fixtures": [
+        {
+          "style": "bus",
+          "skill": 0.97,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.9333333333333333,
+            "d": 0.06666666666666667
+          },
+          "answer": {
+            "w": 0.9333333333333333,
+            "d": 0.06666666666666667
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "league": "アジア",
+      "base": 0.8666666666666667,
+      "answer": 0.9833333333333334,
+      "ptsBase": -0.1431008436406733,
+      "ptsAns": -0.016807118316381174,
+      "distBase": [
+        0.06666666666666662,
+        0.13333333333333333,
+        0,
+        0.8
+      ],
+      "distAns": [
+        -6.938893903907228e-18,
+        0.03333333333333333,
+        0,
+        0.9666666666666667
+      ],
+      "fixtures": [
+        {
+          "style": "bus",
+          "skill": 1.03,
+          "mySkill": 1.17,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.8,
+            "d": 0.13333333333333333
+          },
+          "answer": {
+            "w": 0.9666666666666667,
+            "d": 0.03333333333333333
+          }
+        }
+      ]
+    }
+  ]
+}

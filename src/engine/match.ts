@@ -4,7 +4,7 @@ import { FORMATIONS } from '../data/formations';
 import { assignMarks, teamDefense } from './defending';
 import { dist, mulberry32, relX, toAbs, toRel, vec } from './geometry';
 import { interceptPoint, attackerMove } from './offBall';
-import { decideOnBall, resolveTackles, restartWith } from './onBall';
+import { decideOnBall, nearestOpp, resolveTackles, restartWith } from './onBall';
 import { setKickoffHandler, stepBall } from './ball';
 import { addEvent, gameMinute } from './events';
 import { runCoach } from './coach';
@@ -155,7 +155,7 @@ function movePlayer(m: MatchState, p: Player) {
   const approach = Math.max(0, -m.movementBallVel.x * sign);
   // 2秒以内に背後へ入る球には、通常のスライドでなく帰陣の走行へ切り替える。
   const recoveryThreat = !m.dead && m.possession !== p.team && back && !p.pressing && approach > 1
-    && (p.target.x - p.pos.x) * sign < -3 && (m.ball.pos.x - p.pos.x) * sign < Math.max(6, approach * 2);
+    && (p.target.x - p.pos.x) * sign < -1.5 && (m.ball.pos.x - p.pos.x) * sign < Math.max(8, approach * 3);
   const lateralCover = !m.dead && m.t-m.turnoverAt<3 && m.possession!==p.team && !p.pressing
     && ['fb','wb','wg','iw'].includes(p.role) && Math.abs(p.target.y-p.pos.y)>2
     && (p.target.y-p.pos.y)*(toAbs(p.team,{x:0,y:m.frames[p.team].cy}).y-p.pos.y)>0;
@@ -181,6 +181,13 @@ function movePlayer(m: MatchState, p: Player) {
     if (!ahead) carry = 5.5;
     // 守備者がすぐ近くにいる時は、ボールを守りながらなので速く運べない
     else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 3.5;
+    // Unopposed build-up is a walking survey, not a continuous sprint out of
+    // the own third. Keep escape dribbles and transition counters available.
+    const tactics = m.tactics[p.team];
+    const counter = tactics.onWin === 'counter' && m.t - m.turnoverAt < 6;
+    if (x < 35 && !counter && nearestOpp(m, p.team, p.pos) > 7) {
+      carry = Math.min(carry, { slow: 1.2, normal: 1.8, fast: 2.6 }[tactics.tempo]);
+    }
   }
   // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
   // 帰陣と押し上げを同じ速さにしない。帰陣のゲインは行動分布で校正した値（回帰係数ではない）。
@@ -189,7 +196,7 @@ function movePlayer(m: MatchState, p: Player) {
   const recovering = !m.dead && m.possession !== p.team && (retreatingX || lateralCover);
   // Closed-loop calibration: the old uniform .23 gain left attack targets 7–10m ahead
   // of actual positions. Preserve a slower striker outlet; AM must reconnect sooner.
-  const attackGain = p.role === 'am' ? .7 : ['fb','wb','wg','iw'].includes(p.role) ? .5 : ['st','f9'].includes(p.role) ? .35 : .45;
+  const attackGain = p.role === 'am' ? .6 : ['fb','wb'].includes(p.role) ? .4 : ['wg','iw'].includes(p.role) ? .5 : ['st','f9'].includes(p.role) ? .55 : p.role === 'cb' ? .3 : .35;
   const adjustmentGain = recovering ? (back ? .8 : .6) : m.possession === p.team ? attackGain : .23;
   const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? .32 : adjustmentGain)) * (0.7 + p.urgency * 0.3);
   // 裏抜け・パスへの追走だけスプリントし、寄せや帰陣の高緊急度と区別する。

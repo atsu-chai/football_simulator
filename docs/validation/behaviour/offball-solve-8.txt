@@ -1,0 +1,5 @@
+STAGE 8 base 19
+  W78 gap 59 g2.47 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw","10":"f9"},"buildUp":"long","tempo":"fast","width":"wide","fullbacks":"invert","pressHeight":"high","pressIntensity":"normal","lineHeight":"normal","compactness":"tight","onLoss":"counterpress","onWin":"counter"}
+  W72 gap 53 g2.34 {"formation":"4-3-3","roles":{"8":"iw","9":"f9","10":"iw"},"buildUp":"mixed","tempo":"fast","width":"wide","fullbacks":"stay","pressHeight":"mid","pressIntensity":"normal","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"counter"}
+  W72 gap 53 g2.06 {"formation":"4-2-3-1","roles":{"7":"iw","9":"iw","10":"f9"},"buildUp":"long","tempo":"fast","width":"wide","fullbacks":"invert","pressHeight":"high","pressIntensity":"normal","lineHeight":"deep","compactness":"tight","onLoss":"counterpress","onWin":"counter"}
+  W69 gap 50 g2.03 {"formation":"4-3-3","roles":{"8":"iw","9":"f9","10":"iw"},"buildUp":"mixed","tempo":"fast","width":"wide","fullbacks":"overlap","pressHeight":"mid","pressIntensity":"normal","lineHeight":"normal","compactness":"normal","onLoss":"counterpress","onWin":"counter"}

@@ -1,0 +1,118 @@
+{
+  "matches": 6,
+  "playback": 1.7,
+  "minutesPerMatch": 11.76470588235294,
+  "meanSpeed": 2.480983004328427,
+  "screenSpeed": 4.217671107358326,
+  "sprintPct": 0.6966359035427211,
+  "walkStandPct": 47.215838047037806,
+  "standPct": 7.5445072938374516,
+  "turnsPerSimMinute": 10.644834772253647,
+  "meanAcceleration": 1.675497330945298,
+  "targetJumpsPerSimMinute": 29.03006847275975,
+  "motionTargetJumpsPerSimMinute": 8.122655552247693,
+  "kmPer90Equivalent": 11.083751253568117,
+  "kmActuallyPerMatch": 2.4630558341262483,
+  "players": [
+    {
+      "id": 1,
+      "meanSpeed": 2.2076453082191003,
+      "kmPer90Equivalent": 11.921284664383142
+    },
+    {
+      "id": 2,
+      "meanSpeed": 1.6446586513792274,
+      "kmPer90Equivalent": 8.881156717447828
+    },
+    {
+      "id": 3,
+      "meanSpeed": 1.5928599230059555,
+      "kmPer90Equivalent": 8.60144358423216
+    },
+    {
+      "id": 4,
+      "meanSpeed": 2.103053892532615,
+      "kmPer90Equivalent": 11.356491019676122
+    },
+    {
+      "id": 5,
+      "meanSpeed": 2.035984808204772,
+      "kmPer90Equivalent": 10.99431796430577
+    },
+    {
+      "id": 6,
+      "meanSpeed": 2.2145898657217282,
+      "kmPer90Equivalent": 11.958785274897334
+    },
+    {
+      "id": 7,
+      "meanSpeed": 2.095228300138108,
+      "kmPer90Equivalent": 11.314232820745783
+    },
+    {
+      "id": 8,
+      "meanSpeed": 2.2459128934528803,
+      "kmPer90Equivalent": 12.127929624645555
+    },
+    {
+      "id": 9,
+      "meanSpeed": 2.1833741416234727,
+      "kmPer90Equivalent": 11.790220364766753
+    },
+    {
+      "id": 10,
+      "meanSpeed": 2.196987346944015,
+      "kmPer90Equivalent": 11.86373167349768
+    },
+    {
+      "id": 12,
+      "meanSpeed": 2.115763172029027,
+      "kmPer90Equivalent": 11.425121128956746
+    },
+    {
+      "id": 13,
+      "meanSpeed": 1.726391820950902,
+      "kmPer90Equivalent": 9.32251583313487
+    },
+    {
+      "id": 14,
+      "meanSpeed": 1.7290745075401188,
+      "kmPer90Equivalent": 9.337002340716642
+    },
+    {
+      "id": 15,
+      "meanSpeed": 2.192688622436538,
+      "kmPer90Equivalent": 11.840518561157305
+    },
+    {
+      "id": 16,
+      "meanSpeed": 2.2585719118285494,
+      "kmPer90Equivalent": 12.196288323874168
+    },
+    {
+      "id": 17,
+      "meanSpeed": 2.0700093023284536,
+      "kmPer90Equivalent": 11.17805023257365
+    },
+    {
+      "id": 18,
+      "meanSpeed": 2.061232964290992,
+      "kmPer90Equivalent": 11.130658007171357
+    },
+    {
+      "id": 19,
+      "meanSpeed": 2.239355669969808,
+      "kmPer90Equivalent": 12.092520617836962
+    },
+    {
+      "id": 20,
+      "meanSpeed": 1.9780910116054975,
+      "kmPer90Equivalent": 10.681691462669686
+    },
+    {
+      "id": 21,
+      "meanSpeed": 2.159456454571946,
+      "kmPer90Equivalent": 11.661064854688508
+    }
+  ]
+}

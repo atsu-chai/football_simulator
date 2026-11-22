@@ -25,36 +25,67 @@ export function attackerMove(m: MatchState, p: Player) {
   const pass = m.ball.pass;
   const hub = carrier ?? (pass && m.players[pass.from].team === side ? m.players[pass.to] : null);
   const rel = toRel(side, p.pos);
-  const lim = offsideLimit(m, side);
+  // 相手ラインの押し上げを0.8秒先まで読んで合わせる(反応してから戻るとパスの間にオフサイドに残る)
+  const lim = Math.min(offsideLimit(m, side), anticipatedLimit(m, side));
 
   // 奪取直後も学習位置を基準にする。保持の支援は4mの固定偏差とし、毎tick「現在位置−3m」へ後退し続けない。
   if (sinceWin < 3) {
     const b = toRel(side, base);
     const forward = p.role === 'st' || p.role === 'wg' || p.role === 'iw' || p.role === 'am';
     if(counter&&forward&&carrier&&carrier.team===side){
-      if(p.runTarget&&p.runUntil>m.t){p.target=p.runTarget;p.urgency=1;return;}
+      if(p.runTarget&&p.runUntil>m.t){const r=toRel(side,p.runTarget);p.target=toAbs(side,{x:Math.min(r.x,lim+.3),y:r.y});p.urgency=1;return;}
       const space=PITCH_W-7-lim,nearLine=rel.x>lim-9&&rel.x<=lim+.3;
       if(space>6&&nearLine&&nearestOpp(m,side,carrier.pos)>3.5){
         // Start the same onside-to-behind-line run used in settled play now,
         // rather than waiting three seconds while clamping every runner back
         // to the line. Passing still checks the receiver's position at kick.
         p.runTarget=toAbs(side,{x:lim+Math.min(space,16),y:clamp(rel.y+(34-rel.y)*.25,4,64)});
-        p.runUntil=m.turnoverAt+3;p.target=p.runTarget;p.urgency=1;return;
+        p.runUntil=m.turnoverAt+3;const r=toRel(side,p.runTarget);p.target=toAbs(side,{x:Math.min(r.x,lim+.3),y:r.y});p.urgency=1;return;
       }
     }
     p.runTarget = null; p.runUntil = 0; p.spot = null;
-    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 12 : !counter && forward ? b.x - 4 : b.x), y: b.y });
+    const outlet = p.role === 'st' && !counter;
+    p.target = toAbs(side, { x: Math.min(lim - 0.5, outlet ? Math.max(b.x, lim - 1) : counter && forward ? b.x + 12 : !counter && forward ? b.x - 4 : b.x), y: b.y });
     p.urgency = counter && forward ? 1 : 0.78;
     return;
   }
 
-  // 走り出している選手
-  if (p.runTarget && p.runUntil > m.t) {
-    p.target = p.runTarget;
+  // サイドの深い位置にボールが入ったら、ゴール前へ飛び込む
+  // ニア・ファー・PK地点・マイナスの折り返しに分かれる(実測のクロス局面: ボックス内1.8人、手前1.9人)
+  // パスの移動中も受け手を基準にし、ボールがサイドの深い位置へ運ばれる前から走り込む
+  if (hub && hub.team === side && hub.id !== p.id) {
+    const cr = toRel(side, pass && !carrier ? pass.point : hub.pos);
+    if (cr.x > 70 && Math.abs(cr.y - 34) > 12) {
+      const spot = crossSpot(m, p, hub, cr, lim);
+      if (spot) {
+        p.spot = null;
+        p.runTarget = spot;
+        p.runUntil = m.t + .8;
+        p.target = spot;
+        p.urgency = 1;
+        return;
+      }
+    }
+  }
+
+  // 走り出している選手。ラインを越えてもパスが出なければ走り抜けず、すぐオンサイドへ戻る
+  // (パスはライン手前の走者にしか出ない。実測でボールより後ろなのにラインの裏に残る選手は0.12人)。
+  const passToMe = pass && pass.to === p.id;
+  if (p.runTarget && p.runUntil > m.t && !(rel.x > lim + 1.5 && !passToMe)) {
+    // パスが出るまではライン上を斜めに走ってタイミングを合わせ、出た瞬間に裏へ抜ける
+    // (パスの目標は runTarget のまま。受け手になれば上の受け手処理が裏へ走らせる)。
+    const r = toRel(side, p.runTarget);
+    p.target = toAbs(side, { x: Math.min(r.x, lim + 0.3), y: r.y });
     p.urgency = 1;
     return;
   }
   p.runTarget = null;
+  if (!passToMe && rel.x > lim + 0.3 && toRel(side, m.ball.pos).x < lim) {
+    p.spot = null;
+    p.target = toAbs(side, { x: lim - 1.5, y: rel.y });
+    p.urgency = 0.92;
+    return;
+  }
 
   // 裏抜け: 味方が前を向けているとき、最終ラインの背後にスペースがあれば走る
   if (carrier && carrier.team === side && RUN_ROLES.has(p.role) && (counter || t.buildUp==='long' || toRel(side,carrier.pos).x>=35)) {
@@ -67,19 +98,24 @@ export function attackerMove(m: MatchState, p: Player) {
       const tgtRel = { x: lim + depth, y: clamp(rel.y + (34 - rel.y) * 0.25, 4, 64) };
       p.runTarget = toAbs(side, tgtRel);
       p.runUntil = m.t + 2.6;
-      p.target = p.runTarget;
+      p.target = toAbs(side, { x: Math.min(tgtRel.x, lim + 0.3), y: tgtRel.y });
       p.urgency = 1;
       return;
     }
   }
 
-  // サイドの深い位置にボールが入ったら、ゴール前へ飛び込む
-  if (carrier && carrier.team === side && (p.role === 'st' || p.role === 'f9' || p.role === 'am' || p.role === 'iw' || p.role === 'wg')) {
+  // 同じサイドのウイングが敵陣で持ったら、SBが外を追い越す(実測でSBがWGより前に出る割合16%)
+  if (carrier && carrier.team === side && (p.role === 'fb' || p.role === 'wb') && t.fullbacks !== 'invert'
+    && ['wg', 'iw', 'am', 'cm'].includes(carrier.role)) {
     const cr = toRel(side, carrier.pos);
-    if (cr.x > 74 && Math.abs(cr.y - 34) > 12 && Math.abs(rel.y - cr.y) > 6) {
-      const lane = p.slot % 2 === 0 ? -4.5 : 4.5;
-      p.target = toAbs(side, { x: Math.min(lim - 0.3, 95), y: 34 + lane });
-      p.urgency = 0.95;
+    const sameSide = Math.sign(cr.y - 34) === Math.sign(rel.y - 34) && Math.abs(cr.y - 34) > 10;
+    const rate = t.fullbacks === 'overlap' ? 1.8 : p.role === 'wb' ? 1.2 : 0.9;
+    if (sameSide && cr.x > 55 && cr.x < 90 && rel.x < cr.x + 2 && dist(p.pos, carrier.pos) < 32 && m.rand() < rate * TICK) {
+      const outside = Math.sign(cr.y - 34);
+      p.runTarget = toAbs(side, { x: Math.min(lim - 0.5, cr.x + 14, PITCH_W - 6), y: clamp(34 + outside * Math.max(Math.abs(cr.y - 34) + 5, 26), 3, 65) });
+      p.runUntil = m.t + 4.5;
+      p.target = p.runTarget;
+      p.urgency = 1;
       return;
     }
   }
@@ -89,6 +125,16 @@ export function attackerMove(m: MatchState, p: Player) {
     const baseRel = toRel(side, base);
     p.target = toAbs(side, { x: Math.min(lim - 0.5, baseRel.x + 16), y: baseRel.y });
     p.urgency = 0.95;
+    return;
+  }
+
+  // 敵陣では、CFと逆サイドのウイングは相手の最終ライン上で待ち、裏を狙える位置を保つ
+  // (実測でライン手前5m以内に1.8人、ボールより前に1.6人)
+  if (hub && hub.team === side && holdsLine(p, hub)) {
+    const b = toRel(side, base);
+    p.spot = null;
+    p.target = toAbs(side, { x: Math.min(lim - .5, Math.max(b.x, lim - (p.role === 'st' ? .5 : 1.5))), y: b.y });
+    p.urgency = dist(p.pos, p.target) > 5 ? 0.92 : 0.7;
     return;
   }
 
@@ -130,6 +176,54 @@ export function attackerMove(m: MatchState, p: Player) {
   p.spot = null;
   p.target = base;
   p.urgency = dist(p.pos, base) > 9 ? 0.75 : 0.5;
+}
+
+/** 相手の後ろから2人目の0.8秒後の位置で決まるオフサイドライン(自チーム基準のx)。 */
+function anticipatedLimit(m: MatchState, side: Player['team']): number {
+  const xs: number[] = [];
+  for (const o of m.players) if (o.team !== side) xs.push(toRel(side, { x: o.pos.x + o.vel.x * 0.8, y: o.pos.y }).x);
+  xs.sort((a, b) => b - a);
+  return Math.max(xs[1], toRel(side, m.ball.pos).x, PITCH_W / 2);
+}
+
+function holdsLine(p: Player, carrier: Player): boolean {
+  const side = p.team;
+  const cr = toRel(side, carrier.pos);
+  // CFは自陣の組み立てから相手の最終ラインを押し下げる(実測で自陣保持時の最前線はボールの37m前)
+  if (p.role === 'st') return true;
+  if (cr.x < 45) return false;
+  if (p.role !== 'wg' && p.role !== 'iw') return false;
+  // Central final-third possession needs both wide outlets high enough to
+  // threaten the line; neither is the near-side short support in this case.
+  if (cr.x > 70 && Math.abs(cr.y - 34) <= 6) return true;
+  // ボールと逆サイドのウイング
+  const rel = toRel(side, p.pos);
+  return Math.sign(rel.y - 34) !== Math.sign(cr.y - 34) && Math.abs(cr.y - 34) > 6;
+}
+
+/** クロス局面の役割分担。ゴールに近い順にニア・ファー・PK地点・マイナスへ入る。 */
+function crossSpot(m: MatchState, p: Player, carrier: Player, cr: Vec, lim: number): Vec | null {
+  const side = p.team;
+  const near = Math.sign(cr.y - 34);
+  const eligible = (q: Player) => q.team === side && q.id !== carrier.id
+    && ['st', 'f9', 'am', 'iw', 'wg', 'cm'].includes(q.role)
+    // ボールサイドのウイングは保持者の近くでサポートに残る
+    && !((q.role === 'wg' || q.role === 'iw') && Math.sign(toRel(side, q.pos).y - 34) === near && dist(q.pos, carrier.pos) < 15);
+  if (!eligible(p)) return null;
+  const goal = toAbs(side, { x: PITCH_W, y: 34 });
+  const pri = (q: Player) => dist(q.pos, goal) + (q.role === 'cm' ? 12 : 0);
+  const order = m.players.filter(eligible).sort((a, b) => pri(a) - pri(b));
+  const rank = order.indexOf(p);
+  const spots = [
+    { x: 99, y: 34 + near * 3 },   // ニア
+    { x: 97, y: 34 - near * 6 },   // ファー
+    { x: 93, y: 34 - near * 1 },   // PK地点付近
+    { x: 86, y: 34 + near * 5 },   // マイナスの折り返し
+  ];
+  if (rank < 0 || rank >= spots.length) return null;
+  const s = spots[rank];
+  // ボールが入る前はオフサイドラインを越えない
+  return toAbs(side, { x: Math.min(s.x, lim - 0.3), y: s.y });
 }
 
 const SUPPORTERS = 2;

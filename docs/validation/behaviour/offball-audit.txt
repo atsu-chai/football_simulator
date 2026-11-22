@@ -1,0 +1,35 @@
+項目                     シミュ   現実の目安
+得点(両チーム合計)                3.4    2.6〜2.9
+シュート(1チーム)               14.0    12〜13
+枠内シュート(1チーム)              5.2    4〜4.5
+パス(1チーム)                145.9    420〜480
+パス成功率%                   85.8    80〜84
+クロス(1チーム)                10.7    14〜18
+CK(1チーム)                  2.8    4.5〜5.5
+オフサイド(1チーム)             0.167    1.5〜2
+シュート距離(m)                15.5    16〜17
+ボックス外からのシュート%            32.4    33〜38
+25m以上からのシュート%            16.9    8〜12
+シュートあたり xG              0.109    0.10〜0.11
+決定率%                     11.4    10〜11
+ブロック率%                   22.6    24〜28
+ヘディング%                   18.5    13〜17
+ボックス外シュートの決定率%            2.7    3〜4
+ボックス内シュートの決定率%           15.5    13〜15
+受入判定 {
+  goals: true,
+  shots: true,
+  pass: true,
+  noFrozenPlay: true,
+  shotResolution: true,
+  shotDistance: true,
+  outsideShare: true,
+  longShotShare: true,
+  boxConversion: true,
+  headerShare: true
+}
+停止・未解決シュート {
+  longestFrozenLiveSeconds: 0,
+  longestPendingShotSeconds: 1.2000000000002728,
+  goalsWithoutGoalShot: 20
+}

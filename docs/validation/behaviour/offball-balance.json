@@ -1,0 +1,251 @@
+{
+  "matchesPerTactic": 100,
+  "seedStart": 5000,
+  "engineSha256": "927b2744dc48f336babeec776cec08ec6cfbee4c0ad86aa571b00c24ec67b35d",
+  "stageDataSha256": "5244f8ac5e8e27347e001b52a27f8f1f5626941601fc8d5c41cc5af1639de1cd",
+  "method": "Initial full 12-stage balance-par.sh 100 (UNIVERSAL=0); only answers 3/8 then changed, and balance.ts 100 3 / 100 8 rerun. Other 10 cases retain identical inputs. Opponents, keys, weakness and acceptance criteria unchanged.",
+  "initial": [
+    {
+      "stage": 1,
+      "pass": true,
+      "baseWin": 25,
+      "solutionWin": 95,
+      "gap": 70,
+      "goalsFor": 2.89,
+      "goalsAgainst": 0.04,
+      "totalGoals": 2.93
+    },
+    {
+      "stage": 2,
+      "pass": true,
+      "baseWin": 25,
+      "solutionWin": 99,
+      "gap": 74,
+      "goalsFor": 3.65,
+      "goalsAgainst": 0.02,
+      "totalGoals": 3.67
+    },
+    {
+      "stage": 3,
+      "pass": false,
+      "baseWin": 40,
+      "solutionWin": 54,
+      "gap": 14,
+      "goalsFor": 1.26,
+      "goalsAgainst": 0.51,
+      "totalGoals": 1.77
+    },
+    {
+      "stage": 4,
+      "pass": true,
+      "baseWin": 40,
+      "solutionWin": 72,
+      "gap": 32,
+      "goalsFor": 1.94,
+      "goalsAgainst": 0.36,
+      "totalGoals": 2.3
+    },
+    {
+      "stage": 5,
+      "pass": true,
+      "baseWin": 22,
+      "solutionWin": 92,
+      "gap": 70,
+      "goalsFor": 2.62,
+      "goalsAgainst": 0.15,
+      "totalGoals": 2.77
+    },
+    {
+      "stage": 6,
+      "pass": true,
+      "baseWin": 31,
+      "solutionWin": 97,
+      "gap": 66,
+      "goalsFor": 4.19,
+      "goalsAgainst": 0.11,
+      "totalGoals": 4.3
+    },
+    {
+      "stage": 7,
+      "pass": true,
+      "baseWin": 28,
+      "solutionWin": 90,
+      "gap": 62,
+      "goalsFor": 2.63,
+      "goalsAgainst": 0.26,
+      "totalGoals": 2.89
+    },
+    {
+      "stage": 8,
+      "pass": false,
+      "baseWin": 23,
+      "solutionWin": 59,
+      "gap": 36,
+      "goalsFor": 1.32,
+      "goalsAgainst": 0.44,
+      "totalGoals": 1.76
+    },
+    {
+      "stage": 9,
+      "pass": true,
+      "baseWin": 43,
+      "solutionWin": 91,
+      "gap": 48,
+      "goalsFor": 2.74,
+      "goalsAgainst": 0.02,
+      "totalGoals": 2.76
+    },
+    {
+      "stage": 10,
+      "pass": true,
+      "baseWin": 9,
+      "solutionWin": 91,
+      "gap": 82,
+      "goalsFor": 2.21,
+      "goalsAgainst": 0.2,
+      "totalGoals": 2.41
+    },
+    {
+      "stage": 11,
+      "pass": true,
+      "baseWin": 17,
+      "solutionWin": 88,
+      "gap": 71,
+      "goalsFor": 2.52,
+      "goalsAgainst": 0.18,
+      "totalGoals": 2.7
+    },
+    {
+      "stage": 12,
+      "pass": true,
+      "baseWin": 23,
+      "solutionWin": 97,
+      "gap": 74,
+      "goalsFor": 3.06,
+      "goalsAgainst": 0.28,
+      "totalGoals": 3.34
+    }
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "pass": true,
+      "baseWin": 25,
+      "solutionWin": 95,
+      "gap": 70,
+      "goalsFor": 2.89,
+      "goalsAgainst": 0.04,
+      "totalGoals": 2.93
+    },
+    {
+      "stage": 2,
+      "pass": true,
+      "baseWin": 25,
+      "solutionWin": 99,
+      "gap": 74,
+      "goalsFor": 3.65,
+      "goalsAgainst": 0.02,
+      "totalGoals": 3.67
+    },
+    {
+      "stage": 3,
+      "pass": true,
+      "baseWin": 40,
+      "solutionWin": 72,
+      "gap": 32,
+      "goalsFor": 1.94,
+      "goalsAgainst": 0.4,
+      "totalGoals": 2.34
+    },
+    {
+      "stage": 4,
+      "pass": true,
+      "baseWin": 40,
+      "solutionWin": 72,
+      "gap": 32,
+      "goalsFor": 1.94,
+      "goalsAgainst": 0.36,
+      "totalGoals": 2.3
+    },
+    {
+      "stage": 5,
+      "pass": true,
+      "baseWin": 22,
+      "solutionWin": 92,
+      "gap": 70,
+      "goalsFor": 2.62,
+      "goalsAgainst": 0.15,
+      "totalGoals": 2.77
+    },
+    {
+      "stage": 6,
+      "pass": true,
+      "baseWin": 31,
+      "solutionWin": 97,
+      "gap": 66,
+      "goalsFor": 4.19,
+      "goalsAgainst": 0.11,
+      "totalGoals": 4.3
+    },
+    {
+      "stage": 7,
+      "pass": true,
+      "baseWin": 28,
+      "solutionWin": 90,
+      "gap": 62,
+      "goalsFor": 2.63,
+      "goalsAgainst": 0.26,
+      "totalGoals": 2.89
+    },
+    {
+      "stage": 8,
+      "pass": true,
+      "baseWin": 23,
+      "solutionWin": 70,
+      "gap": 47,
+      "goalsFor": 1.89,
+      "goalsAgainst": 0.57,
+      "totalGoals": 2.46
+    },
+    {
+      "stage": 9,
+      "pass": true,
+      "baseWin": 43,
+      "solutionWin": 91,
+      "gap": 48,
+      "goalsFor": 2.74,
+      "goalsAgainst": 0.02,
+      "totalGoals": 2.76
+    },
+    {
+      "stage": 10,
+      "pass": true,
+      "baseWin": 9,
+      "solutionWin": 91,
+      "gap": 82,
+      "goalsFor": 2.21,
+      "goalsAgainst": 0.2,
+      "totalGoals": 2.41
+    },
+    {
+      "stage": 11,
+      "pass": true,
+      "baseWin": 17,
+      "solutionWin": 88,
+      "gap": 71,
+      "goalsFor": 2.52,
+      "goalsAgainst": 0.18,
+      "totalGoals": 2.7
+    },
+    {
+      "stage": 12,
+      "pass": true,
+      "baseWin": 23,
+      "solutionWin": 97,
+      "gap": 74,
+      "goalsFor": 3.06,
+      "goalsAgainst": 0.28,
+      "totalGoals": 3.34
+    }
+  ]
+}

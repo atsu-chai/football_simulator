@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createMatch } from '../../engine/match';
 import { shapeTarget, updateFrames, updateLastLines } from '../../engine/teamShape';
 import { PITCH_H, PITCH_W, Side, Tactics, TeamSetup, Vec } from '../../engine/types';
-import { drawDot, drawPitch, sx, sy, toPitch } from '../../render/pitch';
+import { drawBallAt, drawDot, drawPitch, sx, sy, toPitch } from '../../render/pitch';
 import { usePitchCanvas } from './usePitchCanvas';
 
 type Phase = 'attack' | 'defend';
@@ -10,7 +10,7 @@ type Phase = 'attack' | 'defend';
 interface Pos { id: number; team: Side; slot: number; role: string; number: number; at: Vec }
 
 /** エンジンの形状計算をそのまま使い、試合で実際に取る配置を見せる。 */
-function preview(home: TeamSetup, away: TeamSetup, phase: Phase): Pos[] {
+export function preview(home: TeamSetup, away: TeamSetup, phase: Phase): Pos[] {
   const m = createMatch({ teams: [home, away], seed: 1 });
   m.dead = null;
   const owner: Side = phase === 'attack' ? 0 : 1;
@@ -75,12 +75,15 @@ export function Board({ home, away, onOffset, editable }: {
       ctx.fillStyle = n[0] > n[1] ? '#7CF0B2' : n[0] < n[1] ? '#FFA494' : '#fff';
       ctx.fillText(`${n[0]} : ${n[1]}`, x, y + 0.5);
     });
-    for (const p of list) {
+    // 自チームを上に描き、相手と重なっても自分の形が見えるようにする
+    for (const p of [...list].sort((a, b) => b.team - a.team)) {
       const d = drag.current?.p.id === p.id ? drag.current.at : p.at;
       drawDot(ctx, view, {
         x: d.x, y: d.y, color: p.team === 0 ? home.color : away.color, label: String(p.number), ring: drag.current?.p.id === p.id,
       });
     }
+    // 配置はボールがセンターサークルにある場面のもの
+    drawBallAt(ctx, view, { x: 52.5, y: 34 }, 0);
   }, [list, view, home.color, away.color, tick, canvas]);
 
   const hit = (e: React.PointerEvent) => {
@@ -139,7 +142,7 @@ export function Board({ home, away, onOffset, editable }: {
         {editable && home.tactics.offsets && Object.keys(home.tactics.offsets).length > 0 && (
           <button className="chip" onClick={() => onOffset?.({ ...home.tactics, offsets: undefined })}>配置の調整を戻す</button>
         )}
-        <span className="muted small">上の数字は自陣・中盤・敵陣の人数(あなた : 相手)。{editable ? '選手はドラッグで動かせます。' : ''}</span>
+        <span className="muted small">ボールが中央にある場面での配置です。上の数字は自陣・中盤・敵陣の人数(あなた : 相手)。{editable ? '選手はドラッグで動かせます。' : ''}</span>
       </div>
     </div>
   );

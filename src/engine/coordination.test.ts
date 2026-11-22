@@ -8,13 +8,27 @@ import {tactic} from '../data/formations';
 import {toRel} from './geometry';
 import {attackerMove} from './offBall';
 describe('shared positioning and cover',()=>{
+ it.each([false,true])('does not step the CB cover beyond its learned position to mark an onside outlet (running=%s)',(running)=>{
+  const m=makeTestMatch();m.dead=null;m.t=30;m.turnoverAt=0;m.possession=1;m.ball.owner=21;m.ball.pos={x:85,y:34};
+  for(const p of m.players)if(p.team===1)p.pos={x:100,y:65};
+  m.players[21].pos={...m.ball.pos};updateFrames(m);
+  for(const p of m.players)if(p.team===0)p.pos=shapeTarget(m,p);
+  const cb=m.players.find(p=>p.team===0&&p.role==='cb')!;
+  m.players[20].pos={x:cb.pos.x+6,y:cb.pos.y};updateFrames(m);
+  if(running){m.players[20].runTarget={x:cb.pos.x-12,y:cb.pos.y};m.players[20].runUntil=m.t+2;}
+  const base=shapeTarget(m,cb);teamDefense(m,0);
+  expect(cb.pressing).toBe(false);expect(cb.markTarget).toBe(20);
+  expect(cb.target.x).toBeLessThanOrEqual(base.x);
+ });
  it('starts a counter run from an onside slot before the first three seconds expire',()=>{
   const m=makeTestMatch(tactic({onWin:'counter'}));m.dead=null;m.t=30;m.turnoverAt=29;m.possession=0;
   m.ball.owner=5;m.ball.pos={x:45,y:34};m.players[5].pos={...m.ball.pos};m.lastLine=[50,50];
   for(const p of m.players)if(p.team===1)p.pos={x:90,y:65};
   const striker=m.players.find(p=>p.team===0&&p.role==='st')!;striker.pos={x:54,y:34};updateFrames(m);
   const limit=offsideLimit(m,0);expect(striker.pos.x).toBeLessThan(limit);
-  attackerMove(m,striker);expect(striker.runTarget).not.toBeNull();expect(striker.target.x).toBeGreaterThan(limit);
+  attackerMove(m,striker);expect(striker.runTarget).not.toBeNull();expect(striker.runTarget!.x).toBeGreaterThan(limit);
+  expect(striker.target.x).toBeLessThanOrEqual(limit+.3);
+  attackerMove(m,striker);expect(striker.target.x).toBeLessThanOrEqual(limit+.3);
  });
  it('allows a striker to enter the box for an advanced wide attack without sending the backs there',()=>{
   const m=makeTestMatch();m.dead=null;m.t=30;m.turnoverAt=0;m.possession=0;m.ball.pos={x:80,y:10};m.ball.owner=1;m.lastLine=[30,10];updateFrames(m);

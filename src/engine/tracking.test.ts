@@ -25,7 +25,9 @@ describe('実測の位置モデル', () => {
       const m = makeTestMatch(tactic({ onWin }));
       m.dead = null; m.t = 20; m.turnoverAt = 19;
       m.ball.pos = { x: 45, y: 34 }; m.lastLine = [30, 20];
-      const p = m.players[10];
+      // The winger joins a counter; the CF now holds the line even when
+      // keeping possession, so it is not the short-support comparison slot.
+      const p = m.players[7];
       p.runTarget = { x: 98, y: 34 }; p.runUntil = 25;
       updateFrames(m); attackerMove(m, p);
       if(onWin==='keep')expect(p.runTarget).toBeNull();

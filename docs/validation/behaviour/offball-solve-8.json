@@ -1,0 +1,237 @@
+{
+  "stage": 8,
+  "matches": 32,
+  "seedIndices": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    25,
+    28,
+    31,
+    34,
+    37,
+    40,
+    43,
+    46,
+    50,
+    53,
+    56,
+    59,
+    62,
+    65,
+    68,
+    71,
+    75,
+    78,
+    81,
+    84,
+    87,
+    90,
+    93,
+    96
+  ],
+  "candidates": 8,
+  "base": {
+    "w": 18.75,
+    "g": 3.09375
+  },
+  "results": [
+    {
+      "t": {
+        "formation": "4-2-3-1",
+        "buildUp": "long",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "invert",
+        "pressHeight": "high",
+        "pressIntensity": "normal",
+        "lineHeight": "normal",
+        "compactness": "tight",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "7": "iw",
+          "9": "iw",
+          "10": "f9"
+        }
+      },
+      "w": 78.125,
+      "g": 2.46875
+    },
+    {
+      "t": {
+        "formation": "4-3-3",
+        "buildUp": "mixed",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "stay",
+        "pressHeight": "mid",
+        "pressIntensity": "normal",
+        "lineHeight": "normal",
+        "compactness": "normal",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "8": "iw",
+          "9": "f9",
+          "10": "iw"
+        }
+      },
+      "w": 71.875,
+      "g": 2.34375
+    },
+    {
+      "t": {
+        "formation": "4-2-3-1",
+        "buildUp": "long",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "invert",
+        "pressHeight": "high",
+        "pressIntensity": "normal",
+        "lineHeight": "deep",
+        "compactness": "tight",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "7": "iw",
+          "9": "iw",
+          "10": "f9"
+        }
+      },
+      "w": 71.875,
+      "g": 2.0625
+    },
+    {
+      "t": {
+        "formation": "4-3-3",
+        "buildUp": "mixed",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "overlap",
+        "pressHeight": "mid",
+        "pressIntensity": "normal",
+        "lineHeight": "normal",
+        "compactness": "normal",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "8": "iw",
+          "9": "f9",
+          "10": "iw"
+        }
+      },
+      "w": 68.75,
+      "g": 2.03125
+    },
+    {
+      "t": {
+        "formation": "4-2-3-1",
+        "buildUp": "long",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "stay",
+        "pressHeight": "high",
+        "pressIntensity": "normal",
+        "lineHeight": "normal",
+        "compactness": "tight",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "7": "iw",
+          "9": "iw",
+          "10": "f9"
+        }
+      },
+      "w": 68.75,
+      "g": 2.1875
+    },
+    {
+      "t": {
+        "formation": "4-2-3-1",
+        "buildUp": "long",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "stay",
+        "pressHeight": "high",
+        "pressIntensity": "normal",
+        "lineHeight": "deep",
+        "compactness": "tight",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "7": "iw",
+          "9": "iw",
+          "10": "f9"
+        }
+      },
+      "w": 59.375,
+      "g": 2.09375
+    },
+    {
+      "t": {
+        "formation": "4-3-3",
+        "buildUp": "mixed",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "overlap",
+        "pressHeight": "mid",
+        "pressIntensity": "normal",
+        "lineHeight": "deep",
+        "compactness": "normal",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "8": "iw",
+          "9": "f9",
+          "10": "iw"
+        }
+      },
+      "w": 56.25,
+      "g": 2.25
+    },
+    {
+      "t": {
+        "formation": "4-3-3",
+        "buildUp": "mixed",
+        "tempo": "fast",
+        "width": "wide",
+        "focus": "balanced",
+        "fullbacks": "stay",
+        "pressHeight": "mid",
+        "pressIntensity": "normal",
+        "lineHeight": "deep",
+        "compactness": "normal",
+        "marking": "zone",
+        "onLoss": "counterpress",
+        "onWin": "counter",
+        "roles": {
+          "8": "iw",
+          "9": "f9",
+          "10": "iw"
+        }
+      },
+      "w": 43.75,
+      "g": 2.65625
+    }
+  ]
+}

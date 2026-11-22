@@ -1,0 +1,969 @@
+{
+  "matches": 30,
+  "engineSha256": "927b2744dc48f336babeec776cec08ec6cfbee4c0ad86aa571b00c24ec67b35d",
+  "stageDataSha256": "5244f8ac5e8e27347e001b52a27f8f1f5626941601fc8d5c41cc5af1639de1cd",
+  "method": "Chapter-partitioned scripts/story.ts 30, identical seeds 3100–3129. After answer changes to stages 3/8, reran STORY_STYLE=bus/manmark (5 fixtures). Recombined all 24 fixture distributions using the exact story.ts equations. Asserted every rerun default cohort and unchanged chapters 2/6 match. Clear rates are independence-based estimates, not observed seasons.",
+  "remeasuredFixtures": 5,
+  "results": [
+    {
+      "chapter": 1,
+      "league": "JFL",
+      "target": 6,
+      "base": 0.8077086419753086,
+      "answer": 0.9903000000000001,
+      "ptsBase": 7.500000000000001,
+      "ptsAns": 10.466666666666667,
+      "distBase": [
+        0.001659259259259259,
+        0.005876543209876542,
+        0.007743209876543209,
+        0.03435061728395062,
+        0.0777037037037037,
+        0.06495802469135803,
+        0.13866666666666666,
+        0.20008395061728396,
+        0.08155061728395062,
+        0.1731604938271605,
+        0.13720987654320987,
+        0,
+        0.07703703703703703
+      ],
+      "distAns": [
+        0.000011111111111111083,
+        0.00007037037037037026,
+        0.0001518518518518517,
+        0.0009111111111111096,
+        0.0035666666666666624,
+        0.004988888888888887,
+        0.02041111111111109,
+        0.051748148148148126,
+        0.035237037037037046,
+        0.16352592592592585,
+        0.2232592592592593,
+        0,
+        0.4961185185185186
+      ],
+      "fixtures": [
+        {
+          "style": "flat442",
+          "skill": 0.82,
+          "mySkill": 1.05,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.3333333333333333,
+            "d": 0.26666666666666666
+          },
+          "answer": {
+            "w": 0.8,
+            "d": 0.1
+          }
+        },
+        {
+          "style": "counter",
+          "skill": 0.84,
+          "mySkill": 1.05,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.5,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.7666666666666667,
+            "d": 0.13333333333333333
+          }
+        },
+        {
+          "style": "diamond",
+          "skill": 0.85,
+          "mySkill": 1.05,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.5333333333333333,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.8666666666666667,
+            "d": 0.1
+          }
+        },
+        {
+          "style": "bus",
+          "skill": 0.87,
+          "mySkill": 1.05,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.8666666666666667,
+            "d": 0.06666666666666667
+          },
+          "answer": {
+            "w": 0.9333333333333333,
+            "d": 0.03333333333333333
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 2,
+      "league": "J3",
+      "target": 7,
+      "base": 0.46491358024691365,
+      "answer": 0.9373333333333334,
+      "ptsBase": 6.233333333333333,
+      "ptsAns": 9.7,
+      "distBase": [
+        0.009876543209876546,
+        0.029382716049382716,
+        0.029679012345679014,
+        0.0805061728395062,
+        0.13653086419753088,
+        0.08279012345679013,
+        0.16632098765432102,
+        0.18104938271604942,
+        0.05075308641975308,
+        0.12874074074074077,
+        0.06970370370370371,
+        0,
+        0.03466666666666667
+      ],
+      "distAns": [
+        -2.8783559897689256e-20,
+        0.00017283950617283942,
+        0.0008148148148148147,
+        0.0018765432098765424,
+        0.009037037037037034,
+        0.01844444444444444,
+        0.03232098765432098,
+        0.1022962962962963,
+        0.0774074074074074,
+        0.1769135802469136,
+        0.2629382716049382,
+        0,
+        0.31777777777777777
+      ],
+      "fixtures": [
+        {
+          "style": "hunters",
+          "skill": 0.88,
+          "mySkill": 1.08,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.26666666666666666,
+            "d": 0.2
+          },
+          "answer": {
+            "w": 0.6,
+            "d": 0.16666666666666666
+          }
+        },
+        {
+          "style": "wingbacks",
+          "skill": 0.9,
+          "mySkill": 1.08,
+          "tactics": {
+            "formation": "5-3-2",
+            "buildUp": "short",
+            "tempo": "fast",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "high",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep"
+          },
+          "base": {
+            "w": 0.6,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.8333333333333334,
+            "d": 0.16666666666666666
+          }
+        },
+        {
+          "style": "counter",
+          "skill": 0.91,
+          "mySkill": 1.08,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.43333333333333335,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.8666666666666667,
+            "d": 0.06666666666666667
+          }
+        },
+        {
+          "style": "zone4231",
+          "skill": 0.93,
+          "mySkill": 1.08,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "long",
+            "tempo": "normal",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter",
+            "roles": {
+              "7": "iw",
+              "9": "iw",
+              "10": "f9"
+            }
+          },
+          "base": {
+            "w": 0.5,
+            "d": 0.16666666666666666
+          },
+          "answer": {
+            "w": 0.7333333333333333,
+            "d": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "league": "J2",
+      "target": 11,
+      "base": 0.20069028806584363,
+      "answer": 0.9478,
+      "ptsBase": 8.6,
+      "ptsAns": 13.333333333333334,
+      "distBase": [
+        -1.2952601953960158e-19,
+        0.0006222222222222216,
+        0.00230469135802469,
+        0.01162131687242798,
+        0.038326008230452666,
+        0.05151358024691357,
+        0.09259580246913578,
+        0.1611739917695473,
+        0.12037407407407406,
+        0.1494151440329218,
+        0.1713628806584362,
+        0.06004617283950618,
+        0.07503654320987654,
+        0.05058897119341564,
+        0,
+        0.015018600823045269
+      ],
+      "distAns": [
+        -2.375790853415286e-53,
+        2.9958910246023655e-37,
+        -1.2507142098400659e-21,
+        0.0000017283950617283833,
+        0.0000172839506172839,
+        0.00008172839506172815,
+        0.0005372839506172831,
+        0.0017311111111111097,
+        0.005664691358024683,
+        0.020287654320987652,
+        0.02387851851851849,
+        0.1274158024691358,
+        0.034346666666666636,
+        0.37673975308641977,
+        0,
+        0.4092977777777778
+      ],
+      "fixtures": [
+        {
+          "style": "falseNine",
+          "skill": 0.95,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "5-3-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.4666666666666667,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.7333333333333333,
+            "d": 0.23333333333333334
+          }
+        },
+        {
+          "style": "bus",
+          "skill": 0.97,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.9333333333333333,
+            "d": 0.06666666666666667
+          },
+          "answer": {
+            "w": 0.9333333333333333,
+            "d": 0.06666666666666667
+          }
+        },
+        {
+          "style": "manmark",
+          "skill": 0.98,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter",
+            "roles": {
+              "7": "iw",
+              "9": "iw",
+              "10": "f9"
+            }
+          },
+          "base": {
+            "w": 0.23333333333333334,
+            "d": 0.3
+          },
+          "answer": {
+            "w": 0.9,
+            "d": 0.1
+          }
+        },
+        {
+          "style": "diamond",
+          "skill": 1,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.6333333333333333,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.8666666666666667,
+            "d": 0.1
+          }
+        },
+        {
+          "style": "hunters",
+          "skill": 1.01,
+          "mySkill": 1.12,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.23333333333333334,
+            "d": 0.26666666666666666
+          },
+          "answer": {
+            "w": 0.7666666666666667,
+            "d": 0.23333333333333334
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "league": "J1",
+      "target": 12,
+      "base": 0.03673333333333334,
+      "answer": 0.6116133333333333,
+      "ptsBase": 6.166666666666667,
+      "ptsAns": 11.866666666666665,
+      "distBase": [
+        0.008866666666666667,
+        0.03391333333333333,
+        0.04727999999999999,
+        0.07606222222222223,
+        0.1350288888888889,
+        0.11917777777777776,
+        0.12693555555555558,
+        0.15862222222222225,
+        0.0867688888888889,
+        0.07842666666666667,
+        0.0731,
+        0.019084444444444446,
+        0.02202,
+        0.011913333333333333,
+        0,
+        0.0028000000000000004
+      ],
+      "distAns": [
+        0.000009876543209876548,
+        0.00008543209876543213,
+        0.0002770370370370371,
+        0.0008074074074074075,
+        0.0028948148148148158,
+        0.006132345679012346,
+        0.011720000000000003,
+        0.030620740740740747,
+        0.042329382716049385,
+        0.06320641975308643,
+        0.13610864197530867,
+        0.09419456790123457,
+        0.1597762962962963,
+        0.23144592592592594,
+        0,
+        0.22039111111111112
+      ],
+      "fixtures": [
+        {
+          "style": "zone4231",
+          "skill": 0.99,
+          "mySkill": 1.15,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "long",
+            "tempo": "normal",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter",
+            "roles": {
+              "7": "iw",
+              "9": "iw",
+              "10": "f9"
+            }
+          },
+          "base": {
+            "w": 0.5,
+            "d": 0.3
+          },
+          "answer": {
+            "w": 0.7333333333333333,
+            "d": 0.2
+          }
+        },
+        {
+          "style": "positional",
+          "skill": 1.01,
+          "mySkill": 1.15,
+          "tactics": {
+            "formation": "3-4-2-1",
+            "buildUp": "long",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.23333333333333334,
+            "d": 0.13333333333333333
+          },
+          "answer": {
+            "w": 0.7,
+            "d": 0.16666666666666666
+          }
+        },
+        {
+          "style": "counter",
+          "skill": 1.02,
+          "mySkill": 1.15,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.4,
+            "d": 0.3
+          },
+          "answer": {
+            "w": 0.7,
+            "d": 0.2
+          }
+        },
+        {
+          "style": "gegen",
+          "skill": 1.03,
+          "mySkill": 1.15,
+          "tactics": {
+            "formation": "5-4-1",
+            "buildUp": "long",
+            "tempo": "slow",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.3,
+            "d": 0.2
+          },
+          "answer": {
+            "w": 0.7666666666666667,
+            "d": 0.06666666666666667
+          }
+        },
+        {
+          "style": "manmark",
+          "skill": 1.05,
+          "mySkill": 1.15,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter",
+            "roles": {
+              "7": "iw",
+              "9": "iw",
+              "10": "f9"
+            }
+          },
+          "base": {
+            "w": 0.2,
+            "d": 0.3333333333333333
+          },
+          "answer": {
+            "w": 0.8,
+            "d": 0.13333333333333333
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "league": "アジア",
+      "base": 0.057777777777777775,
+      "answer": 0.5637777777777778,
+      "ptsBase": -2.8511510447428834,
+      "ptsAns": -0.5730951161591292,
+      "distBase": [
+        0.026666666666666655,
+        0.07185185185185185,
+        0.04,
+        0.3385185185185186,
+        0.2518518518518519,
+        0.04444444444444444,
+        0.1525925925925926,
+        0.056296296296296296,
+        0,
+        0.017777777777777778
+      ],
+      "distAns": [
+        -1.1564823173178719e-19,
+        0.0005555555555555553,
+        0.001888888888888889,
+        0.01766666666666667,
+        0.060666666666666674,
+        0.05455555555555556,
+        0.1707777777777778,
+        0.28788888888888886,
+        0,
+        0.40599999999999997
+      ],
+      "fixtures": [
+        {
+          "style": "bus",
+          "skill": 1.03,
+          "mySkill": 1.17,
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep",
+            "roles": {
+              "7": "iw",
+              "9": "iw"
+            }
+          },
+          "base": {
+            "w": 0.8,
+            "d": 0.13333333333333333
+          },
+          "answer": {
+            "w": 0.9666666666666667,
+            "d": 0.03333333333333333
+          }
+        },
+        {
+          "style": "hunters",
+          "skill": 1.06,
+          "mySkill": 1.17,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.16666666666666666,
+            "d": 0.16666666666666666
+          },
+          "answer": {
+            "w": 0.6,
+            "d": 0.23333333333333334
+          }
+        },
+        {
+          "style": "positional",
+          "skill": 1.05,
+          "mySkill": 1.17,
+          "tactics": {
+            "formation": "3-4-2-1",
+            "buildUp": "long",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.13333333333333333,
+            "d": 0.26666666666666666
+          },
+          "answer": {
+            "w": 0.7,
+            "d": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "chapter": 6,
+      "league": "世界",
+      "base": 0.014583333333333335,
+      "answer": 0.29274074074074075,
+      "ptsBase": -4.227875954846623,
+      "ptsAns": -1.2284679055587624,
+      "distBase": [
+        0.20125925925925925,
+        0.22825925925925925,
+        0.062407407407407404,
+        0.2689259259259259,
+        0.13977777777777778,
+        0.01025925925925926,
+        0.07048148148148148,
+        0.013740740740740743,
+        0,
+        0.004888888888888889
+      ],
+      "distAns": [
+        0.002962962962962957,
+        0.022370370370370363,
+        0.029333333333333333,
+        0.08829629629629629,
+        0.16992592592592592,
+        0.08533333333333333,
+        0.2251851851851852,
+        0.21303703703703705,
+        0,
+        0.16355555555555557
+      ],
+      "fixtures": [
+        {
+          "style": "counter",
+          "skill": 1.35,
+          "mySkill": 1.19,
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.36666666666666664,
+            "d": 0.26666666666666666
+          },
+          "answer": {
+            "w": 0.7666666666666667,
+            "d": 0.2
+          }
+        },
+        {
+          "style": "gegen",
+          "skill": 1.4,
+          "mySkill": 1.19,
+          "tactics": {
+            "formation": "5-4-1",
+            "buildUp": "long",
+            "tempo": "slow",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.13333333333333333,
+            "d": 0.23333333333333334
+          },
+          "answer": {
+            "w": 0.5333333333333333,
+            "d": 0.2
+          }
+        },
+        {
+          "style": "positional",
+          "skill": 1.45,
+          "mySkill": 1.19,
+          "tactics": {
+            "formation": "3-4-2-1",
+            "buildUp": "long",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "overlap",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "counter"
+          },
+          "base": {
+            "w": 0.1,
+            "d": 0.03333333333333333
+          },
+          "answer": {
+            "w": 0.4,
+            "d": 0.26666666666666666
+          }
+        }
+      ]
+    }
+  ]
+}

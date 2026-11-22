@@ -11,6 +11,8 @@ export function coordinateUnits(m:MatchState){
   const unit=(p:Player)=>m.possession!==side&&['cb','fb','wb'].includes(p.role)?0:slots[p.slot].x<.2?0:slots[p.slot].x<.7?1:2;
   const bases=new Map(team.map(p=>[p.id,toRel(side,shapeTarget(m,p))]));
   const special=(p:Player)=>p.id===m.ball.owner||p.pressing||p.runTarget!==null||m.ball.pass?.to===p.id;
+  const sharedCover: [Player,Player][]=[];
+  for(let a=0;a<team.length;a++)for(let b=a+1;b<team.length;b++)if(!special(team[a])&&!special(team[b])&&dist(team[a].target,team[b].target)<.1)sharedCover.push([team[a],team[b]]);
   for(const i of [0,1,2]){
    const members=team.filter(p=>unit(p)===i),settled=members.filter(p=>!special(p));
    if(!settled.length)continue;
@@ -40,7 +42,8 @@ export function coordinateUnits(m:MatchState){
   for(const p of team)if(p.id!==m.ball.owner&&!p.pressing&&m.ball.pass?.to!==p.id){
    // A genuine box run from an advanced wide ball needs the measured striker
    // tail, rather than the ordinary p90 envelope that stopped runners at 85m.
-   const front=crossingAttack&&['st','f9','am','wg','iw'].includes(p.role);
+   // CFが相手の最終ライン上に残る時も、通常の包絡(p90)でなく実測のCFの先端分布を使う。
+   const front=(crossingAttack&&['st','f9','am','wg','iw'].includes(p.role))||(phase==='attack'&&p.role==='st');
    const upper=front?positioning.frontTail.attack:bounds[1];
    const r=toRel(side,p.target);r.x=clamp(r.x,center+bounds[0]*compact,center+upper*compact);
    p.target=toAbs(side,{x:clamp(r.x,2,103),y:r.y});
@@ -73,7 +76,7 @@ export function coordinateUnits(m:MatchState){
   // Real nearest-teammate p10 is about 5m; the arrival dead zone otherwise leaves pairs much closer.
   const settled=team.filter(p=>!special(p));
   const corrections=new Map(settled.map(p=>[p.id,{x:0,y:0}]));
-  const gap=m.possession===side?8.5:9.5;
+  const gap=m.possession===side?8.5:7.5;
   for(let a=0;a<settled.length;a++)for(let b=a+1;b<settled.length;b++){
    const p=settled[a],q=settled[b];
    const back=(r:string)=>r==='fb'||r==='wb',wing=(r:string)=>r==='wg'||r==='iw';
@@ -91,10 +94,17 @@ export function coordinateUnits(m:MatchState){
   // Repel actual close neighbours as well; the ball carrier and active receiver retain priority.
   for(const p of settled)for(const q of team){
    if(p===q)continue;const dx=p.pos.x-q.pos.x,dy=p.pos.y-q.pos.y,d=Math.hypot(dx,dy);
-   if(d<.01||d>=6)continue;
-   const c=corrections.get(p.id)!;c.x+=dx/d*(6-d);c.y+=dy/d*(6-d);
+   const separation=m.possession===side?6:5;
+   if(d<.01||d>=separation)continue;
+   const c=corrections.get(p.id)!;c.x+=dx/d*(separation-d);c.y+=dy/d*(separation-d);
   }
   for(const p of settled){const c=corrections.get(p.id)!,s=spacing.get(p.id)!,n=Math.hypot(s.x,s.y),scale=Math.min(1,3.8/(n||1));const dx=c.x-s.x,dy=c.y-s.y,budget=Math.max(0,3.8-n),physical=Math.min(1,budget/(Math.hypot(dx,dy)||1));p.target={x:clamp(p.target.x+s.x*scale+dx*physical,2,103),y:clamp(p.target.y+s.y*scale+dy*physical,2,66)};}
+  // Reserve distinct lanes for an originally identical cover assignment.
+  // Weaker third-player forces must not cancel that pair's separation.
+  for(const[p,q]of sharedCover){let dx=p.target.x-q.target.x,dy=p.target.y-q.target.y,d=Math.hypot(dx,dy);if(d>=6.6)continue;
+   if(d<.01){dx=bases.get(p.id)!.x-bases.get(q.id)!.x;dy=bases.get(p.id)!.y-bases.get(q.id)!.y;const sign=side===0?1:-1;dx*=sign;dy*=sign;d=Math.hypot(dx,dy)||1;}
+   const push=Math.min(2,(6.6-dist(p.target,q.target))*.5);p.target={x:clamp(p.target.x+dx/d*push,2,103),y:clamp(p.target.y+dy/d*push,2,66)};q.target={x:clamp(q.target.x-dx/d*push,2,103),y:clamp(q.target.y-dy/d*push,2,66)};
+  }
 
 
  }

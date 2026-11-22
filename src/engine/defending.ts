@@ -196,7 +196,9 @@ function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
   if (isBack) {
     // CBは深さを揃え、SB/WBは実測の一段前の持ち場からサイドの相手へ出る。
     // 全員をCBの高さへ固定すると、SBが相手のWGから10m以上離れてしまう。
-    const ceiling = p.role === 'cb' ? Math.max(baseRel.x, m.frames[side].line) + (mark ? 2 : 3) : baseRel.x + (mark ? 6 : 4);
+    // An onside forward holding the line is not a cue to step beyond the
+    // learned cover position: otherwise both players ratchet the line up.
+    const ceiling = p.role === 'cb' ? baseRel.x - clamp((ball.x - 70) / 15, 0, 1) : baseRel.x + (mark ? 6 : 4);
     target.x = Math.min(target.x, ceiling);
     // 自陣深くでは、出遅れてから帰る判定を繰り返さず、先にゴール側のカバーへ戻る。
     if (ball.x < 40) target.x = Math.min(target.x, ball.x - 1.5);
@@ -212,7 +214,10 @@ function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
       const releasedBehind = m.ball.pass !== null && toRel(side, m.ball.pass.point).x < actualLine + 3;
       const holdHighLine = t.lineHeight === 'high' && !releasedBehind;
       if (running && !holdHighLine && r.x > actualLine - 14 && dist(o.pos, p.pos) < 12) {
-        target = { x: Math.max(r.x - 2, 3), y: r.y };
+        // Tracking a run is a recovery action, never a reason to abandon
+        // deeper cover. A runner timing on the line may still be in front of
+        // the learned target, especially before the pass is released.
+        target = { x: Math.min(target.x, Math.max(r.x - 2, 3)), y: r.y };
         break;
       }
     }

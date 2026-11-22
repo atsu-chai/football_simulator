@@ -32,7 +32,7 @@ function computeFrame(m: MatchState, side: Side): TeamFrame {
   return {
     hasBall, line, referenceBack: base[1],
     length: base[2] * (hasBall ? 0.92 : 1) * LENGTH_SCALE[t.compactness],
-    width: base[3] * (hasBall ? 1.15 : trackingPhase(m, side) === 'loss' ? 1.10 : 1.65) * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
+    width: base[3] * (hasBall ? 1.15 : trackingPhase(m, side) === 'loss' ? 1.10 : 1.2) * WIDTH_SCALE[t.compactness] * (hasBall ? ATTACK_WIDTH[t.width] : 1) + pulled,
     cy: base[4] + (hasBall ? (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0) : 0),
   };
 }
@@ -63,6 +63,48 @@ export function updateLastLines(m: MatchState) {
 export function offsideLimit(m: MatchState, side: Side): number {
   const ballX = relX(side, m.ball.pos.x);
   return Math.max(oppLineX(m, side), ballX, PITCH_W / 2);
+}
+
+const layoutCache = new WeakMap<TeamFrame, Map<number, Vec>>();
+/** 実測で学習した位置は役割単位なので、フォーメーション上の前後・左右の並びが消える。
+ *  チームの重心(ブロックの位置)は学習値のまま、重心からの相対配置だけを
+ *  学習値とフォーメーションの並びで混ぜ、アンカーとIH、シャドーと1トップなどの段差を残す。 */
+export const FORMATION_BLEND = { x: 0.6, y: 0.25 };
+function formationLayout(m: MatchState, team: Side, f: TeamFrame): Map<number, Vec> {
+  const hit = layoutCache.get(f);
+  if (hit) return hit;
+  const slots = FORMATIONS[m.tactics[team].formation];
+  // 最終ライン(スロットxが0付近)は実測の凹凸と間隔をそのまま使う。揃えると実測より平らで等間隔になる。
+  // 奪った直後・失った直後の3秒は実測の崩れた動きを優先する(速攻・即時奪回の差を消さない)。
+  const transition = trackingPhase(m, team) === 'win' || trackingPhase(m, team) === 'loss';
+  const ps = transition ? [] : m.players.filter((q) => q.team === team && q.role !== 'gk' && slots[q.slot].x > 0.1);
+  const obs = ps.map((q) => learnedPosition(m, q));
+  const geo = ps.map((q) => ({ x: slots[q.slot].x * f.length, y: (slots[q.slot].y - 0.5) * f.width }));
+  const mean = (a: Vec[]) => ({ x: a.reduce((s, v) => s + v.x, 0) / a.length, y: a.reduce((s, v) => s + v.y, 0) / a.length });
+  const o = ps.length ? mean(obs) : { x: 0, y: 0 }, g = ps.length ? mean(geo) : { x: 0, y: 0 };
+  // フォーメーションからは並び順だけを借り、前後・左右の広がりは実測の学習位置に合わせる
+  // (スロット幅をそのまま使うと実測よりチームが縦に短くなる)。
+  const sd = (a: number[], c: number) => Math.sqrt(a.reduce((s, v) => s + (v - c) ** 2, 0) / Math.max(1, a.length)) || 1;
+  const kx = sd(obs.map((v) => v.x), o.x) / sd(geo.map((v) => v.x), g.x);
+  const ky = sd(obs.map((v) => v.y), o.y) / sd(geo.map((v) => v.y), g.y);
+  for (const v of geo) { v.x = g.x + (v.x - g.x) * kx; v.y = g.y + (v.y - g.y) * ky; }
+  const out = new Map<number, Vec>();
+  for (const q of m.players) if (q.team === team && q.role !== 'gk') out.set(q.id, learnedPosition(m, q));
+  ps.forEach((q, i) => out.set(q.id, {
+    x: o.x + (obs[i].x - o.x) * (1 - FORMATION_BLEND.x) + (geo[i].x - g.x) * FORMATION_BLEND.x,
+    // 守備時の横位置はshapeRelで既にスロット幅を半分混ぜているので、ここでは足さない
+    y: f.hasBall ? o.y + (obs[i].y - o.y) * (1 - FORMATION_BLEND.y) + (geo[i].y - g.y) * FORMATION_BLEND.y : obs[i].y,
+  }));
+  // Blending differently ordered positions shrinks variance even when each
+  // input has the same spread. Restore the learned spread after blending too.
+  for (const axis of ['x', 'y'] as const) {
+    if (axis === 'y' && !f.hasBall) continue;
+    const mixed = ps.map(q => out.get(q.id)![axis]);
+    const scale = sd(obs.map(v => v[axis]), o[axis]) / sd(mixed, o[axis]);
+    for (const q of ps) { const v = out.get(q.id)!; v[axis] = o[axis] + (v[axis] - o[axis]) * scale; }
+  }
+  layoutCache.set(f, out);
+  return out;
 }
 
 /** 局面と役割から決まる、その選手の基準位置(絶対座標)。 */
@@ -96,7 +138,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
   const sideSign = slot.y < 0.5 ? -1 : 1;
   let x = f.line + learnedRoleX(t.formation, trackingPhase(m, p.team), p.role, slot.x, toRel(p.team, m.ball.pos).x) * f.length;
   let y = f.cy + (slot.y - 0.5) * f.width;
-  const observed = learnedPosition(m, p);
+  const observed = formationLayout(m, p.team, f).get(p.id)!;
   x = f.hasBall ? observed.x + (observed.x-f.referenceBack)*(LENGTH_SCALE[t.compactness]-1) + LINE_ADJ[t.lineHeight] * .8 * (1-slot.x) : f.line + (observed.x - f.referenceBack) * LENGTH_SCALE[t.compactness];
   y = f.hasBall ? 34 + (observed.y-34)*learnedAttackWidth(m,p.team)*ATTACK_WIDTH[t.width]*WIDTH_SCALE[t.compactness] + (t.focus==='left'?-5:t.focus==='right'?5:0) : y * .5 + observed.y * .5;
 
@@ -124,7 +166,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
       case 'wb':
         // 同じ選手が攻守の幅を担うので、SBの上がりより一段低い位置までにする
         x += 4;
-        y = 34 + sideSign * Math.min(edge + 2, 32);
+        y = 34 + sideSign * Math.min(edge + 2, 29);
         break;
       case 'cb': {
         // SB が内側に入る/高く上がるとCBは幅を取り、後方の3枚を作る。
@@ -133,7 +175,8 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
         }
         if (deepBuild) {
           // 中央のCB(3バックの真ん中)は残り、両脇はペナルティエリアの角の外へ開く
-          y = 34 + (observed.y - 34) * WIDTH_SCALE[t.compactness] * ATTACK_WIDTH[t.width] + (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0);
+          // ボックス脇へ開く幅は実測そのもの(フォーメーションの並びで狭めない)
+          y = 34 + (learnedPosition(m, p).y - 34) * WIDTH_SCALE[t.compactness] * ATTACK_WIDTH[t.width] + (t.focus === 'left' ? -5 : t.focus === 'right' ? 5 : 0);
           x = Math.max(x, 8);
         }
         break;
@@ -144,7 +187,7 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
       case 'cm':
         break;
       case 'am':
-        x = Math.min(x, lim - 6);
+        x = Math.min(x, lim - 3.5);
         break;
       case 'wg':
         x = Math.min(x, lim - 3);
@@ -166,7 +209,8 @@ function shapeRel(m: MatchState, p: Player, t: Tactics, f: TeamFrame): Vec {
     // Calibrate the residual forward pull of marking, fading towards the front outlet.
     // 2m is smaller than the measured back-unit x SD (4.33m).
     x -= 2*(1-slot.x);
-    if (p.role === 'st' || p.role === 'f9') x += 2;
+    if ((p.role === 'st' || p.role === 'f9') && toRel(p.team, m.ball.pos).x > 70) x += 2;
+    if ((p.role === 'st' || p.role === 'f9') && toRel(p.team, m.ball.pos).x < 70) x -= 2;
     if (p.role === 'dm' || p.role === 'cm') y = f.cy + (y - f.cy) * .76;
     // 最終ラインは中盤ほどボールサイドへ寄らず、逆サイドのCBは中央に絞って残る
     if (p.role === 'cb' || p.role === 'fb' || p.role === 'wb') {

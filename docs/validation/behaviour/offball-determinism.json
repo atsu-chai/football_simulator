@@ -1,0 +1,24 @@
+{
+  "engineSha256": "927b2744dc48f336babeec776cec08ec6cfbee4c0ad86aa571b00c24ec67b35d",
+  "method": "Full players/ball/stats/shots/events/tactics plus 8 future PRNG draws; fresh initial config on each repeat",
+  "tests": [
+    {
+      "seed": 9001,
+      "first": "17a53539d66d22eefd33bf3b4008683738b44cb9e62eb832dc5d6fe7fdd3f7df",
+      "second": "17a53539d66d22eefd33bf3b4008683738b44cb9e62eb832dc5d6fe7fdd3f7df",
+      "pass": true
+    },
+    {
+      "seed": 12345,
+      "first": "2c5abf9b5c1c59b02b8f11699751045fbd985ee2b11671d7a749dea70b510d4b",
+      "second": "2c5abf9b5c1c59b02b8f11699751045fbd985ee2b11671d7a749dea70b510d4b",
+      "pass": true
+    },
+    {
+      "seed": 55555,
+      "first": "8dbe60729f86da1f99329755a0816f1f5d12eeb1032fb5a9e6d53a4f8891245b",
+      "second": "8dbe60729f86da1f99329755a0816f1f5d12eeb1032fb5a9e6d53a4f8891245b",
+      "pass": true
+    }
+  ]
+}
