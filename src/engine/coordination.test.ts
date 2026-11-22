@@ -1,12 +1,53 @@
 import {describe,expect,it} from 'vitest';
 import {teamDefense} from './defending';
 import {coordinateUnits} from './coordination';
-import {shapeTarget,updateFrames} from './teamShape';
+import {offsideLimit,shapeTarget,updateFrames} from './teamShape';
 import {makeTestMatch} from './testUtils';
-import {learnedPosition} from './positioning';
+import {learnedPosition,learnedAttackWidth} from './positioning';
 import {tactic} from '../data/formations';
 import {toRel} from './geometry';
+import {attackerMove} from './offBall';
 describe('shared positioning and cover',()=>{
+ it('starts a counter run from an onside slot before the first three seconds expire',()=>{
+  const m=makeTestMatch(tactic({onWin:'counter'}));m.dead=null;m.t=30;m.turnoverAt=29;m.possession=0;
+  m.ball.owner=5;m.ball.pos={x:45,y:34};m.players[5].pos={...m.ball.pos};m.lastLine=[50,50];
+  for(const p of m.players)if(p.team===1)p.pos={x:90,y:65};
+  const striker=m.players.find(p=>p.team===0&&p.role==='st')!;striker.pos={x:54,y:34};updateFrames(m);
+  const limit=offsideLimit(m,0);expect(striker.pos.x).toBeLessThan(limit);
+  attackerMove(m,striker);expect(striker.runTarget).not.toBeNull();expect(striker.target.x).toBeGreaterThan(limit);
+ });
+ it('allows a striker to enter the box for an advanced wide attack without sending the backs there',()=>{
+  const m=makeTestMatch();m.dead=null;m.t=30;m.turnoverAt=0;m.possession=0;m.ball.pos={x:80,y:10};m.ball.owner=1;m.lastLine=[30,10];updateFrames(m);
+  for(const p of m.players)p.pos=shapeTarget(m,p);
+  m.players[1].pos={...m.ball.pos};updateFrames(m);
+  for(const p of m.players){p.target=shapeTarget(m,p);p.runTarget=null;p.pressing=false;}
+  const striker=m.players.find(p=>p.team===0&&p.role==='st')!,cb=m.players.find(p=>p.team===0&&p.role==='cb')!;
+  striker.runTarget={x:95,y:34};striker.target={...striker.runTarget};
+  coordinateUnits(m);expect(striker.target.x).toBeGreaterThan(88.5);expect(cb.target.x).toBeLessThan(88.5);
+ });
+ it('keeps an independent striker run connected to the block at midfield',()=>{
+  const m=makeTestMatch();m.dead=null;m.t=30;m.possession=0;m.ball.owner=-1;m.ball.pass=null;m.ball.pos={x:45,y:34};m.lastLine=[30,30];updateFrames(m);
+  for(const p of m.players){p.target=shapeTarget(m,p);p.runTarget=null;p.pressing=false;}
+  const striker=m.players.find(p=>p.team===0&&p.role==='st')!;
+  striker.runTarget={x:98,y:34};striker.target={...striker.runTarget};striker.urgency=1;
+  coordinateUnits(m);expect(striker.target.x).toBeLessThan(90);
+ });
+
+ it('uses tracking pressure-conditioned attack width without carrying a stale tick cache',()=>{
+  const m=makeTestMatch();m.dead=null;m.t=30;m.possession=0;m.ball.pos={x:50,y:34};
+  for(const p of m.players)if(p.team===1)p.pos={x:90,y:34};updateFrames(m);
+  const free=learnedAttackWidth(m,0);m.players[18].pos={x:52,y:34};updateFrames(m);
+  const pressed=learnedAttackWidth(m,0);expect(free).toBeGreaterThan(pressed);
+  expect(learnedAttackWidth(m,0)).toBe(pressed);
+ });
+
+ it('does not compress an attack behind an opponent line inside its own half',()=>{
+  const m=makeTestMatch(tactic({formation:'4-2-3-1'}));m.dead=null;m.t=30;m.turnoverAt=0;m.possession=0;
+  m.ball.pos={x:25,y:34};m.lastLine=[20,70];updateFrames(m);
+  const am=m.players.find(p=>p.team===0&&p.role==='am')!;
+  expect(shapeTarget(m,am).x).toBeGreaterThan(40);
+ });
+
  it('retains lateral slot identity when the ball crosses the pitch',()=>{
   const m=makeTestMatch();m.dead=null;m.possession=0;m.t=30;
   for(const y of [1,34,67]){m.ball.pos={x:50,y};updateFrames(m);

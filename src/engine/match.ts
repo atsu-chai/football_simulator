@@ -156,7 +156,12 @@ function movePlayer(m: MatchState, p: Player) {
   // 2秒以内に背後へ入る球には、通常のスライドでなく帰陣の走行へ切り替える。
   const recoveryThreat = !m.dead && m.possession !== p.team && back && !p.pressing && approach > 1
     && (p.target.x - p.pos.x) * sign < -3 && (m.ball.pos.x - p.pos.x) * sign < Math.max(6, approach * 2);
-  const urgent = !m.dead && (isCarrier || p.pressing || p.urgency >= 0.9 || recoveryThreat);
+  const lateralCover = !m.dead && m.t-m.turnoverAt<3 && m.possession!==p.team && !p.pressing
+    && ['fb','wb','wg','iw'].includes(p.role) && Math.abs(p.target.y-p.pos.y)>2
+    && (p.target.y-p.pos.y)*(toAbs(p.team,{x:0,y:m.frames[p.team].cy}).y-p.pos.y)>0;
+  const leavingCover = m.possession!==p.team && !p.pressing && p.role!=='gk'
+    && dist(p.pos,m.ball.pos)<20 && dist(p.target,m.ball.pos)>21;
+  const urgent = !m.dead && (isCarrier || p.pressing || p.urgency >= 0.9 || recoveryThreat || leavingCover || lateralCover);
   // 追走・保持時は反応を優先し、持ち場の調整は実測の横移動の遅れに応じて平滑化する。
   const target = p.moveTarget;
   const blend = 1 - Math.exp(-TICK / (urgent ? 0.15 : TRACKING_MOTION.response));
@@ -168,41 +173,48 @@ function movePlayer(m: MatchState, p: Player) {
   const dx = target.x - p.pos.x;
   const dy = target.y - p.pos.y;
   const d = Math.hypot(dx, dy);
-  let carry = 6.2;
+  let carry = 4;
   if (isCarrier) {
     // 前に守備者がいなければ、ほぼ全速でゴールへ運べる
     const x = relX(p.team, p.pos.x);
     const ahead = m.players.some((o) => o.team !== p.team && o.role !== 'gk' && relX(p.team, o.pos.x) > x - 1 && dist(o.pos, p.pos) < 14);
-    if (!ahead) carry = 7.5;
+    if (!ahead) carry = 5.5;
     // 守備者がすぐ近くにいる時は、ボールを守りながらなので速く運べない
-    else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 5.2;
+    else if (m.players.some((o) => o.team !== p.team && o.role !== 'gk' && dist(o.pos, p.pos) < 3)) carry = 3.5;
   }
   // 持ち場に近い時は歩き、大きくスライドする時は走る。一定の緊急度で全員が同じ速さにならない。
   // 帰陣と押し上げを同じ速さにしない。帰陣のゲインは行動分布で校正した値（回帰係数ではない）。
-  const lateralCover = m.t-m.turnoverAt<3 && ['fb','wb','wg','iw'].includes(p.role)
-    && Math.abs(dy)>2 && dy*(m.frames[p.team].cy-p.pos.y)>0;
+
   const retreatingX = (target.x-p.pos.x)*sign < -2;
   const recovering = !m.dead && m.possession !== p.team && (retreatingX || lateralCover);
-  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? 0.32 : recovering ? (back ? 0.8 : 0.6) : 0.23)) * (0.7 + p.urgency * 0.3);
+  // Closed-loop calibration: the old uniform .23 gain left attack targets 7–10m ahead
+  // of actual positions. Preserve a slower striker outlet; AM must reconnect sooner.
+  const attackGain = p.role === 'am' ? .7 : ['fb','wb','wg','iw'].includes(p.role) ? .5 : ['st','f9'].includes(p.role) ? .35 : .45;
+  const adjustmentGain = recovering ? (back ? .8 : .6) : m.possession === p.team ? attackGain : .23;
+  const recovery = Math.min(m.dead ? 3.8 : TRACKING_MOTION.running, 0.5 + d * (m.dead ? .32 : adjustmentGain)) * (0.7 + p.urgency * 0.3);
   // 裏抜け・パスへの追走だけスプリントし、寄せや帰陣の高緊急度と区別する。
   const sprintAction = p.runTarget !== null || m.ball.pass?.to === p.id;
-  const chaseSpeed = recoveryThreat ? TRACKING_MOTION.recoverySprint : (sprintAction ? TRACKING_MOTION.sprint : 5.9) * p.urgency;
+  const chaseSpeed = recoveryThreat ? TRACKING_MOTION.recoverySprint : lateralCover ? TRACKING_MOTION.running : (sprintAction ? TRACKING_MOTION.sprint : 5.9) * p.urgency;
   const retreatResponse = recovering && retreatingX ? Math.max(0, -m.movementBallVel.x * sign) * learnedBallResponse(p.role) : 0;
   const recoverySpeed = Math.min(TRACKING_MOTION.running, recovery + retreatResponse);
   const top = (isCarrier ? carry : urgent ? chaseSpeed : recoverySpeed) * (stunned ? 0.35 : 1);
   const tired = 0.72 + 0.28 * m.energy[p.team];
   // 到着前に減速する。位置の微調整で走り続けない。
-  const remaining = Math.max(0, d - (urgent || m.dead?.taker === p.id ? 0.15 : m.dead ? 0.8 : 1.2));
+  const remaining = Math.max(0, d - (urgent || m.dead?.taker === p.id ? 0.15 : m.dead ? 0.8 : 1.19));
   const speed = Math.min(top * tired, remaining * (urgent ? 2.2 : 1.2), Math.sqrt(2 * 3 * remaining));
   let vx = d > 0.05 ? (dx / d) * speed : 0;
   let vy = d > 0.05 ? (dy / d) * speed : 0;
-  // 実測で推定した球速への応答。目標そのものの差分は追わず、守備で後退する時だけ使う。
-  if (!urgent && retreatResponse > 0) vx -= sign * retreatResponse * Math.min(1, remaining / 3);
+  // Feed-forward follows a moving block even at zero position error. Gating
+  // this by remaining distance suppressed the measured longitudinal coupling.
   if (!m.dead && !urgent && p.role !== 'gk') {
     vy += m.movementBallVel.y * learnedBallResponse(p.role, m.possession === p.team, true) * .6 * Math.min(1, remaining / 3);
-    if (m.possession === p.team && dx * m.movementBallVel.x > 0) {
-      vx += m.movementBallVel.x * learnedBallResponse(p.role, true) * .6 * Math.min(1, remaining / 3);
-    }
+    vx += m.movementBallVel.x * learnedBallResponse(p.role, m.possession === p.team) * 1.4;
+  }
+  // Real loss width contracts before the block has completed longitudinal recovery.
+  // Prioritise the lateral component while retaining the existing physical caps.
+  if(lateralCover && m.possession!==p.team && !p.pressing){
+    vx *= .6;
+    vy = Math.sign(dy)*Math.max(Math.abs(vy),Math.min(TRACKING_MOTION.running,Math.abs(dy)*1.2));
   }
   // 味方と重ならないように少し離れる
   for (const o of m.players) {

@@ -3,6 +3,18 @@ import {Coordination,compareCoordination,hullArea} from './coordination';
 import type {Frame} from './behaviour';
 function sequence():Frame[]{return Array.from({length:16},(_,t)=>({match:'synthetic',section:'firstHalf',t,live:true,poss:0,directions:[1,-1],b:[40+t*t*.08,25+t*t*.02],p:Array.from({length:22},(_,id)=>{const team=id<11?0:1,slot=id%11;return [id,team,slot===0?'gk':slot<5?'cb':slot<8?'cm':'st',15+slot*3+t*t*.04,5+slot*5+t*t*.01];})}));}
 describe('coordination measurements',()=>{
+ it('counts frame tails, near-ball players and same-side overlaps including zero frames',()=>{
+  const h=sequence().slice(0,9);const f=h.at(-1)!;
+  f.b=[40,34];f.p=f.p.filter(p=>p[1]!==0||p[2]==='gk');
+  f.p.push([1,0,'fb',10,8],[2,0,'wg',11,9],[3,0,'cm',70,34],[4,0,'cm',72,34]);
+  for(const g of h.slice(0,-1))g.p=f.p.map(p=>[...p]);
+  const values:Record<string,number>={};new Coordination().feed(h,0,1,(k,v)=>{values[k]=v;});
+  expect(values.teamLength_attack).toBe(62);expect(values.teamWidth_attack).toBe(26);
+  expect(values.ahead25_attack_cm).toBe(2);expect(values.behind25_attack_fb).toBe(1);
+  expect(values.pairs3_attack_all).toBe(2);expect(values.pairs5_attack_fb_wg).toBe(1);
+  expect(values.pairs3_attack_am_st).toBe(0);expect(values.ballNear20_attack).toBe(0);
+ });
+
  it('measures convex hull area independent of point order and interior points',()=>{expect(hullArea([[0,0],[4,3],[4,0],[0,3],[1,1]])).toBe(12);expect(hullArea([[1,1],[2,2],[3,3]])).toBe(0);});
  it('measures Pearson coupling and preserves all metrics under 180 degree rotation',()=>{
   const a=new Coordination(),b=new Coordination(),fs=sequence();

@@ -4,7 +4,7 @@
 import { writeFileSync } from 'node:fs';
 import { tactic } from '../src/data/formations';
 import { createMatch, resume, step } from '../src/engine/match';
-import { Tactics } from '../src/engine/types';
+import { Tactics, TICK } from '../src/engine/types';
 
 const N = Number(process.argv[2] ?? 12);
 const mk = (t: Tactics, n: string) => ({ name: n, short: n, color: '#888', tactics: t });
@@ -15,11 +15,24 @@ const pairs: [Tactics, Tactics][] = [
 ];
 const acc: Record<string, number[]> = {};
 const add = (k: string, v: number) => (acc[k] ??= []).push(v);
+const diagnostics={longestFrozenLiveSeconds:0,longestPendingShotSeconds:0,goalsWithoutGoalShot:0};
+const distanceBins:Record<string,{n:number;goals:number;xg:number;distance:number;headers:number}>={};
 
 for (const [a, b] of pairs) {
   for (let i = 0; i < N; i++) {
     const m = createMatch({ teams: [mk(a, 'A'), mk(b, 'B')], seed: 5000 + i });
-    while (!m.finished) { step(m); if (m.atHalftime) resume(m); }
+    let frozen=0,shotSince=0,activeShot:typeof m.ball.shot=null;
+    while (!m.finished) {
+      step(m);
+      const unchanged=!m.dead&&!m.atHalftime&&m.ball.pos.x===m.ball.prev.x&&m.ball.pos.y===m.ball.prev.y
+        &&m.players.every(p=>p.pos.x===p.prev.x&&p.pos.y===p.prev.y);
+      frozen=unchanged?frozen+1:0;
+      diagnostics.longestFrozenLiveSeconds=Math.max(diagnostics.longestFrozenLiveSeconds,frozen*TICK);
+      if(m.ball.shot!==activeShot){activeShot=m.ball.shot;shotSince=m.t;}
+      if(activeShot)diagnostics.longestPendingShotSeconds=Math.max(diagnostics.longestPendingShotSeconds,m.t-shotSince);
+      if (m.atHalftime) resume(m);
+    }
+    diagnostics.goalsWithoutGoalShot+=m.score[0]+m.score[1]-m.shots.filter(s=>s.outcome==='goal').length;
     const s = m.stats;
     const team = (f: (k: 0 | 1) => number) => (f(0) + f(1)) / 2;
     add('得点(両チーム合計)', m.score[0] + m.score[1]);
@@ -33,6 +46,9 @@ for (const [a, b] of pairs) {
     for (const sh of m.shots) {
       const d = Math.hypot(105 - sh.x, sh.y - 34);
       const inBox = sh.x > 105 - 16.5 && Math.abs(sh.y - 34) < 20.16;
+      const key=d<8?'0–8':d<12?'8–12':d<16.5?'12–16.5':d<20?'16.5–20':d<25?'20–25':'25+';
+      const bin=distanceBins[key]??={n:0,goals:0,xg:0,distance:0,headers:0};
+      bin.n++;bin.goals+=+(sh.outcome==='goal');bin.xg+=sh.xg;bin.distance+=d;bin.headers+=+sh.header;
       add('シュート距離(m)', d);
       add('ボックス外からのシュート%', inBox ? 0 : 100);
       add('25m以上からのシュート%', d >= 25 ? 100 : 0);
@@ -74,9 +90,17 @@ const checks = {
   goals: measured['得点(両チーム合計)'] >= 2.5 && measured['得点(両チーム合計)'] <= 3.5,
   shots: measured['シュート(1チーム)'] >= 11 && measured['シュート(1チーム)'] <= 16,
   pass: measured['パス成功率%'] >= 80 && measured['パス成功率%'] <= 87,
+  noFrozenPlay:diagnostics.longestFrozenLiveSeconds<1,
+  shotResolution:diagnostics.longestPendingShotSeconds<8,
+  shotDistance:measured['シュート距離(m)']>=15&&measured['シュート距離(m)']<=19,
+  outsideShare:measured['ボックス外からのシュート%']>=28&&measured['ボックス外からのシュート%']<=45,
+  longShotShare:measured['25m以上からのシュート%']>=4&&measured['25m以上からのシュート%']<=18,
+  boxConversion:measured['ボックス内シュートの決定率%']>=10&&measured['ボックス内シュートの決定率%']<=20,
+  headerShare:measured['ヘディング%']>=8&&measured['ヘディング%']<=22,
 };
-if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N * pairs.length, perPair: N, measured, checks }, null, 2) + '\n');
+if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N * pairs.length, perPair: N, measured, diagnostics, distanceBins:Object.fromEntries(Object.entries(distanceBins).map(([key,b])=>[key,{n:b.n,conversion:b.goals/b.n,xg:b.xg/b.n,meanDistance:b.distance/b.n,headerShare:b.headers/b.n}])), checks }, null, 2) + '\n');
 if (process.argv.includes('--check')) {
   console.log('受入判定', checks);
+  console.log('停止・未解決シュート',diagnostics);
   if (Object.values(checks).some(v => !v)) process.exitCode = 1;
 }

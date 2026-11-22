@@ -1,0 +1,29 @@
+{
+  "chapter": 4,
+  "opponentMatches": 30,
+  "oldTarget": 10,
+  "newTarget": 12,
+  "method": "Same measured opponent outcome distributions; target affects advancement threshold only, not match tactics or outcomes. Selected 12 to place chapter 4 between chapters 3 and 5 in solution advancement probability. Fresh story.ts 30 chapter 4 rerun verifies the result.",
+  "candidates": [
+    {
+      "target": 10,
+      "base": 0.30613205761316864,
+      "answer": 0.9244921810699589
+    },
+    {
+      "target": 11,
+      "base": 0.15990654320987652,
+      "answer": 0.8295736625514403
+    },
+    {
+      "target": 12,
+      "base": 0.11414098765432096,
+      "answer": 0.753679012345679
+    },
+    {
+      "target": 13,
+      "base": 0.051306460905349786,
+      "answer": 0.5900181069958848
+    }
+  ]
+}

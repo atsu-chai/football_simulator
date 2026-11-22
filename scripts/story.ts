@@ -30,6 +30,7 @@ for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
     return next;
   };
   const rows: string[] = [];
+  const fixtures:{style:StyleId;skill:number;mySkill:number;tactics:Tactics;base:{w:number;d:number};answer:{w:number;d:number}}[]=[];
   for (const o of opponents) {
     const run = (t: Tactics) => {
       let w = 0, d = 0;
@@ -41,6 +42,7 @@ for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
     };
     const b = run(DEFAULT_TACTICS);
     const a = run(answer(o.style));
+    fixtures.push({style:o.style,skill:o.skill,mySkill:c.mySkill,tactics:answer(o.style),base:b,answer:a});
     distBase = advance(distBase, b);
     distAns = advance(distAns, a);
     // cup は引き分けを PK で五分とみなす
@@ -55,7 +57,7 @@ for (const c of CHAPTERS.filter((x) => x.id >= from && x.id <= to)) {
   console.log(`第${c.id}章 ${c.league}: 初期 ${fmt(ptsBase)} | 対策 ${fmt(ptsAns)}`);
   if (!process.env.STORY_STYLE) console.log(`  章突破率(独立分布による推計): 初期 ${(100 * clear(ptsBase, distBase)).toFixed(1)}% / 対策 ${(100 * clear(ptsAns, distAns)).toFixed(1)}%`);
   rows.forEach((r) => console.log(r));
-  results.push({ chapter: c.id, league: c.league, target: c.target, base: clear(ptsBase, distBase), answer: clear(ptsAns, distAns), ptsBase, ptsAns, distBase, distAns });
+  results.push({ chapter: c.id, league: c.league, target: c.target, base: clear(ptsBase, distBase), answer: clear(ptsAns, distAns), ptsBase, ptsAns, distBase, distAns, fixtures });
 }
 
 if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringify({ matches: N, results }, null, 2) + '\n');

@@ -20,11 +20,35 @@ export class Coordination {
   const ball=(g:Frame)=>sign===1?g.b:[105-g.b[0],68-g.b[1]];
   const center=(g:Frame,ids=ps.map(p=>p[0]))=>[0,1].map(a=>mean(ids.map(id=>at(g,id)[a])));
   const c=center(f),b=ball(f),zone=`${Math.min(2,Math.floor(b[0]/35))}|${Math.min(2,Math.floor(b[1]/(68/3)))}`;
+  // Frame distributions: each team contributes once, including zero-count frames.
+  const positions=ps.map(p=>at(f,p[0]));
+  for(const axis of [0,1]) add(`${axis===0?'teamLength':'teamWidth'}_${phase}`,Math.max(...positions.map(v=>v[axis]))-Math.min(...positions.map(v=>v[axis])));
+  for(const radius of [10,20])add(`ballNear${radius}_${phase}`,positions.filter(v=>Math.hypot(v[0]-b[0],v[1]-b[1])<radius).length);
+  for(const r of ['all','cb','fb','cm','am','wg','st']){
+   const group=ps.filter(p=>r==='all'||role(p[2])===r);if(!group.length)continue;
+   for(const direction of ['ahead','behind'])add(`${direction}25_${phase}_${r}`,group.filter(p=>(at(f,p[0])[0]-b[0])*(direction==='ahead'?1:-1)>25).length);
+  }
+  for(const threshold of [3,5]){
+   const counts:Record<string,number>={all:0,fb_wg:0,cm_cm:0,am_st:0};
+   for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+    const a=at(f,ps[i][0]),z=at(f,ps[j][0]);if(Math.hypot(a[0]-z[0],a[1]-z[1])>=threshold)continue;
+    counts.all++;const pair=[role(ps[i][2]),role(ps[j][2])].sort().join('_');
+    if(pair in counts&&(pair!=='fb_wg'||(a[1]-34)*(z[1]-34)>0))counts[pair]++;
+   }
+   for(const [pair,n] of Object.entries(counts))add(`pairs${threshold}_${phase}_${pair}`,n);
+  }
+  if(phase==='attack')for(const side of [-1,1]){
+   const flank=ps.filter(p=>(at(f,p[0])[1]-34)*side>0);if(!flank.length)continue;
+   const outer=flank.reduce((a,z)=>at(f,a[0])[1]*side>at(f,z[0])[1]*side?a:z);
+   for(const r of ['fb','wg','other'])add(`outermost_${r}`,+(r==='other'?!['fb','wg'].includes(role(outer[2])):role(outer[2])===r));
+  }
   // Stable role membership, including all five defenders in a three-CB system.
   // WG belongs to the front unit; inter-line figures therefore describe role units, not inferred formations.
   const units=[ps.filter(p=>['cb','fb','wb'].includes(p[2])),ps.filter(p=>['dm','cm'].includes(p[2])),ps.filter(p=>['am','wg','iw','st','f9'].includes(p[2]))];
   for(const p of ps){const v=at(f,p[0]),key=`${phase}|${zone}|${role(p[2])}`,a=this.cells[key]??={n:0,sum:[0,0,0,0],square:[0,0,0,0]};
    const values=[v[0]-b[0],v[1]-b[1],v[0]-c[0],v[1]-c[1]];a.n++;values.forEach((v,i)=>{a.sum[i]+=v;a.square[i]+=v*v;});
+   for(const [name,value] of [['BallX',values[0]],['BallY',values[1]],['CentroidX',values[2]],['CentroidY',values[3]]] as const)add(`role${name}_${phase}_${role(p[2])}`,value);
+   for(const radius of [10,20])add(`roleNear${radius}_${phase}_${role(p[2])}`,+(Math.hypot(values[0],values[1])<radius));
    add(`nearestTeammate_${phase}`,Math.min(...ps.filter(q=>q!==p).map(q=>Math.hypot(v[0]-at(f,q[0])[0],v[1]-at(f,q[0])[1]))));
    if(phase==='attack'&&['fb','wg'].includes(role(p[2])))add(`width_${role(p[2])}`,Math.abs(v[1]-34));
   }
@@ -64,12 +88,14 @@ export class Coordination {
 
 export function compareCoordination(sim:ReturnType<Coordination['result']>,real:ReturnType<Coordination['result']>){
  const errors=[0,0,0,0],spreads=[0,0,0,0];let weight=0,total=0,cells=0;
+ const roleErrors:Record<string,{n:number;squared:number[]}>= {};
  for(const [k,r] of Object.entries(real.cells)){
   if(r.n<40)continue;total+=r.n;const s=sim.cells[k];if(!s||s.n<20)continue;
+  const parts=k.split('|'),group=`${parts[0]}|${parts[3]}`,g=roleErrors[group]??={n:0,squared:[0,0,0,0]};g.n+=r.n;for(let i=0;i<4;i++)g.squared[i]+=r.n*(s.mean[i]-r.mean[i])**2;
   cells++;weight+=r.n;for(let i=0;i<4;i++){errors[i]+=r.n*(s.mean[i]-r.mean[i])**2;spreads[i]+=r.n*(s.spread[i]-r.spread[i])**2;}
  }
  const correlationErrors:Record<string,number[]>={};
  const eligible:Record<string,number>={},covered:Record<string,number>={};
  for(const [k,r] of Object.entries(real.correlations)){const family=k.split('_')[0];if(r.n<100||r.r===null)continue;eligible[family]=(eligible[family]??0)+1;const s=sim.correlations[k];if(!s||s.n<100||s.r===null)continue;covered[family]=(covered[family]??0)+1;(correlationErrors[family]??=[]).push((s.r-r.r)**2);}
- return {correlationCoverage:Object.fromEntries(Object.entries(eligible).map(([k,n])=>[k,(covered[k]??0)/n])),cells,coverage:weight/Math.max(1,total),ballPositionRMSE:Math.sqrt((errors[0]+errors[1])/Math.max(1,weight)),centroidPositionRMSE:Math.sqrt((errors[2]+errors[3])/Math.max(1,weight)),spreadRMSE:Math.sqrt(spreads.reduce((a,b)=>a+b,0)/Math.max(1,weight)/4),correlationRMSE:Object.fromEntries(Object.entries(correlationErrors).map(([k,a])=>[k,Math.sqrt(mean(a))]))};
+ return {roleErrors:Object.fromEntries(Object.entries(roleErrors).map(([k,g])=>[k,{n:g.n,ballRMSE:Math.sqrt((g.squared[0]+g.squared[1])/g.n),centroidRMSE:Math.sqrt((g.squared[2]+g.squared[3])/g.n)}])),correlationCoverage:Object.fromEntries(Object.entries(eligible).map(([k,n])=>[k,(covered[k]??0)/n])),cells,coverage:weight/Math.max(1,total),ballPositionRMSE:Math.sqrt((errors[0]+errors[1])/Math.max(1,weight)),centroidPositionRMSE:Math.sqrt((errors[2]+errors[3])/Math.max(1,weight)),spreadRMSE:Math.sqrt(spreads.reduce((a,b)=>a+b,0)/Math.max(1,weight)/4),correlationRMSE:Object.fromEntries(Object.entries(correlationErrors).map(([k,a])=>[k,Math.sqrt(mean(a))]))};
 }

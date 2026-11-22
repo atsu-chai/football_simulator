@@ -1,0 +1,189 @@
+{
+  "status": "complete",
+  "gitHead": "50851ce",
+  "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6",
+  "stageDataSha256": "d2ab836cb72c2641029d602d1f84c419f644cb06364b4097b61556d563ba07a6",
+  "storyDataSha256": "1a97a3f44c3c950f851ae30859b72031723b139e71f7f1d90905faeef6db07ef",
+  "completedCommands": [
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "casesOrMatches": 117
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0
+    },
+    {
+      "command": "node --import tsx scripts/audit.ts 36 --check",
+      "exitCode": 0,
+      "casesOrMatches": 108
+    },
+    {
+      "command": "node --import tsx scripts/audit.ts 12 --check",
+      "exitCode": 0,
+      "casesOrMatches": 36
+    },
+    {
+      "command": "node --import tsx scripts/compare-real.ts 12 --check",
+      "exitCode": 0,
+      "casesOrMatches": 12
+    },
+    {
+      "command": "node --import tsx scripts/movement.ts 6 --check",
+      "exitCode": 0,
+      "casesOrMatches": 6
+    },
+    {
+      "command": "node --import tsx scripts/restarts.ts 12",
+      "exitCode": 0,
+      "casesOrMatches": 12
+    },
+    {
+      "command": "OUT=/tmp/shot-c20-balance UNIVERSAL=0 sh scripts/balance-par.sh 100; then balance.ts 100 3/4 after solution changes",
+      "exitCode": 0,
+      "casesOrMatches": 2400
+    },
+    {
+      "command": "node --import tsx scripts/determinism.ts 9001 12345 55555",
+      "exitCode": 0,
+      "casesOrMatches": 6
+    },
+    {
+      "command": "node --import tsx scripts/behaviour-clip.ts /tmp/behaviour-real-clip.json; node scripts/check-behaviour-page.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node --import tsx scripts/story.ts 30 (all 6 chapters, equivalent chapter-wise parallel execution)",
+      "exitCode": 0,
+      "matches": 1440
+    }
+  ],
+  "audit108": {
+    "goals": true,
+    "shots": true,
+    "pass": true,
+    "noFrozenPlay": true,
+    "shotResolution": true,
+    "shotDistance": true,
+    "outsideShare": true,
+    "longShotShare": true,
+    "boxConversion": true,
+    "headerShare": true
+  },
+  "behaviour": [
+    {
+      "seedStart": 9001,
+      "matches": 60,
+      "passed": 125,
+      "total": 125,
+      "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6"
+    },
+    {
+      "seedStart": 12345,
+      "matches": 60,
+      "passed": 125,
+      "total": 125,
+      "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6"
+    },
+    {
+      "seedStart": 55555,
+      "matches": 60,
+      "passed": 125,
+      "total": 125,
+      "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6"
+    }
+  ],
+  "tests": {
+    "passed": 117,
+    "total": 117,
+    "files": 9
+  },
+  "build": "pass",
+  "balance": {
+    "passed": 12,
+    "total": 12,
+    "matchesPerTacticPerStage": 100,
+    "minimumGapPoints": 30.0,
+    "totalGoalsRange": [
+      2.07,
+      3.66
+    ]
+  },
+  "determinism": {
+    "passed": 3,
+    "total": 3
+  },
+  "clip": {
+    "realFrames": 450,
+    "simFrames": 450,
+    "realPlayers": 22,
+    "simPlayers": 22,
+    "simLongestIdenticalLiveFrames": 1,
+    "simIdenticalLivePairs": 0,
+    "sampledTimes": [
+      0,
+      8,
+      30,
+      60,
+      89.8
+    ],
+    "drawnLabels": 276,
+    "note": "Canvas calls executed with a mock context; browser visual inspection unavailable."
+  },
+  "clipSha256": "13e81c792e1f7762be305b68a46e30b42b307c7bdfd81d2ef36beb394350097f",
+  "harnessSha256": {
+    "scripts/audit.ts": "d05651f67fd38fad4222b06bb2d72e1db8d26e8b27d3edd4a69101958f4a1ce9",
+    "scripts/behaviour.ts": "0a3ffa908ab5f81bb2974a6c4d97617c84c87b2f8db2f74645307509aa2fe849",
+    "scripts/coordination.ts": "c590330fc0b4e4cefd381d5ecc087176e4f641a329387d680544c5d34e97f4e7",
+    "scripts/compare-real.ts": "1683fbaeb1e124b855de63de30c429971b78c2193dc5980d044f49630ed8e6d6",
+    "scripts/movement.ts": "098e11afce61950bb47d66cec281f9b71ebd65a48d39aba223c5818b55689e6f",
+    "scripts/restarts.ts": "2f62f935aefcaa794c97017cf69b12350dfb4dd0fc1c1b6c53d884e961147269",
+    "scripts/balance.ts": "1345dd0dfdd2ccd0d231471100a51347fefa22d37ad49b1fabdcf171dac48c14",
+    "scripts/story.ts": "68b43654744e7ff77a87945b488143cd5f5a6e484536a2684452fe16ad5da4f4",
+    "scripts/determinism.ts": "929e339eb52e78cfec3ef9c5fbc3ec90de8f56c63a62619365779506ef106a03",
+    "scripts/check-behaviour-page.mjs": "5b7ed06bbe07626b73b22fbf189bcf7d5527e25081293f672ca645b81acb4b34"
+  },
+  "story": {
+    "chapters": 6,
+    "matchesPerTacticPerOpponent": 30,
+    "fixtures": 24,
+    "matches": 1440,
+    "fixtureInputsVerified": true,
+    "advancement": [
+      {
+        "chapter": 1,
+        "base": 0.8183962962962963,
+        "answer": 0.9950481481481481
+      },
+      {
+        "chapter": 2,
+        "base": 0.5473333333333332,
+        "answer": 0.9074518518518518
+      },
+      {
+        "chapter": 3,
+        "base": 0.1887294650205761,
+        "answer": 0.85738
+      },
+      {
+        "chapter": 4,
+        "base": 0.06430740740740741,
+        "answer": 0.6972222222222222
+      },
+      {
+        "chapter": 5,
+        "base": 0.19644444444444442,
+        "answer": 0.7236574074074075
+      },
+      {
+        "chapter": 6,
+        "base": 0.08433333333333334,
+        "answer": 0.46686111111111117
+      }
+    ]
+  },
+  "gitDiffCheck": "pass",
+  "cleanup": "Own temporary source copies and freeze fixture removed; no temp/debug scripts in scripts/",
+  "userBallStallGuard": "retained"
+}

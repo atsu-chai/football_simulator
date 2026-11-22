@@ -61,7 +61,7 @@ export const STAGES: Stage[] = [
   {
     id: 2, title: '幅で揺さぶる', concept: '幅とサイドチェンジ',
     opponent: opp('ダイヤモンド・シティ', { formation: '4-1-2-1-2', width: 'narrow', compactness: 'tight' }, 1.6),
-    solution: tactic({ formation: '3-4-3', buildUp: 'short', width: 'wide', fullbacks: 'invert', pressHeight: 'high', compactness: 'tight' }),
+    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'short', width: 'wide', fullbacks: 'overlap', pressHeight: 'high', onLoss: 'counterpress' }),
     brief: '相手は中央に人を集めるダイヤモンド型。その代わり、サイドには人がいません。',
     scouting: ['中央に5人以上が密集する', 'サイドを守るのはSBだけ', '横に振ると中盤のスライドが間に合わない'],
     hints: ['幅を「広い」に設定しよう', 'SBを上げてサイドで2対1を作ろう', '5レーンのオーバーレイで大外の使い方を見よう'],
@@ -72,7 +72,7 @@ export const STAGES: Stage[] = [
   {
     id: 3, title: 'ハーフスペースの鍵', concept: 'ハーフスペース攻略',
     opponent: opp('セブン・ウォール', { formation: '5-4-1', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.3),
-    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, buildUp: 'mixed', tempo: 'fast', width: 'wide', fullbacks: 'overlap', pressHeight: 'mid', onLoss: 'counterpress', onWin: 'counter' }),
+    solution: tactic({ formation: '4-2-3-1', roles: { 7: 'iw', 9: 'iw' }, buildUp: 'short', width: 'wide', fullbacks: 'stay', pressHeight: 'high', onLoss: 'counterpress' }),
     brief: '相手は5-4-1のブロックで中央を固め、奪えば速攻を狙います。5バックの間、ハーフスペースが崩しの入口です。',
     scouting: ['最終ラインが5枚で、背後のスペースは小さい', '中盤4枚と最終ラインの間は狭いが空く', '奪われると1トップへ素早く長いボールが来る'],
     hints: ['ウイングを「インサイドWG」にして、5バックの間(ハーフスペース)に立たせよう', '幅を「広い」にしてSBで大外を取り、内側のレーンを広げよう', '奪われたら即時奪回。相手の速攻を出させない'],
@@ -83,7 +83,7 @@ export const STAGES: Stage[] = [
   {
     id: 4, title: '攻めながら守る', concept: 'レストディフェンス',
     opponent: opp('スパーク・カウンターズ', { formation: '4-4-2', pressHeight: 'mid', compactness: 'tight', onWin: 'counter', tempo: 'fast', buildUp: 'long' }, 1.15),
-    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 10: 'iw' }, tempo: 'fast', width: 'wide', compactness: 'tight', onLoss: 'counterpress', onWin: 'counter' }),
+    solution: tactic({ formation: '3-5-2', buildUp: 'long', tempo: 'fast', width: 'narrow', fullbacks: 'stay', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '相手は中盤に網を張って奪い、一気に前線へ蹴ってきます。攻めるほど背後が危険になります。',
     scouting: ['奪った瞬間に2トップが走り出す', 'ボールを持つ時間は短い', 'ビルドアップでは蹴ってくる'],
     hints: ['アンカーを置いて、攻撃中も中央に人を残そう', '3バック(3-5-2 など)か、SBを「残る」にして後ろに3人以上を残そう', '奪われた瞬間に囲む「即時奪回」を試そう'],
@@ -126,7 +126,7 @@ export const STAGES: Stage[] = [
   {
     id: 8, title: 'マンツーマン崩し', concept: '偽9とローテーション',
     opponent: opp('シャドウズ', { formation: '3-5-2', marking: 'man', pressHeight: 'high', pressIntensity: 'normal', buildUp: 'long', tempo: 'fast', onWin: 'counter', compactness: 'tight' }, 1.6),
-    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, tempo: 'fast', width: 'wide', fullbacks: 'invert', onLoss: 'counterpress', onWin: 'counter' }),
+    solution: tactic({ formation: '4-3-3', roles: { 8: 'iw', 9: 'f9', 10: 'iw' }, tempo: 'fast', width: 'wide', fullbacks: 'overlap', onLoss: 'counterpress', onWin: 'counter' }),
     brief: '全員が1人ずつマークに付いてきます。味方が動けば相手も動きます。つまり、相手の配置を操作できます。',
     scouting: ['担当の相手にどこまでも付いてくる', '動き出しへの反応は一瞬遅れる', 'カバーリングの余り人がいないので、1人剥がされると一気に崩れる'],
     hints: ['陣形はそのままでいい。CFを偽9番にして相手CBを釣り出そう', 'ウイングをインサイドWGにして、空いた中央へ走り込ませよう', 'テンポを上げ、SBも上げて担当者を動かし続けよう'],

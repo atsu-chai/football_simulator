@@ -1,4 +1,4 @@
-import { clamp, dist, relX, toRel } from './geometry';
+import { clamp, dist, pointToSegment, relX, toRel } from './geometry';
 import { DeadKind, GOAL_H, GOAL_W, MatchState, PITCH_H, PITCH_W, Player, Side, TICK, Vec } from './types';
 import { addEvent, gameMinute } from './events';
 import { attemptHeader } from './onBall';
@@ -158,9 +158,24 @@ function resolveShot(m: MatchState) {
   const b = m.ball;
   const s = b.shot;
   if (!s) return;
+  // 遠目のシュートが減速してゴールや GK・ブロッカーに届かず止まった場合は、こぼれ球に戻す。
+  // シュートが未解決のままだと誰もボールを追わず、試合が止まってしまう。
+  if (b.z === 0 && b.vz === 0 && Math.hypot(b.vel.x, b.vel.y) < 1.5) {
+    const shooterTeam = m.players[s.shooter].team;
+    if (s.outcome === 'goal') {
+      for (let i = m.shots.length - 1; i >= 0; i--) {
+        if (m.shots[i].team === shooterTeam && m.shots[i].outcome === 'goal') {
+          m.shots[i].outcome = 'miss';
+          break;
+        }
+      }
+    }
+    b.shot = null;
+    return;
+  }
   if (s.outcome === 'blocked') {
     const d = m.players[s.blocker];
-    if (dist(d.pos, b.pos) < 1.8) {
+    if (pointToSegment(d.pos, b.prev, b.pos).d < 1.8) {
       b.shot = null;
       b.lastTouch = d.id;
       // ブロックしたボールの一部はゴールラインを割ってコーナーになる
@@ -175,7 +190,7 @@ function resolveShot(m: MatchState) {
   } else if (s.outcome === 'saved') {
     const shooterTeam = m.players[s.shooter].team;
     const gk = m.players.find((p) => p.team !== shooterTeam && p.role === 'gk')!;
-    if (dist(gk.pos, b.pos) < 2.5) {
+    if (pointToSegment(gk.pos, b.prev, b.pos).d < 2.5) {
       b.shot = null;
       m.stats[shooterTeam].onTarget += 1;
       addEvent(m, 'save', '好セーブ', gk.team);
@@ -217,7 +232,11 @@ function checkOut(m: MatchState): boolean {
   }
   if (x < 0 || x > PITCH_W) {
     const defending: Side = x < 0 ? 0 : 1;
-    const inGoal = Math.abs(y - 34) < GOAL_W / 2 && b.z < GOAL_H;
+    // Judge the crossing of the goal plane, not the end of a 0.1s step.
+    // A fast oblique shot can already be metres beyond the post at step end.
+    const fraction = clamp(((x < 0 ? 0 : PITCH_W) - b.prev.x) / (x - b.prev.x || 1), 0, 1);
+    const crossingY = b.prev.y + (y-b.prev.y)*fraction;
+    const inGoal = Math.abs(crossingY - 34) < GOAL_W / 2 && b.z < GOAL_H;
     if (inGoal && !(b.shot && b.shot.outcome !== 'goal')) {
       scoreGoal(m, (1 - defending) as Side);
       return true;

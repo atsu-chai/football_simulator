@@ -8,7 +8,7 @@ function sequence(mirror = false): Frame[] {
     p:Array.from({length:22},(_,i)=>{
       const team=i<11?0:1,slot=i%11,role=slot===0?'gk':slot<5?'cb':'cm';
       const x=slot===0?(team===0?5:100):team===0?20+slot-1.5*t:60+slot-1.5*t;
-      return [i,team,role,mirror?105-x:x,34+slot%3*5] as Frame['p'][number];
+      return [i,team,role,mirror?105-x:x,mirror?68-(34+slot%3*5):34+slot%3*5] as Frame['p'][number];
     }),
   }));
 }

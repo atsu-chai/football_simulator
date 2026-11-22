@@ -1,0 +1,326 @@
+{
+  "comparisons": [
+    {
+      "roleErrors": {
+        "defend|am": {
+          "n": 12676,
+          "ballRMSE": 2.6402699637234766,
+          "centroidRMSE": 3.2257346572882777
+        },
+        "defend|fb": {
+          "n": 30120,
+          "ballRMSE": 3.4114997479865403,
+          "centroidRMSE": 1.4927496997398275
+        },
+        "defend|st": {
+          "n": 23725,
+          "ballRMSE": 5.605320600291153,
+          "centroidRMSE": 2.8373603030068955
+        },
+        "defend|cb": {
+          "n": 38062,
+          "ballRMSE": 2.9103970674127226,
+          "centroidRMSE": 1.7956723081056563
+        },
+        "defend|wg": {
+          "n": 29056,
+          "ballRMSE": 4.821155942475379,
+          "centroidRMSE": 1.4397284917462754
+        },
+        "defend|cm": {
+          "n": 33497,
+          "ballRMSE": 4.100959524047708,
+          "centroidRMSE": 1.0718609358510767
+        },
+        "attack|am": {
+          "n": 11747,
+          "ballRMSE": 6.668706650477577,
+          "centroidRMSE": 3.1242195714116843
+        },
+        "attack|st": {
+          "n": 23762,
+          "ballRMSE": 4.209756929523668,
+          "centroidRMSE": 1.7621047375629515
+        },
+        "attack|cm": {
+          "n": 34134,
+          "ballRMSE": 3.1830256432730395,
+          "centroidRMSE": 2.3459131341179655
+        },
+        "attack|wg": {
+          "n": 28644,
+          "ballRMSE": 4.492293418623449,
+          "centroidRMSE": 1.8906299936140625
+        },
+        "attack|cb": {
+          "n": 37463,
+          "ballRMSE": 3.7259153792631348,
+          "centroidRMSE": 1.1835562395349306
+        },
+        "attack|fb": {
+          "n": 31524,
+          "ballRMSE": 7.902170235591173,
+          "centroidRMSE": 4.286200733060299
+        }
+      },
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 4.60822296120228,
+      "centroidPositionRMSE": 2.2690613838931344,
+      "spreadRMSE": 2.903387754787611,
+      "correlationRMSE": {
+        "velocity": 0.14916577698851077,
+        "coupling": 0.28513751380386576,
+        "centroidLag": 0.13543067297416594
+      }
+    },
+    {
+      "roleErrors": {
+        "defend|am": {
+          "n": 12676,
+          "ballRMSE": 2.558077294909645,
+          "centroidRMSE": 3.075903601465202
+        },
+        "defend|fb": {
+          "n": 30120,
+          "ballRMSE": 4.256543543847209,
+          "centroidRMSE": 1.6747276825841684
+        },
+        "defend|st": {
+          "n": 23725,
+          "ballRMSE": 5.363061297308551,
+          "centroidRMSE": 2.780691265065893
+        },
+        "defend|cb": {
+          "n": 38062,
+          "ballRMSE": 3.107970321296169,
+          "centroidRMSE": 1.8668594195619437
+        },
+        "defend|wg": {
+          "n": 29056,
+          "ballRMSE": 5.242310320964173,
+          "centroidRMSE": 1.604541377165956
+        },
+        "defend|cm": {
+          "n": 33497,
+          "ballRMSE": 3.9476607308089653,
+          "centroidRMSE": 1.2673281198726343
+        },
+        "attack|am": {
+          "n": 11747,
+          "ballRMSE": 6.322307034752348,
+          "centroidRMSE": 2.6826081225936185
+        },
+        "attack|st": {
+          "n": 23762,
+          "ballRMSE": 4.613426469632697,
+          "centroidRMSE": 1.7634093082406084
+        },
+        "attack|cm": {
+          "n": 34134,
+          "ballRMSE": 3.242455163819708,
+          "centroidRMSE": 2.471566602506221
+        },
+        "attack|wg": {
+          "n": 28644,
+          "ballRMSE": 5.749866546139007,
+          "centroidRMSE": 1.9532820847325567
+        },
+        "attack|cb": {
+          "n": 37463,
+          "ballRMSE": 4.042159194211935,
+          "centroidRMSE": 1.2937664610876045
+        },
+        "attack|fb": {
+          "n": 31524,
+          "ballRMSE": 8.660140030989206,
+          "centroidRMSE": 4.414473514415283
+        }
+      },
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 4.968953227347968,
+      "centroidPositionRMSE": 2.321574270043302,
+      "spreadRMSE": 2.9086781106665396,
+      "correlationRMSE": {
+        "velocity": 0.1493068484732539,
+        "coupling": 0.24061468378082776,
+        "centroidLag": 0.11648210734037215
+      }
+    },
+    {
+      "roleErrors": {
+        "defend|am": {
+          "n": 12676,
+          "ballRMSE": 2.4413624209125757,
+          "centroidRMSE": 3.2057728059851955
+        },
+        "defend|fb": {
+          "n": 30120,
+          "ballRMSE": 4.047764257396944,
+          "centroidRMSE": 1.652690535027891
+        },
+        "defend|st": {
+          "n": 23725,
+          "ballRMSE": 5.2387519959773385,
+          "centroidRMSE": 2.831568702163087
+        },
+        "defend|cb": {
+          "n": 38062,
+          "ballRMSE": 2.9831129387223205,
+          "centroidRMSE": 1.8309891298332805
+        },
+        "defend|wg": {
+          "n": 29056,
+          "ballRMSE": 5.093527096239794,
+          "centroidRMSE": 1.6542352179145379
+        },
+        "defend|cm": {
+          "n": 33497,
+          "ballRMSE": 3.7287112839459207,
+          "centroidRMSE": 1.276488023440751
+        },
+        "attack|am": {
+          "n": 11747,
+          "ballRMSE": 6.102705825789761,
+          "centroidRMSE": 2.6532522057925316
+        },
+        "attack|st": {
+          "n": 23762,
+          "ballRMSE": 4.335372667218562,
+          "centroidRMSE": 1.7954033947219525
+        },
+        "attack|cm": {
+          "n": 34134,
+          "ballRMSE": 2.9272150832159505,
+          "centroidRMSE": 2.390508262830023
+        },
+        "attack|wg": {
+          "n": 28644,
+          "ballRMSE": 5.289518622652839,
+          "centroidRMSE": 1.953153634536665
+        },
+        "attack|cb": {
+          "n": 37463,
+          "ballRMSE": 3.795862454836328,
+          "centroidRMSE": 1.2245145139268816
+        },
+        "attack|fb": {
+          "n": 31524,
+          "ballRMSE": 8.277623721314999,
+          "centroidRMSE": 4.38301507756232
+        }
+      },
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 4.721937325936216,
+      "centroidPositionRMSE": 2.313499993368606,
+      "spreadRMSE": 2.902537026886143,
+      "correlationRMSE": {
+        "velocity": 0.15099831886228132,
+        "coupling": 0.24070770541500747,
+        "centroidLag": 0.11429382250196281
+      }
+    },
+    {
+      "roleErrors": {
+        "defend|am": {
+          "n": 12676,
+          "ballRMSE": 2.3638180547536254,
+          "centroidRMSE": 3.1281529311933363
+        },
+        "defend|fb": {
+          "n": 30120,
+          "ballRMSE": 3.9332538081622532,
+          "centroidRMSE": 1.590575458321128
+        },
+        "defend|st": {
+          "n": 23725,
+          "ballRMSE": 5.290731122380937,
+          "centroidRMSE": 2.7523087561760007
+        },
+        "defend|cb": {
+          "n": 38062,
+          "ballRMSE": 2.9373218323040544,
+          "centroidRMSE": 1.8836586982959587
+        },
+        "defend|wg": {
+          "n": 29056,
+          "ballRMSE": 5.010013298897038,
+          "centroidRMSE": 1.5961819310013794
+        },
+        "defend|cm": {
+          "n": 33497,
+          "ballRMSE": 3.710629569693686,
+          "centroidRMSE": 1.1933065369472238
+        },
+        "attack|am": {
+          "n": 11747,
+          "ballRMSE": 5.823145217228375,
+          "centroidRMSE": 2.572022106824607
+        },
+        "attack|st": {
+          "n": 23762,
+          "ballRMSE": 4.212688401131656,
+          "centroidRMSE": 1.8288217758262346
+        },
+        "attack|cm": {
+          "n": 34134,
+          "ballRMSE": 2.9092493941563475,
+          "centroidRMSE": 2.4434462459976407
+        },
+        "attack|wg": {
+          "n": 28644,
+          "ballRMSE": 5.287732782208556,
+          "centroidRMSE": 1.8369987719843854
+        },
+        "attack|cb": {
+          "n": 37463,
+          "ballRMSE": 3.8202780531231566,
+          "centroidRMSE": 1.1837734072404076
+        },
+        "attack|fb": {
+          "n": 31524,
+          "ballRMSE": 8.234183724503357,
+          "centroidRMSE": 4.364359100693944
+        }
+      },
+      "correlationCoverage": {
+        "velocity": 1,
+        "coupling": 1,
+        "centroidLag": 1
+      },
+      "cells": 108,
+      "coverage": 1,
+      "ballPositionRMSE": 4.67661201845206,
+      "centroidPositionRMSE": 2.2858540601111885,
+      "spreadRMSE": 2.9189711513237957,
+      "correlationRMSE": {
+        "velocity": 0.15690632812701708,
+        "coupling": 0.2480677840734827,
+        "centroidLag": 0.11588476043685639
+      }
+    }
+  ],
+  "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6",
+  "seedStarts": [
+    9001,
+    12345,
+    55555
+  ]
+}

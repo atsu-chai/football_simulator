@@ -1,0 +1,13 @@
+Full C20 balance-par 100 UNIVERSAL=0; retuned solutions 3/4 after representative 50-seed search, then re-ran both on all 100 seeds. Other ten case inputs unchanged. Acceptance total goals refers to the solution, as in balance.ts. All lesson keys verified.
+1 OK  base W 37 D 18 1.18-1.42 S11.5/10.2 | sol W 93 D  7 2.82-0.08 S22.4/1.7 | gap 56
+2 OK  base W 48 D 37 0.89-0.34 S6.8/6.3 | sol W 98 D  2 3.63-0.03 S25.8/0.8 | gap 50
+3 OK  base W 43 D 21 1.15-0.97 S12.2/11.3 | sol W 73 D 21 1.67-0.40 S15.6/7.6 | gap 30
+4 OK  base W 42 D 28 1.22-1.08 S11.8/13.3 | sol W 78 D 17 1.90-0.32 S19.4/5.3 | gap 36
+5 OK  base W 35 D 30 1.54-1.51 S15.0/13.2 | sol W 97 D  3 3.04-0.10 S26.5/0.3 | gap 62
+6 OK  base W 30 D 23 1.16-1.40 S11.1/10.4 | sol W 96 D  4 3.04-0.02 S23.8/0.4 | gap 66
+7 OK  base W 38 D 32 1.36-1.20 S11.0/11.2 | sol W 81 D 16 2.25-0.26 S19.9/4.5 | gap 43
+8 OK  base W 49 D 26 1.50-0.97 S17.8/9.4 | sol W 85 D 13 2.14-0.29 S18.6/4.7 | gap 36
+9 OK  base W 34 D 33 0.90-0.91 S9.5/9.9 | sol W 95 D  5 2.35-0.03 S23.2/1.0 | gap 61
+10 OK  base W 22 D 13 1.26-2.28 S13.4/15.2 | sol W 92 D  6 2.58-0.10 S24.8/2.5 | gap 70
+11 OK  base W 28 D 26 1.46-1.65 S15.4/12.7 | sol W 94 D  6 3.01-0.16 S25.7/3.5 | gap 66
+12 OK  base W 27 D 31 1.11-1.37 S11.8/7.8 | sol W 81 D 16 2.16-0.24 S21.6/2.3 | gap 54

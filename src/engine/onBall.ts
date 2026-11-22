@@ -1,12 +1,11 @@
 import { clamp, dist, pointToSegment, relX, sigmoid, toAbs, toRel } from './geometry';
-import { GOAL_W, MatchState, PITCH_W, Player, Side, Vec } from './types';
+import { GOAL_W, MatchState, PITCH_W, Player, Side, TICK, Vec } from './types';
 import { giveBall, groundPassSpeed, groundPassTime, kick, loftLandingFor, loftTime, onBallWon } from './ball';
 import { addEvent, gameMinute } from './events';
 import { offsideLimit } from './teamShape';
+import { TRACKING_MOTION } from './tracking';
 
 const SPRINT = 7.6;
-// 実測のブロック配置へ置き換えた後の試合集計で、シュートの期待値を再校正する。
-export const XG_SCALE = 2.8;
 
 /** そのチーム基準の位置の脅威度。ゴールに近いほど、ハーフスペースほど高い。 */
 export function threat(rel: Vec): number {
@@ -63,11 +62,12 @@ export function computeXg(m: MatchState, p: Player, at: Vec, header = false): nu
   const a1 = Math.atan2(rel.y - (34 - GOAL_W / 2), PITCH_W - rel.x);
   const a2 = Math.atan2(rel.y - (34 + GOAL_W / 2), PITCH_W - rel.x);
   const angle = Math.abs(a1 - a2);
-  // 中央からのシュートの基準値(6m で約0.6、PKの位置で約0.24、16m で約0.10、20m で約0.05、25m で約0.02)
-  let xg = 0.6 * Math.exp(-(d - 6) / 5.5);
+  // Footed central attempts: 6m .66, 11m .30, 16m .14,
+  // 20m .072, 25m .032, before pressure, angle and defenders.
+  let xg = 0.66 * Math.exp(-(d - 6) / 6.3);
   // 同じ距離でも、角度がないほど入りにくい
   const central = 2 * Math.atan(GOAL_W / 2 / Math.max(d, 1));
-  xg *= clamp(angle / central, 0.25, 1);
+  xg *= clamp(angle / central, 0.08, 1);
   const goal: Vec = toAbs(p.team, { x: PITCH_W, y: 34 });
   let blockers = 0;
   for (const o of m.players) {
@@ -77,7 +77,9 @@ export function computeXg(m: MatchState, p: Player, at: Vec, header = false): nu
     else if (dd < 4) xg *= 0.8;
     if (dist(o.pos, goal) < d && pointToSegment(o.pos, at, goal).d < 2.4) blockers += 1;
   }
-  xg *= Math.pow(0.72, Math.min(blockers, 4));
+  // Occlusion is one shooting lane, not four independent missed chances.
+  // Block probability below already resolves contact with the nearest defender.
+  xg *= blockers > 0 ? .72 : 1;
   // シュート地点より前にいる守備者の数。カウンターは少なく、整った守備は多い。
   let settled = 0;
   for (const o of m.players) {
@@ -85,13 +87,13 @@ export function computeXg(m: MatchState, p: Player, at: Vec, header = false): nu
     // 真横(2m以内)の守備者もシュートを妨げられるので数える
     if (relX(p.team, o.pos.x) > rel.x - 2 && dist(o.pos, goal) < 26) settled += 1;
   }
-  xg *= settled === 0 ? 1.5 : settled === 1 ? 1.2 : settled >= 5 ? 0.7 : settled >= 3 ? 0.85 : 1;
+  xg *= settled >= 5 ? 0.7 : settled >= 3 ? 0.85 : 1;
   const gk = m.players.find((o) => o.team !== p.team && o.role === 'gk')!;
   const gkRel = toRel(p.team, gk.pos);
   if (Math.abs(gkRel.y - rel.y) > 7 && d < 18) xg *= 1.4;
   // ヘディングは同じ位置でも足より入りにくい
   if (header) xg *= 0.55;
-  return clamp(xg * XG_SCALE * m.skillNow[p.team], 0.005, 0.7);
+  return clamp(xg * m.skillNow[p.team], 0.005, 0.7);
 }
 
 interface Option {
@@ -110,7 +112,7 @@ export function decideOnBall(m: MatchState, p: Player) {
   const skill = m.skillNow[side];
   const noise = (0.016 + (pressure < 3 ? 0.03 : 0)) / skill;
   const tempoMul = { slow: 0.7, normal: 1, fast: 1.2 }[t.tempo] * (counter ? 1.4 : 1) * (safeMode ? 0.75 : 1);
-  const riskPow = { short: 2.1, mixed: 1.5, long: 1.15 }[t.buildUp] * (safeMode ? 1.15 : 1) * (counter ? 0.75 : 1);
+  const riskPow = { short: 2.4, mixed: 1.5, long: 1.15 }[t.buildUp] * (safeMode ? 1.15 : 1) * (counter ? 0.75 : 1);
 
   const options: Option[] = [];
   const lim = offsideLimit(m, side);
@@ -122,9 +124,11 @@ export function decideOnBall(m: MatchState, p: Player) {
     const xg = computeXg(m, p, p.pos);
     // xG を保持の価値と同じ尺度に直す。ミドルは他に手がない時だけ、ゴール前の好機は迷わず打つ
     const d = Math.hypot(PITCH_W - rel.x, rel.y - 34);
-    const longRange = d > 18 ? 0.05 + (d - 18) * 0.008 : 0;
-    const inBox = rel.x > PITCH_W - 16.5 && Math.abs(rel.y - 34) < 20.16;
-    if (xg > 0.012 && d < 32) options.push({ score: (xg / XG_SCALE * 1.8) * 10 + 0.2 + (inBox ? 0.22 : 0) - longRange + (m.rand() - 0.5) * 0.06, run: () => shoot(m, p, xg, false) });
+    const longRange = Math.max(0, d - 20) * .012;
+    const facingGoal = (PITCH_W-rel.x)/Math.max(1,d);
+    const inBox=rel.x>88.5&&Math.abs(rel.y-34)<20.16;
+    const opportunity=inBox?.47:.35*clamp((pressure-1)/4,.25,1);
+    if (xg > 0.004 && d < 32) options.push({ score: xg * 5 + opportunity*facingGoal - longRange + (m.rand() - 0.5) * 0.12, run: () => shoot(m, p, xg, false) });
   }
 
   // パス
@@ -139,7 +143,8 @@ export function decideOnBall(m: MatchState, p: Player) {
     const d = dist(p.pos, q.pos);
     const lead = Math.min(1.1, 0.2 + d / 26);
     const leadPt: Vec = { x: q.pos.x + q.vel.x * lead, y: q.pos.y + q.vel.y * lead };
-    addPass(leadPt, q, false);
+    const lowCross=rel.x>74&&Math.abs(rel.y-34)>12&&qRel.x>88.5&&Math.abs(qRel.y-34)<16;
+    addPass(leadPt, q, false, false, lowCross);
     // 足元への浮き球は、地上で届かない距離か大きなサイドチェンジに限る
     if (d > 28 || (d > 20 && Math.abs(q.pos.y - p.pos.y) > 26)) addPass(leadPt, q, true);
 
@@ -151,7 +156,7 @@ export function decideOnBall(m: MatchState, p: Player) {
     // 背後への一発。カウンター時、ロング志向、相手ラインが高いときに狙う。
     const spaceBehind = PITCH_W - 7 - lim;
     const forwardRole = q.role === 'st' || q.role === 'wg' || q.role === 'iw';
-    if (forwardRole && qRel.x <= lim + 0.3 && rel.x < lim - 6 && (counter || t.buildUp === 'long' || spaceBehind > 18)) {
+    if (forwardRole && qRel.x <= lim + 0.3 && rel.x < lim - 6 && (counter || t.buildUp === 'long' || (rel.x>=35 && spaceBehind > 18))) {
       const depth = Math.min(spaceBehind + 2, 15);
       const pt = toAbs(side, { x: lim + depth, y: qRel.y + (34 - qRel.y) * 0.2 });
       addPass(pt, q, d > 16, true);
@@ -191,7 +196,17 @@ export function decideOnBall(m: MatchState, p: Player) {
     const pr = toRel(side, point);
     if (pr.x < 1 || pr.x > PITCH_W - 1 || pr.y < 1 || pr.y > 67) return;
     if (dist(point, p.pos) < 3.5) return;
-    const safe = cross ? Math.max(0.68, passSafety(m, p.pos, point, side, lofted, q)) : passSafety(m, p.pos, point, side, lofted, q);
+    if(cross){
+      // Do not cross at a zone a stationary runner cannot reach before landing.
+      // Use the same acceleration and tired sprint cap as the movement engine.
+      const distance=dist(q.pos,point),flight=Math.max(0,(lofted?loftTime(dist(p.pos,point)):groundPassTime(dist(p.pos,point)))-.15);
+      const top=TRACKING_MOTION.sprint*(.72+.28*m.energy[side]);
+      const closing=clamp(((point.x-q.pos.x)*q.vel.x+(point.y-q.pos.y)*q.vel.y)/Math.max(.01,distance),0,top);
+      const accelerating=Math.min(flight,(top-closing)/TRACKING_MOTION.acceleration);
+      const reach=closing*accelerating+.5*TRACKING_MOTION.acceleration*accelerating**2+top*(flight-accelerating)+1.25;
+      if(distance>reach)return;
+    }
+    const safe = cross ? Math.max(lofted?.68:.5, passSafety(m, p.pos, point, side, lofted, q)) : passSafety(m, p.pos, point, side, lofted, q);
     let safeFinal = safe;
     if (through) {
       // 受け手が相手より先に着けるかの競争
@@ -215,7 +230,9 @@ export function decideOnBall(m: MatchState, p: Player) {
     const forward = pr.x - rel.x;
     // ライン間を通す縦パスほど価値がある。頭越しのボールは同じ人数を越えても評価を下げる
     value += broke * (lofted && !cross ? 0.012 : 0.03) * tempoMul;
-    value += (forward / 105) * (0.3 * tempoMul + 0.2 * clamp(sinceWin / 12, 0, 1));
+    value += (forward / 105) * (counter || t.buildUp==='long' ? 0.3 * tempoMul + 0.2 * clamp(sinceWin / 12,0,1) : 0.15 * tempoMul + 0.1 * clamp(sinceWin / 12,0,1));
+    if(!lofted&&!through&&!cross&&safe>.85)value+=.025;
+    if(!cross&&pr.x>65&&Math.abs(pr.y-34)>12&&Math.abs(pr.y-34)<30&&forward>-12)value+=.22*open*clamp((pr.x-60)/25,0,1);
     // 圧力を受けているときは、確実につなげる味方への逃げのパスに価値がある
     if (pressure < 4 && safe > 0.8 && !lofted) value += 0.07;
     else if (pressure < 7 && safe > 0.85 && !lofted) value += 0.03;
@@ -230,7 +247,7 @@ export function decideOnBall(m: MatchState, p: Player) {
       }
       if (ahead <= 1) value += 0.28;
     }
-    if (cross) value += 0.2;
+    if (cross) value += 0.35;
     if (t.focus !== 'balanced') {
       const inFocus = t.focus === 'center' ? Math.abs(pr.y - 34) < 15 : t.focus === 'left' ? pr.y < 27 : pr.y > 41;
       if (inFocus && rel.x > 35) value += 0.035;
@@ -243,11 +260,11 @@ export function decideOnBall(m: MatchState, p: Player) {
     // 大きなサイドチェンジ。幅を取るチームほど狙う。
     if (t.width === 'wide' && Math.abs(pr.y - rel.y) > 26) value += 0.05;
     // 余裕がある受球直後は、入ってきた方向へ即座に蹴り返すより向き直ってつなぐ。
-    // 圧力下の落としやカウンターは妨げない。
+    // 3m以内の圧力下の落としやカウンターは妨げない。2.5s/.2は実測11.3%の反転率に対する閉ループ校正。
     const facing = p.receiveDir;
     const passLength = dist(p.pos, point);
-    const turn = facing && pressure > 5 && !counter && m.t - p.receivedAt < 1.4
-      ? Math.max(0, -(facing.x * (point.x - p.pos.x) + facing.y * (point.y - p.pos.y)) / passLength) * 0.1 : 0;
+    const turn = facing && pressure > 3 && !counter && m.t - p.receivedAt < 2.5
+      ? Math.max(0, -(facing.x * (point.x - p.pos.x) + facing.y * (point.y - p.pos.y)) / passLength) * 0.2 : 0;
     const score =
       Math.pow(safeFinal, riskPow) * value - turn - (1 - safeFinal) * lossCost + (m.rand() - 0.5) * noise * 2;
     options.push({
@@ -266,7 +283,10 @@ export function decideOnBall(m: MatchState, p: Player) {
     const tgt = toAbs(side, tgtRel);
     const lane = laneOpenness(m, p, tgt);
     const open = clamp((nearestOpp(m, side, tgt) - 1) / 7, 0, 1);
-    const value = threat(tgtRel) * (0.62 + 0.38 * open) - (rel.x > 70 ? 0.08 : 0.03) - (pressure < 3 ? 0.06 : 0);
+    const entersBox=rel.x<=88.5&&tgtRel.x>88.5&&Math.abs(tgtRel.y-34)<20.16;
+    const reachesByline=rel.x>70&&rel.x<=88.5&&tgtRel.x>88.5&&Math.abs(rel.y-34)>12;
+    const preparation=(entersBox?.14:reachesByline?.1:0)*lane*open;
+    const value = threat(tgtRel) * (0.62 + 0.38 * open) - (rel.x > 70 ? 0.08 : 0.03) - (pressure < 3 ? 0.06 : 0) + preparation;
     options.push({
       score: value * (0.55 + 0.45 * lane) - (1 - lane) * lossCost + (m.rand() - 0.5) * noise * 2,
       run: () => {
@@ -359,11 +379,17 @@ function makePass(m: MatchState, p: Player, q: Player, point: Vec, lofted: boole
   b.lastTouch = p.id;
   if (lofted) {
     // スペースへの浮き球は手前に落とし、弾んで転がった先で受け手が拾えるようにする
-    // クロスは狙った地点の少し奥に落とし、そこを頭の高さで通過させる
-    const dLand = through ? loftLandingFor(len) : cross ? len + 3 : len;
-    const T = loftTime(dLand);
-    kick(m, aim, dLand / T, 0.5 * 9.8 * T);
-    b.z = 0.1;
+    // クロスは距離にかかわらず受け手の位置で頭の高さを通過させる。
+    if(cross){
+      const flight=loftTime(len);
+      b.z=.1;
+      kick(m,aim,dist(b.pos,aim)/flight,(1.6-b.z+.5*9.8*flight*flight)/flight-.5*9.8*TICK);
+    }else{
+      const dLand = through ? loftLandingFor(len) : len;
+      const T = loftTime(dLand);
+      kick(m, aim, dLand / T, 0.5 * 9.8 * T);
+      b.z = 0.1;
+    }
   } else {
     kick(m, aim, groundPassSpeed(d0));
   }
@@ -383,7 +409,7 @@ function clearBall(m: MatchState, p: Player, tgt: Vec) {
   b.z = 0.1;
 }
 
-function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
+export function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
   const side = p.team;
   const stats = m.stats[side];
   const rel = toRel(side, p.pos);
@@ -418,19 +444,17 @@ function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
 
   const gk = m.players.find((o) => o.team !== side && o.role === 'gk')!;
   let aim: Vec;
-  let vz = 0;
   if (outcome === 'goal') {
     const gkRel = toRel(side, gk.pos);
     const y = gkRel.y > 34 ? 34 - 2.8 : 34 + 2.8;
-    aim = toAbs(side, { x: PITCH_W + 2, y: y + (m.rand() - 0.5) });
-    vz = 1.2;
+    const onLine = toAbs(side, { x: PITCH_W, y: y + (m.rand() - 0.5) });
+    const extend = 1 + 2 / Math.max(.5, dist(b.pos, onLine));
+    aim = { x: b.pos.x + (onLine.x-b.pos.x)*extend, y: b.pos.y + (onLine.y-b.pos.y)*extend };
   } else if (outcome === 'saved') {
     aim = { x: gk.pos.x, y: gk.pos.y };
-    vz = 0.8;
   } else if (outcome === 'miss') {
     const sgn = m.rand() < 0.5 ? -1 : 1;
     aim = toAbs(side, { x: PITCH_W + 2, y: 34 + sgn * (GOAL_W / 2 + 0.6 + m.rand() * 4) });
-    vz = 2;
   } else {
     aim = { ...m.players[blocker].pos };
   }
@@ -447,8 +471,14 @@ function shoot(m: MatchState, p: Player, xg: number, header: boolean) {
   b.lastTouch = p.id;
   b.pass = null;
   b.shot = { shooter: p.id, outcome, xg, blocker, header };
-  kick(m, aim, 24, vz);
-  b.z = 0.3;
+  // Keep the trajectory airborne until the intended contact. Fixed low vz used
+  // to cause two .6-speed bounces before a long shot reached its destination.
+  const speed = header ? 18 : 26;
+  const flight = dist(b.pos, aim) / speed;
+  b.z = header ? Math.max(.7, b.z) : .3;
+  const targetHeight = outcome === 'goal' ? 1 : outcome === 'miss' ? 1.4 : .6;
+  const vz = (targetHeight - b.z + .5 * 9.8 * flight * flight) / Math.max(.05, flight) - .5 * 9.8 * TICK;
+  kick(m, aim, speed, vz);
   p.decideAt = m.t + 0.5;
 }
 

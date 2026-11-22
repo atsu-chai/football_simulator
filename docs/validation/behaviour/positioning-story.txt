@@ -1,0 +1,43 @@
+Fresh ALL 6 chapter-wise execution of story.ts 30 after final solutions 3/4/8 settled; every fixture skill/style/tactic verified against current CHAPTERS and STYLE_STAGE. 24 fixtures, both default and answer: 1440 matches. Advancement assumes independent opponent distributions; this is not observed season survival.
+
+第1章 JFL: 初期 期待勝ち点 7.8 / 目標 6 | 対策 期待勝ち点 10.7 / 目標 6
+  章突破率(独立分布による推計): 初期 81.8% / 対策 99.5%
+  浜風FC           flat442    初期 W37 D30 / 対策 W80 D17
+  北嶺ユナイテッド       counter    初期 W57 D20 / 対策 W83 D13
+  港町SC           diamond    初期 W63 D33 / 対策 W87 D10
+  緑ヶ丘FC          bus        初期 W63 D33 / 対策 W90 D10
+
+第2章 J3: 初期 期待勝ち点 6.7 / 目標 7 | 対策 期待勝ち点 9.4 / 目標 7
+  章突破率(独立分布による推計): 初期 54.7% / 対策 90.7%
+  白鷺SC           hunters    初期 W40 D33 / 対策 W63 D23
+  岬アスレティック       wingbacks  初期 W60 D17 / 対策 W80 D20
+  霧島FC           counter    初期 W53 D37 / 対策 W77 D13
+  雷鳥ユナイテッド       zone4231   初期 W30 D30 / 対策 W73 D7
+
+第3章 J2: 初期 期待勝ち点 8.2 / 目標 11 | 対策 期待勝ち点 12.7 / 目標 11
+  章突破率(独立分布による推計): 初期 18.9% / 対策 85.7%
+  大河FC           falseNine  初期 W37 D50 / 対策 W67 D30
+  樹海ヴィクトリー       bus        初期 W57 D33 / 対策 W87 D13
+  鋼鉄シティ          manmark    初期 W47 D23 / 対策 W77 D17
+  青嵐SC           diamond    初期 W53 D37 / 対策 W83 D10
+  紅葉アスレティック      hunters    初期 W27 D17 / 対策 W80 D17
+
+第4章 J1: 初期 期待勝ち点 7.2 / 目標 12 | 対策 期待勝ち点 12.6 / 目標 12
+  章突破率(独立分布による推計): 初期 6.4% / 対策 69.7%
+  王都FC           zone4231   初期 W43 D27 / 対策 W70 D30
+  東邦ユナイテッド       positional 初期 W27 D27 / 対策 W87 D7
+  黒潮マリンズ         counter    初期 W30 D37 / 対策 W67 D30
+  旭日SC           gegen      初期 W37 D43 / 対策 W83 D10
+  古都ヴィッセ         manmark    初期 W50 D27 / 対策 W83 D10
+
+第5章 アジア: 初期 突破率 20% | 対策 突破率 72%
+  章突破率(独立分布による推計): 初期 19.6% / 対策 72.4%
+  デザート・ファルコンズ    bus        初期 W70 D30 / 対策 W93 D7
+  タイガー・シティ       hunters    初期 W37 D33 / 対策 W87 D10
+  ゴールデン・ドラゴンズ    positional 初期 W30 D27 / 対策 W70 D23
+
+第6章 世界: 初期 突破率 8% | 対策 突破率 47%
+  章突破率(独立分布による推計): 初期 8.4% / 対策 46.7%
+  アトレティコ・セレステ    counter    初期 W47 D27 / 対策 W53 D33
+  ノルテ・ロイヤルズ      gegen      初期 W20 D33 / 対策 W77 D10
+  アルカディア         positional 初期 W30 D17 / 対策 W77 D10

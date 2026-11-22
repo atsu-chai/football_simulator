@@ -11,6 +11,9 @@ import { addEvent } from '../src/engine/events';
 const id = Number(process.argv[2]);
 const K = Number(process.argv[3] ?? 30);
 const N = Number(process.argv[4] ?? 40);
+// Cover the whole 100-seed acceptance cohort instead of selecting on an
+// unusually easy/hard prefix. Final balance still uses all 100 seeds.
+const seedIndices=Array.from({length:N},(_,i)=>N<100?Math.floor(i*100/N):i);
 const s = STAGES.find((x) => x.id === id)!;
 const stub = (changed: boolean) => ({ events: changed ? [{ type: 'tactic', team: 0, minute: 50 }] : [] }) as unknown as MatchState;
 // 試合の出来事で決まる鍵(後半の修正など)は、事前の設定では満たせないので除く
@@ -31,10 +34,10 @@ function randomTactics(): Tactics {
     tempo: pick(['slow', 'normal', 'fast'] as const),
     width: pick(['narrow', 'normal', 'wide'] as const),
     fullbacks: pick(['overlap', 'invert', 'stay'] as const),
-    pressHeight: pick(['mid', 'high', 'high'] as const),
-    pressIntensity: pick(['normal', 'normal', 'high'] as const),
-    lineHeight: pick(['normal', 'normal', 'high'] as const),
-    compactness: pick(['normal', 'tight'] as const),
+    pressHeight: pick(['low', 'mid', 'high'] as const),
+    pressIntensity: pick(['low', 'normal', 'high'] as const),
+    lineHeight: pick(['deep', 'normal', 'high'] as const),
+    compactness: pick(['loose', 'normal', 'tight'] as const),
     onLoss: pick(['regroup', 'counterpress'] as const),
     onWin: pick(['keep', 'counter'] as const),
   });
@@ -43,7 +46,7 @@ function randomTactics(): Tactics {
 function run(t: Tactics, adapt = false) {
   let w = 0, g = 0;
   for (let i = 0; i < N; i++) {
-    const m = createMatch({ teams: [myTeamBase(t), s.opponent], seed: 5000 + i, script: s.script ? { side: 1, phases: s.script } : undefined });
+    const m = createMatch({ teams: [myTeamBase(t), s.opponent], seed: 5000 + seedIndices[i], script: s.script ? { side: 1, phases: s.script } : undefined });
     if (adapt && s.solutionAfter) {
       while (!m.finished) {
         step(m);
@@ -63,21 +66,24 @@ function run(t: Tactics, adapt = false) {
 const base = run(DEFAULT_TACTICS);
 // 現在の答えの局所変更を先に比べ、守備的すぎる/攻撃的すぎる答えを調整する。
 const nearby: Partial<Tactics>[] = [{ tempo: 'normal' }, { tempo: 'slow' }, { onWin: 'keep' }, { fullbacks: 'overlap' }, { pressHeight: 'high' }, { lineHeight: 'high' },
-  { fullbacks: 'overlap', pressHeight: 'high' }, { pressHeight: 'high', lineHeight: 'high' }];
+  { fullbacks: 'overlap', pressHeight: 'high' }, { pressHeight: 'high', lineHeight: 'high' },
+  { lineHeight: 'normal' }, { lineHeight: 'deep' }, { buildUp: 'long' }, { compactness: 'normal' }];
 // 他の教材で実際に使う設定も候補にする。攻略の鍵を満たすものだけを共通シードで比較する。
-const cands: Tactics[] = [s.solution];
-for (const over of nearby) {
-  const t = tactic({ ...s.solution, ...over });
-  if (cands.length < K && keys.every(k => k.check(t, stub(false))) && !cands.some(c => JSON.stringify(c) === JSON.stringify(t))) cands.push(t);
-}
-for (const stage of STAGES) if (cands.length < K && keys.every(k => k.check(stage.solution, stub(false)))
-  && !cands.some(t => JSON.stringify(t) === JSON.stringify(stage.solution))) cands.push(stage.solution);
+const cands: Tactics[] = [];
+const add=(t:Tactics)=>{if(cands.length<K&&keys.every(k=>k.check(t,stub(false)))&&!cands.some(c=>JSON.stringify(c)===JSON.stringify(t)))cands.push(t);};
+const catalog=STAGES.flatMap(stage=>stage.solutionAfter?[stage.solution,stage.solutionAfter]:[stage.solution]);
+add(s.solution);
+for(const candidate of catalog)add(candidate);
+// Repair a single lesson setting on a known formation before random search.
+// This includes e.g. a wide 3-4-2-1, or a 3-CB counter with the FBs staying.
+for(const over of [{width:'wide'},{fullbacks:'stay'},{onLoss:'counterpress'},{lineHeight:'deep'},{pressHeight:'low'},...nearby] as Partial<Tactics>[])
+ for(const base of [...cands,...catalog])add(tactic({...base,...over}));
 while (cands.length < K) {
   const t = randomTactics();
   if (keys.every((k) => k.check(t, stub(false)))) cands.push(t);
 }
 const res = cands.map((t) => ({ t, ...run(t, true) })).sort((a, b) => Number(b.g >= 2 && b.g <= 5 && b.w - base.w >= 20) - Number(a.g >= 2 && a.g <= 5 && a.w - base.w >= 20) || b.w - a.w);
-if(process.env.RESULT_JSON)writeFileSync(process.env.RESULT_JSON,JSON.stringify({stage:id,matches:N,candidates:K,base,results:res},null,2)+'\n');
+if(process.env.RESULT_JSON)writeFileSync(process.env.RESULT_JSON,JSON.stringify({stage:id,matches:N,seedIndices,candidates:K,base,results:res},null,2)+'\n');
 console.log(`STAGE ${id} base ${base.w.toFixed(0)}`);
 for (const r of res.slice(0, 4)) {
   const { formation, roles, buildUp, tempo, width, fullbacks, pressHeight, pressIntensity, lineHeight, compactness, onLoss, onWin } = r.t;

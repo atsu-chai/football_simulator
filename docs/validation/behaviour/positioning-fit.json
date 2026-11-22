@@ -1,6 +1,6 @@
 {
-  "runtimeVelocityApproximation": "training: 2s displacement velocity; runtime: 1s EWMA; holdout validates the regression, not the closed-loop controller",
-  "split": "first 5 matches train, last 2 holdout; shipped model refit on all 7; both halves scanned, 11v11 only; lateral identity from half-average position; dm/cm pooled; predict backs 3s and midfield/front 4s ahead during stable possession and uninterrupted play",
+  "runtimeVelocityApproximation": "ball: training 2s displacement, runtime 1s EWMA; team centroid: training 2s displacement, runtime mean current player velocity; holdout validates the predictor, not the closed-loop controller",
+  "split": "first 5 matches train, last 2 holdout; shipped model refit on all 7; both halves scanned, 11v11 only; lateral identity from half-average position; dm/cm pooled; predict attack backs 3s, attack midfield/front 4s, defence 2s ahead during stable possession and uninterrupted play",
   "validation": {
     "attack|am|right": {
       "train": 478,
@@ -14,12 +14,25 @@
       "test": 3072,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.43028519772885,
-        7.126442179621286
+        7.804693691591622,
+        7.117611944972048
       ],
       "rmse": [
-        9.43028519772885,
-        7.126442179621286
+        7.804693691591622,
+        7.117611944972048
+      ]
+    },
+    "attack|fb|right|fb": {
+      "train": 4136,
+      "test": 1616,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.370843729900133,
+        6.9807396696990605
+      ],
+      "rmse": [
+        7.370843729900133,
+        6.9807396696990605
       ]
     },
     "attack|st|centre": {
@@ -27,12 +40,12 @@
       "test": 6132,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        7.197016388224017,
-        10.492087915916192
+        6.40912818666117,
+        10.097550680838282
       ],
       "rmse": [
-        7.197016388224017,
-        10.492087915916192
+        6.40912818666117,
+        10.097550680838282
       ]
     },
     "attack|fb|left": {
@@ -40,12 +53,25 @@
       "test": 2780,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        10.67913948217942,
-        6.345771980055636
+        8.106786432032283,
+        6.3866496731164775
       ],
       "rmse": [
-        10.67913948217942,
-        6.345771980055636
+        8.106786432032283,
+        6.3866496731164775
+      ]
+    },
+    "attack|fb|left|fb": {
+      "train": 4440,
+      "test": 1487,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.484902098276876,
+        6.216836969206664
+      ],
+      "rmse": [
+        8.484902098276876,
+        6.216836969206664
       ]
     },
     "attack|cb|left": {
@@ -53,12 +79,12 @@
       "test": 3577,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        7.450311355948035,
-        7.766829915098497
+        6.2106929870480565,
+        6.970839574831958
       ],
       "rmse": [
-        7.450311355948035,
-        7.766829915098497
+        6.2106929870480565,
+        6.970839574831958
       ]
     },
     "attack|wg|right": {
@@ -66,12 +92,25 @@
       "test": 2869,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.964966784552665,
-        9.746134950177828
+        9.348313275064877,
+        9.1338764978124
       ],
       "rmse": [
-        9.964966784552665,
-        9.746134950177828
+        9.348313275064877,
+        9.1338764978124
+      ]
+    },
+    "attack|wg|right|fb": {
+      "train": 4136,
+      "test": 1616,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.457123329244562,
+        8.10214438734557
+      ],
+      "rmse": [
+        7.457123329244562,
+        8.10214438734557
       ]
     },
     "attack|cm|centre": {
@@ -79,12 +118,12 @@
       "test": 6189,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.07342712064733,
-        9.163444842427916
+        8.741516273903924,
+        9.430752780080706
       ],
       "rmse": [
-        9.07342712064733,
-        9.163444842427916
+        8.741516273903924,
+        9.430752780080706
       ]
     },
     "attack|wg|left": {
@@ -92,12 +131,25 @@
       "test": 3210,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.509228627522713,
-        10.590730475307407
+        8.681583550773926,
+        10.07958750582934
       ],
       "rmse": [
-        9.509228627522713,
-        10.590730475307407
+        8.681583550773926,
+        10.07958750582934
+      ]
+    },
+    "attack|wg|left|fb": {
+      "train": 4440,
+      "test": 1529,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        6.092040833663624,
+        9.30387711889193
+      ],
+      "rmse": [
+        6.092040833663624,
+        9.30387711889193
       ]
     },
     "attack|cb|right": {
@@ -105,12 +157,12 @@
       "test": 3719,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        8.81613814498305,
-        7.252978490214454
+        7.653138711961279,
+        6.97650904789814
       ],
       "rmse": [
-        8.81613814498305,
-        7.252978490214454
+        7.653138711961279,
+        6.97650904789814
       ]
     },
     "defend|am|centre": {
@@ -118,12 +170,12 @@
       "test": 2381,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        8.833024011234555,
-        7.9834597448155336
+        6.671379880775534,
+        7.184609849425468
       ],
       "rmse": [
-        8.833024011234555,
-        7.9834597448155336
+        6.671379880775534,
+        7.184609849425468
       ]
     },
     "defend|st|centre": {
@@ -131,12 +183,12 @@
       "test": 5516,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        8.369495478092533,
-        11.046628843615265
+        6.470423736564166,
+        10.228392592491662
       ],
       "rmse": [
-        8.369495478092533,
-        11.046628843615265
+        6.470423736564166,
+        10.228392592491662
       ]
     },
     "defend|cm|centre": {
@@ -144,12 +196,12 @@
       "test": 5410,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        8.487316197618481,
-        8.657356475776862
+        6.551397502156676,
+        7.454449134379367
       ],
       "rmse": [
-        8.487316197618481,
-        8.657356475776862
+        6.551397502156676,
+        7.454449134379367
       ]
     },
     "defend|wg|right": {
@@ -157,12 +209,12 @@
       "test": 3072,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        10.359324311624487,
-        7.2650041634172275
+        8.761801130421974,
+        6.8799269874948354
       ],
       "rmse": [
-        10.359324311624487,
-        7.2650041634172275
+        8.761801130421974,
+        6.8799269874948354
       ]
     },
     "defend|wg|left": {
@@ -170,12 +222,12 @@
       "test": 3822,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        11.112864029896057,
-        6.947856828823271
+        9.274979420824247,
+        6.222242586151063
       ],
       "rmse": [
-        11.112864029896057,
-        6.947856828823271
+        9.274979420824247,
+        6.222242586151063
       ]
     },
     "defend|cb|left": {
@@ -183,12 +235,12 @@
       "test": 3917,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        6.529661643945852,
-        6.042244046125498
+        5.106227139819378,
+        5.48170007268791
       ],
       "rmse": [
-        6.529661643945852,
-        6.042244046125498
+        5.106227139819378,
+        5.48170007268791
       ]
     },
     "defend|fb|left": {
@@ -196,12 +248,12 @@
       "test": 2142,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        7.939305688553378,
-        5.326631112579084
+        6.348545893329697,
+        5.016423286685745
       ],
       "rmse": [
-        7.939305688553378,
-        5.326631112579084
+        6.348545893329697,
+        5.016423286685745
       ]
     },
     "defend|cb|right": {
@@ -209,12 +261,12 @@
       "test": 3114,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        6.804172041784151,
-        5.5434164301262205
+        5.575373141917399,
+        5.028209097265926
       ],
       "rmse": [
-        6.804172041784151,
-        5.5434164301262205
+        5.575373141917399,
+        5.028209097265926
       ]
     },
     "defend|fb|right": {
@@ -222,12 +274,12 @@
       "test": 2869,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        7.188798965279169,
-        4.923744864761144
+        5.2887821680323235,
+        4.451642736556271
       ],
       "rmse": [
-        7.188798965279169,
-        4.923744864761144
+        5.2887821680323235,
+        4.451642736556271
       ]
     },
     "defend|am|right": {
@@ -242,12 +294,64 @@
       "test": 1366,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.18841163160731,
-        14.20884692992218
+        7.822964814168062,
+        14.60882271271706
       ],
       "rmse": [
-        9.18841163160731,
-        14.20884692992218
+        7.822964814168062,
+        14.60882271271706
+      ]
+    },
+    "attack|wg|right|wg": {
+      "train": 1677,
+      "test": 578,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        9.87342614548969,
+        6.286445329619986
+      ],
+      "rmse": [
+        9.87342614548969,
+        6.286445329619986
+      ]
+    },
+    "attack|fb|right|wg": {
+      "train": 1677,
+      "test": 578,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.245373608185538,
+        7.819239555244475
+      ],
+      "rmse": [
+        8.245373608185538,
+        7.819239555244475
+      ]
+    },
+    "attack|wg|left|wg": {
+      "train": 1979,
+      "test": 422,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        7.113106549283337,
+        6.620546593188395
+      ],
+      "rmse": [
+        7.113106549283337,
+        6.620546593188395
+      ]
+    },
+    "attack|fb|left|wg": {
+      "train": 1979,
+      "test": 415,
+      "trainingVelocityScale": 1,
+      "scaledFeatureRmse": [
+        8.3575364342713,
+        6.941373375579678
+      ],
+      "rmse": [
+        8.3575364342713,
+        6.941373375579678
       ]
     },
     "attack|am|left": {
@@ -262,12 +366,12 @@
       "test": 2043,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        8.706607182421875,
-        10.578875808694665
+        11.35516123488892,
+        9.026682457406746
       ],
       "rmse": [
-        8.706607182421875,
-        10.578875808694665
+        11.35516123488892,
+        9.026682457406746
       ]
     },
     "defend|st|right": {
@@ -275,12 +379,12 @@
       "test": 188,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        11.33548280604716,
-        10.81670788235442
+        8.659435851706451,
+        10.527674347864311
       ],
       "rmse": [
-        11.33548280604716,
-        10.81670788235442
+        8.659435851706451,
+        10.527674347864311
       ]
     },
     "defend|wg|centre": {
@@ -295,12 +399,12 @@
       "test": 2743,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        6.528280796153802,
-        7.682149675925728
+        5.506995386480935,
+        7.3918659160327564
       ],
       "rmse": [
-        6.528280796153802,
-        7.682149675925728
+        5.506995386480935,
+        7.3918659160327564
       ]
     },
     "defend|fb|centre": {
@@ -315,12 +419,12 @@
       "test": 675,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        14.32700345236857,
-        10.300141838055287
+        12.003660959159504,
+        10.185495909202231
       ],
       "rmse": [
-        14.32700345236857,
-        10.300141838055287
+        12.003660959159504,
+        10.185495909202231
       ]
     },
     "defend|am|left": {
@@ -335,12 +439,12 @@
       "test": 528,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        7.63791747324023,
-        10.49279584146164
+        6.181318916059942,
+        9.950970379618283
       ],
       "rmse": [
-        7.63791747324023,
-        10.49279584146164
+        6.181318916059942,
+        9.950970379618283
       ]
     },
     "attack|wg|centre": {
@@ -362,12 +466,12 @@
       "test": 878,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        14.155731721256156,
-        11.506296553802832
+        12.124272145513887,
+        11.221714960804666
       ],
       "rmse": [
-        14.155731721256156,
-        11.506296553802832
+        12.124272145513887,
+        11.221714960804666
       ]
     },
     "defend|cm|left": {
@@ -375,12 +479,12 @@
       "test": 1357,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        13.075668955910482,
-        8.027798741985015
+        10.884242303428355,
+        7.353114336820286
       ],
       "rmse": [
-        13.075668955910482,
-        8.027798741985015
+        10.884242303428355,
+        7.353114336820286
       ]
     },
     "attack|cm|left": {
@@ -388,12 +492,12 @@
       "test": 1013,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        11.069299377695986,
-        8.90470027149327
+        9.58147199438026,
+        8.373588503355778
       ],
       "rmse": [
-        11.069299377695986,
-        8.90470027149327
+        9.58147199438026,
+        8.373588503355778
       ]
     },
     "attack|st|left": {
@@ -401,12 +505,12 @@
       "test": 94,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        12.80542806022006,
-        11.029045033580445
+        10.611876480273414,
+        9.80745451130224
       ],
       "rmse": [
-        12.80542806022006,
-        11.029045033580445
+        10.611876480273414,
+        9.80745451130224
       ]
     },
     "defend|st|left": {
@@ -414,12 +518,12 @@
       "test": 264,
       "trainingVelocityScale": 1,
       "scaledFeatureRmse": [
-        9.04529098841707,
-        6.401199152524275
+        7.9259301971482525,
+        5.977205045980176
       ],
       "rmse": [
-        9.04529098841707,
-        6.401199152524275
+        7.9259301971482525,
+        5.977205045980176
       ]
     }
   }

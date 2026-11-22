@@ -131,14 +131,14 @@ export function teamDefense(m: MatchState, side: Side) {
 
   // 相手前線から離れすぎた後方ユニットを一緒に押し上げる。
   // 急接近する球には押し上げず、低いラインを選んだ戦術も維持する。
-  if (t.lineHeight !== 'deep' && m.movementBallVel.x * (side === 0 ? 1 : -1) > -1.5) {
+  if (t.lineHeight === 'high' && m.movementBallVel.x * (side === 0 ? 1 : -1) > -1.5) {
     const backs = team.filter(p => ['cb','fb','wb'].includes(p.role) && !pressSet.has(p.id));
     const line = deepestOutfield(m,side);
     const threats = m.players.filter(p=>p.team!==side&&p.role!=='gk').map(p=>toRel(side,p.pos).x).filter(x=>x>=line-3);
     const cbs = backs.filter(p=>p.role==='cb');
     if(cbs.length && threats.length){
       const targetLine=cbs.reduce((s,p)=>s+toRel(side,p.target).x,0)/cbs.length;
-      const shift=clamp(Math.min(...threats)-8-targetLine,0,t.pressHeight==='low'?2.5:5);
+      const shift=clamp(Math.min(...threats)-8-targetLine,0,t.pressHeight==='low'?1.5:3);
       for(const p of backs){const r=toRel(side,p.target);r.x=clamp(r.x+shift,2,PITCH_W-2);p.target=toAbs(side,r);}
     }
   }
@@ -185,7 +185,7 @@ function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
     const nearest = threats.reduce((a,b) => dist(base,a.pos)<dist(base,b.pos)?a:b);
     const r = toRel(side,nearest.pos);
     const cover = p.role === 'cb' ? 6 : 12;
-    const dx = r.x - 5 - baseRel.x;
+    const dx = Math.min(0,r.x - 5 - baseRel.x);
     const dy = r.y + Math.sign(baseRel.y-r.y)*4 - baseRel.y;
     const scale = Math.min(1,cover/Math.max(1,Math.hypot(dx,dy)));
     target.x += dx*scale;
@@ -196,7 +196,7 @@ function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
   if (isBack) {
     // CBは深さを揃え、SB/WBは実測の一段前の持ち場からサイドの相手へ出る。
     // 全員をCBの高さへ固定すると、SBが相手のWGから10m以上離れてしまう。
-    const ceiling = p.role === 'cb' ? Math.max(baseRel.x, m.frames[side].line) + (mark ? 6 : 5) : baseRel.x + 10;
+    const ceiling = p.role === 'cb' ? Math.max(baseRel.x, m.frames[side].line) + (mark ? 2 : 3) : baseRel.x + (mark ? 6 : 4);
     target.x = Math.min(target.x, ceiling);
     // 自陣深くでは、出遅れてから帰る判定を繰り返さず、先にゴール側のカバーへ戻る。
     if (ball.x < 40) target.x = Math.min(target.x, ball.x - 1.5);
@@ -234,7 +234,7 @@ function defenderMove(m: MatchState, p: Player, zoneMark?: Player) {
   const rel = toRel(side, p.pos);
   // ボールより前にいる守備者と中盤は全力で帰陣する。前線の選手は自分の持ち場(カウンターの出口)まで戻る
   const forward = p.role === 'st' || p.role === 'f9' || p.role === 'wg' || p.role === 'iw';
-  const behind = !forward && rel.x > ball.x + 4;
+  const behind = !forward && rel.x > ball.x + 4 && (m.t-m.turnoverAt<3 || baseRel.x<ball.x+4);
   if (behind) {
     target.x = Math.min(target.x, ball.x - 2);
   }

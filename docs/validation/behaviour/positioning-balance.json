@@ -1,0 +1,869 @@
+{
+  "matchesPerTacticPerStage": 100,
+  "seedStart": 5000,
+  "engineSha256": "81ed4c0a642f7f50406b20f9e2899bf5e86f126e5f6de5eb272a306500ced9b6",
+  "stageDataSha256": "d2ab836cb72c2641029d602d1f84c419f644cb06364b4097b61556d563ba07a6",
+  "method": "Full C20 balance-par 100 UNIVERSAL=0; retuned solutions 3/4 after representative 50-seed search, then re-ran both on all 100 seeds. Other ten case inputs unchanged. Acceptance total goals refers to the solution, as in balance.ts. All lesson keys verified.",
+  "results": [
+    {
+      "stage": 1,
+      "base": {
+        "win": 37.0,
+        "draw": 18.0,
+        "gf": 1.18,
+        "ga": 1.42,
+        "sf": 11.5,
+        "sa": 10.2
+      },
+      "answer": {
+        "win": 93.0,
+        "draw": 7.0,
+        "gf": 2.82,
+        "ga": 0.08,
+        "sf": 22.4,
+        "sa": 1.7
+      },
+      "totalGoals": 2.9,
+      "gap": 56.0,
+      "pass": true,
+      "inputs": {
+        "stage": 1,
+        "solution": {
+          "formation": "4-2-3-1",
+          "buildUp": "short",
+          "tempo": "normal",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "keep",
+          "roles": {
+            "7": "iw",
+            "9": "iw"
+          }
+        },
+        "opponent": {
+          "name": "ブロック・フラッツ",
+          "short": "ブロック",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-4-2",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1
+        },
+        "keys": [
+          "中盤の中央に3人以上",
+          "前から奪いに行く"
+        ]
+      }
+    },
+    {
+      "stage": 2,
+      "base": {
+        "win": 48.0,
+        "draw": 37.0,
+        "gf": 0.89,
+        "ga": 0.34,
+        "sf": 6.8,
+        "sa": 6.3
+      },
+      "answer": {
+        "win": 98.0,
+        "draw": 2.0,
+        "gf": 3.63,
+        "ga": 0.03,
+        "sf": 25.8,
+        "sa": 0.8
+      },
+      "totalGoals": 3.66,
+      "gap": 50.0,
+      "pass": true,
+      "inputs": {
+        "stage": 2,
+        "solution": {
+          "formation": "4-2-3-1",
+          "buildUp": "short",
+          "tempo": "normal",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "keep",
+          "roles": {
+            "7": "iw",
+            "9": "iw"
+          }
+        },
+        "opponent": {
+          "name": "ダイヤモンド・シティ",
+          "short": "ダイヤモ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-1-2-1-2",
+            "buildUp": "mixed",
+            "tempo": "normal",
+            "width": "narrow",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1.6
+        },
+        "keys": [
+          "攻撃の幅を広く取る",
+          "中央に攻めを偏らせない",
+          "前から奪いに行く"
+        ]
+      }
+    },
+    {
+      "stage": 3,
+      "base": {
+        "win": 43.0,
+        "draw": 21.0,
+        "gf": 1.15,
+        "ga": 0.97,
+        "sf": 12.2,
+        "sa": 11.3
+      },
+      "answer": {
+        "win": 73.0,
+        "draw": 21.0,
+        "gf": 1.67,
+        "ga": 0.4,
+        "sf": 15.6,
+        "sa": 7.6
+      },
+      "totalGoals": 2.07,
+      "gap": 30.0,
+      "pass": true,
+      "inputs": {
+        "stage": 3,
+        "solution": {
+          "formation": "4-2-3-1",
+          "buildUp": "short",
+          "tempo": "normal",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "stay",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "keep",
+          "roles": {
+            "7": "iw",
+            "9": "iw"
+          }
+        },
+        "opponent": {
+          "name": "セブン・ウォール",
+          "short": "セブン・",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "5-4-1",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "skill": 1.3
+        },
+        "keys": [
+          "ハーフスペースに2人",
+          "攻撃の幅を広く取る",
+          "失った直後に奪い返す"
+        ]
+      }
+    },
+    {
+      "stage": 4,
+      "base": {
+        "win": 42.0,
+        "draw": 28.0,
+        "gf": 1.22,
+        "ga": 1.08,
+        "sf": 11.8,
+        "sa": 13.3
+      },
+      "answer": {
+        "win": 78.0,
+        "draw": 17.0,
+        "gf": 1.9,
+        "ga": 0.32,
+        "sf": 19.4,
+        "sa": 5.3
+      },
+      "totalGoals": 2.22,
+      "gap": 36.0,
+      "pass": true,
+      "inputs": {
+        "stage": 4,
+        "solution": {
+          "formation": "3-5-2",
+          "buildUp": "long",
+          "tempo": "fast",
+          "width": "narrow",
+          "focus": "balanced",
+          "fullbacks": "stay",
+          "pressHeight": "mid",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "counter"
+        },
+        "opponent": {
+          "name": "スパーク・カウンターズ",
+          "short": "スパーク",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-4-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "skill": 1.15
+        },
+        "keys": [
+          "SBを上げすぎない",
+          "失った直後に奪い返す",
+          "中央の守備役を置く"
+        ]
+      }
+    },
+    {
+      "stage": 5,
+      "base": {
+        "win": 35.0,
+        "draw": 30.0,
+        "gf": 1.54,
+        "ga": 1.51,
+        "sf": 15.0,
+        "sa": 13.2
+      },
+      "answer": {
+        "win": 97.0,
+        "draw": 3.0,
+        "gf": 3.04,
+        "ga": 0.1,
+        "sf": 26.5,
+        "sa": 0.3
+      },
+      "totalGoals": 3.14,
+      "gap": 62.0,
+      "pass": true,
+      "inputs": {
+        "stage": 5,
+        "solution": {
+          "formation": "3-5-2",
+          "buildUp": "long",
+          "tempo": "fast",
+          "width": "narrow",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "mid",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "counter"
+        },
+        "opponent": {
+          "name": "ハンターズ",
+          "short": "ハンター",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-3-3",
+            "buildUp": "mixed",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "high",
+            "pressIntensity": "high",
+            "lineHeight": "high",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1.2
+        },
+        "keys": [
+          "プレスを長いボールで越える",
+          "奪ったら速攻",
+          "最終ラインを5枚にする"
+        ]
+      }
+    },
+    {
+      "stage": 6,
+      "base": {
+        "win": 30.0,
+        "draw": 23.0,
+        "gf": 1.16,
+        "ga": 1.4,
+        "sf": 11.1,
+        "sa": 10.4
+      },
+      "answer": {
+        "win": 96.0,
+        "draw": 4.0,
+        "gf": 3.04,
+        "ga": 0.02,
+        "sf": 23.8,
+        "sa": 0.4
+      },
+      "totalGoals": 3.06,
+      "gap": 66.0,
+      "pass": true,
+      "inputs": {
+        "stage": 6,
+        "solution": {
+          "formation": "5-3-2",
+          "buildUp": "short",
+          "tempo": "fast",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "invert",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "high",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "keep"
+        },
+        "opponent": {
+          "name": "トライデント",
+          "short": "トライデ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "mixed",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1.6
+        },
+        "keys": [
+          "攻撃の幅を広く取る",
+          "2トップを置く",
+          "前から奪いに行く"
+        ]
+      }
+    },
+    {
+      "stage": 7,
+      "base": {
+        "win": 38.0,
+        "draw": 32.0,
+        "gf": 1.36,
+        "ga": 1.2,
+        "sf": 11.0,
+        "sa": 11.2
+      },
+      "answer": {
+        "win": 81.0,
+        "draw": 16.0,
+        "gf": 2.25,
+        "ga": 0.26,
+        "sf": 19.9,
+        "sa": 4.5
+      },
+      "totalGoals": 2.51,
+      "gap": 43.0,
+      "pass": true,
+      "inputs": {
+        "stage": 7,
+        "solution": {
+          "formation": "4-2-3-1",
+          "buildUp": "long",
+          "tempo": "normal",
+          "width": "narrow",
+          "focus": "balanced",
+          "fullbacks": "invert",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "regroup",
+          "onWin": "counter",
+          "roles": {
+            "7": "iw",
+            "9": "iw",
+            "10": "f9"
+          }
+        },
+        "opponent": {
+          "name": "グリッド・ユナイテッド",
+          "short": "グリッド",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-2-3-1",
+            "buildUp": "mixed",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1
+        },
+        "keys": [
+          "ライン間に2人",
+          "前から奪いに行く"
+        ]
+      }
+    },
+    {
+      "stage": 8,
+      "base": {
+        "win": 49.0,
+        "draw": 26.0,
+        "gf": 1.5,
+        "ga": 0.97,
+        "sf": 17.8,
+        "sa": 9.4
+      },
+      "answer": {
+        "win": 85.0,
+        "draw": 13.0,
+        "gf": 2.14,
+        "ga": 0.29,
+        "sf": 18.6,
+        "sa": 4.7
+      },
+      "totalGoals": 2.43,
+      "gap": 36.0,
+      "pass": true,
+      "inputs": {
+        "stage": 8,
+        "solution": {
+          "formation": "4-3-3",
+          "buildUp": "mixed",
+          "tempo": "fast",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "mid",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "normal",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "counter",
+          "roles": {
+            "8": "iw",
+            "9": "f9",
+            "10": "iw"
+          }
+        },
+        "opponent": {
+          "name": "シャドウズ",
+          "short": "シャドウ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "3-5-2",
+            "buildUp": "long",
+            "tempo": "fast",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "tight",
+            "marking": "man",
+            "onLoss": "regroup",
+            "onWin": "counter"
+          },
+          "skill": 1.6
+        },
+        "keys": [
+          "偽9番で釣り出す",
+          "空いた場所へ走り込む選手",
+          "テンポを上げる"
+        ]
+      }
+    },
+    {
+      "stage": 9,
+      "base": {
+        "win": 34.0,
+        "draw": 33.0,
+        "gf": 0.9,
+        "ga": 0.91,
+        "sf": 9.5,
+        "sa": 9.9
+      },
+      "answer": {
+        "win": 95.0,
+        "draw": 5.0,
+        "gf": 2.35,
+        "ga": 0.03,
+        "sf": 23.2,
+        "sa": 1.0
+      },
+      "totalGoals": 2.38,
+      "gap": 61.0,
+      "pass": true,
+      "inputs": {
+        "stage": 9,
+        "solution": {
+          "formation": "5-3-2",
+          "buildUp": "long",
+          "tempo": "fast",
+          "width": "narrow",
+          "focus": "balanced",
+          "fullbacks": "invert",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "regroup",
+          "onWin": "counter"
+        },
+        "opponent": {
+          "name": "ファントム",
+          "short": "ファント",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-3-3",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "mid",
+            "pressIntensity": "normal",
+            "lineHeight": "normal",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep",
+            "roles": {
+              "8": "iw",
+              "9": "f9",
+              "10": "iw"
+            }
+          },
+          "skill": 1
+        },
+        "keys": [
+          "陣形を密集させる",
+          "人ではなく場所を守る",
+          "2トップを置く"
+        ]
+      }
+    },
+    {
+      "stage": 10,
+      "base": {
+        "win": 22.0,
+        "draw": 13.0,
+        "gf": 1.26,
+        "ga": 2.28,
+        "sf": 13.4,
+        "sa": 15.2
+      },
+      "answer": {
+        "win": 92.0,
+        "draw": 6.0,
+        "gf": 2.58,
+        "ga": 0.1,
+        "sf": 24.8,
+        "sa": 2.5
+      },
+      "totalGoals": 2.68,
+      "gap": 70.0,
+      "pass": true,
+      "inputs": {
+        "stage": 10,
+        "solution": {
+          "formation": "3-4-2-1",
+          "buildUp": "long",
+          "tempo": "normal",
+          "width": "normal",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "counter"
+        },
+        "opponent": {
+          "name": "ファイブ・レーンズ",
+          "short": "ファイブ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-3-3",
+            "buildUp": "short",
+            "tempo": "normal",
+            "width": "wide",
+            "focus": "balanced",
+            "fullbacks": "invert",
+            "pressHeight": "high",
+            "pressIntensity": "normal",
+            "lineHeight": "high",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep"
+          },
+          "skill": 1.8
+        },
+        "keys": [
+          "最終ラインを5枚にする",
+          "中央を閉じる",
+          "奪ったら速攻"
+        ]
+      }
+    },
+    {
+      "stage": 11,
+      "base": {
+        "win": 28.0,
+        "draw": 26.0,
+        "gf": 1.46,
+        "ga": 1.65,
+        "sf": 15.4,
+        "sa": 12.7
+      },
+      "answer": {
+        "win": 94.0,
+        "draw": 6.0,
+        "gf": 3.01,
+        "ga": 0.16,
+        "sf": 25.7,
+        "sa": 3.5
+      },
+      "totalGoals": 3.17,
+      "gap": 66.0,
+      "pass": true,
+      "inputs": {
+        "stage": 11,
+        "solution": {
+          "formation": "5-4-1",
+          "buildUp": "long",
+          "tempo": "slow",
+          "width": "narrow",
+          "focus": "balanced",
+          "fullbacks": "overlap",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "regroup",
+          "onWin": "counter"
+        },
+        "opponent": {
+          "name": "リップタイド",
+          "short": "リップタ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "4-3-3",
+            "buildUp": "mixed",
+            "tempo": "fast",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "high",
+            "pressIntensity": "high",
+            "lineHeight": "high",
+            "compactness": "normal",
+            "marking": "zone",
+            "onLoss": "counterpress",
+            "onWin": "keep"
+          },
+          "skill": 1.2
+        },
+        "keys": [
+          "プレスを長いボールで越える",
+          "奪ったら速攻",
+          "最終ラインを5枚にする"
+        ]
+      }
+    },
+    {
+      "stage": 12,
+      "base": {
+        "win": 27.0,
+        "draw": 31.0,
+        "gf": 1.11,
+        "ga": 1.37,
+        "sf": 11.8,
+        "sa": 7.8
+      },
+      "answer": {
+        "win": 81.0,
+        "draw": 16.0,
+        "gf": 2.16,
+        "ga": 0.24,
+        "sf": 21.6,
+        "sa": 2.3
+      },
+      "totalGoals": 2.4,
+      "gap": 54.0,
+      "pass": true,
+      "inputs": {
+        "stage": 12,
+        "solution": {
+          "formation": "3-4-3",
+          "buildUp": "short",
+          "tempo": "normal",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "invert",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "regroup",
+          "onWin": "keep"
+        },
+        "solutionAfter": {
+          "formation": "4-2-3-1",
+          "buildUp": "long",
+          "tempo": "fast",
+          "width": "wide",
+          "focus": "balanced",
+          "fullbacks": "invert",
+          "pressHeight": "high",
+          "pressIntensity": "normal",
+          "lineHeight": "normal",
+          "compactness": "tight",
+          "marking": "zone",
+          "onLoss": "counterpress",
+          "onWin": "counter",
+          "roles": {
+            "7": "iw",
+            "9": "iw",
+            "10": "f9"
+          }
+        },
+        "opponent": {
+          "name": "カメレオン",
+          "short": "カメレオ",
+          "color": "#F2694C",
+          "tactics": {
+            "formation": "5-4-1",
+            "buildUp": "mixed",
+            "tempo": "normal",
+            "width": "normal",
+            "focus": "balanced",
+            "fullbacks": "stay",
+            "pressHeight": "low",
+            "pressIntensity": "normal",
+            "lineHeight": "deep",
+            "compactness": "tight",
+            "marking": "zone",
+            "onLoss": "regroup",
+            "onWin": "keep"
+          },
+          "skill": 1.6
+        },
+        "script": [
+          {
+            "atMinute": 45,
+            "change": {
+              "formation": "4-3-3",
+              "pressHeight": "high",
+              "pressIntensity": "high",
+              "lineHeight": "high",
+              "compactness": "normal"
+            },
+            "message": "相手が4-3-3のハイプレスに変更!"
+          },
+          {
+            "whenDiffAtMost": -2,
+            "change": {
+              "formation": "3-4-3",
+              "onWin": "counter",
+              "tempo": "fast",
+              "buildUp": "long"
+            },
+            "message": "相手が3-4-3で前線の人数を増やしてきた!"
+          }
+        ],
+        "keys": [
+          "後半に修正する",
+          "攻撃の幅を広く取る",
+          "前から奪いに行く"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "method": "Same seeds 5000–5011; A 4-3-3 only changes fullbacks, B fixed 4-4-2. Extra diagnostic, not a replacement for the three audit pairs.",
+  "results": [
+    {
+      "fullbacks": "stay",
+      "matches": 12,
+      "crosses": 9.333333333333334,
+      "corners": 2.5,
+      "shots": 14,
+      "headerShare": 0.10119047619047619,
+      "totalGoals": 3.1666666666666665
+    },
+    {
+      "fullbacks": "overlap",
+      "matches": 12,
+      "crosses": 9.916666666666666,
+      "corners": 2.1666666666666665,
+      "shots": 10.916666666666666,
+      "headerShare": 0.1984732824427481,
+      "totalGoals": 2.4166666666666665
+    }
+  ]
+}

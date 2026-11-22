@@ -31,9 +31,20 @@ export function attackerMove(m: MatchState, p: Player) {
   if (sinceWin < 3) {
     const b = toRel(side, base);
     const forward = p.role === 'st' || p.role === 'wg' || p.role === 'iw' || p.role === 'am';
+    if(counter&&forward&&carrier&&carrier.team===side){
+      if(p.runTarget&&p.runUntil>m.t){p.target=p.runTarget;p.urgency=1;return;}
+      const space=PITCH_W-7-lim,nearLine=rel.x>lim-9&&rel.x<=lim+.3;
+      if(space>6&&nearLine&&nearestOpp(m,side,carrier.pos)>3.5){
+        // Start the same onside-to-behind-line run used in settled play now,
+        // rather than waiting three seconds while clamping every runner back
+        // to the line. Passing still checks the receiver's position at kick.
+        p.runTarget=toAbs(side,{x:lim+Math.min(space,16),y:clamp(rel.y+(34-rel.y)*.25,4,64)});
+        p.runUntil=m.turnoverAt+3;p.target=p.runTarget;p.urgency=1;return;
+      }
+    }
     p.runTarget = null; p.runUntil = 0; p.spot = null;
-    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 10 : !counter && forward ? b.x - 4 : b.x), y: b.y });
-    p.urgency = counter && forward ? 0.95 : 0.78;
+    p.target = toAbs(side, { x: Math.min(lim - 0.5, counter && forward ? b.x + 12 : !counter && forward ? b.x - 4 : b.x), y: b.y });
+    p.urgency = counter && forward ? 1 : 0.78;
     return;
   }
 
@@ -46,7 +57,7 @@ export function attackerMove(m: MatchState, p: Player) {
   p.runTarget = null;
 
   // 裏抜け: 味方が前を向けているとき、最終ラインの背後にスペースがあれば走る
-  if (carrier && carrier.team === side && RUN_ROLES.has(p.role)) {
+  if (carrier && carrier.team === side && RUN_ROLES.has(p.role) && (counter || t.buildUp==='long' || toRel(side,carrier.pos).x>=35)) {
     const space = PITCH_W - 7 - oppLineX(m, side);
     const carrierFree = nearestOpp(m, side, carrier.pos) > 3.5;
     const nearLine = rel.x > lim - 9 && rel.x <= lim;
@@ -73,24 +84,6 @@ export function attackerMove(m: MatchState, p: Player) {
     }
   }
 
-  // 敵陣深くで攻めている時、逆サイドのウイングはファーサイドへ、トップ下はボックス手前へ入る
-  if (hub && hub.team === side) {
-    const hr = toRel(side, hub.pos);
-    if (hr.x > 66) {
-      const farSide = (rel.y - 34) * (hr.y - 34) < 0 && Math.abs(hr.y - 34) > 8;
-      if ((p.role === 'wg' || p.role === 'iw') && farSide) {
-        p.target = toAbs(side, { x: Math.min(lim - 0.4, 95), y: 34 + Math.sign(rel.y - 34) * 6 });
-        p.urgency = 0.85;
-        return;
-      }
-      if ((p.role === 'am' || p.role === 'f9') && dist(p.pos, hub.pos) > 9) {
-        p.target = toAbs(side, { x: Math.min(lim - 0.4, 87), y: 34 + (hr.y - 34) * 0.25 });
-        p.urgency = 0.8;
-        return;
-      }
-    }
-  }
-
   // カウンター: 前線が一気に駆け上がる
   if (counter && rel.x < lim - 2 && p.role !== 'cb' && p.role !== 'dm') {
     const baseRel = toRel(side, base);
@@ -109,6 +102,10 @@ export function attackerMove(m: MatchState, p: Player) {
       p.spotOwner = hub.id;
     }
     const tgt = toRel(side, { x: hub.pos.x + p.spot.x, y: hub.pos.y + p.spot.y });
+    const anchor=toRel(side,base);
+    const deviation=Math.hypot(tgt.x-anchor.x,tgt.y-anchor.y);
+    const scale=Math.min(1,8.5/Math.max(1,deviation));
+    tgt.x=anchor.x+(tgt.x-anchor.x)*scale;tgt.y=anchor.y+(tgt.y-anchor.y)*scale;
     // 中盤が毎回保持者の後方へ下がらず、前進するチームの接続点を保つ。
     const supportFloor = p.role === 'dm' || p.role === 'cm' ? Math.min(toRel(side, base).x - 2, lim - 1) : 2;
     p.target = toAbs(side, { x: clamp(tgt.x, supportFloor, Math.min(lim - 0.4, PITCH_W - 3)), y: clamp(tgt.y, 2, 66) });
@@ -143,7 +140,7 @@ const HOLDERS = new Set(['gk', 'st', 'wg', 'iw', 'wb']);
 /** 幅と深さを作る選手(ウイング、CF、WB)は、すぐ近くにいる時しか寄らない。 */
 function isSupporter(m: MatchState, p: Player, carrier: Player): boolean {
   // CF は最終ラインを押し下げる役。下がって受けるのは偽9番の仕事
-  if (p.role === 'gk' || p.role === 'st') return false;
+  if (p.role === 'gk' || p.role === 'st' || p.role === 'am') return false;
   const d = dist(p.pos, carrier.pos);
   if (d > 25 || (HOLDERS.has(p.role) && d > 13)) return false;
   let closer = 0;
@@ -200,7 +197,7 @@ function findOpenSpot(m: MatchState, p: Player, base: Vec, lim: number): Vec {
   for (let i = -1; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
     // 幅と深さを作る選手は、持ち場から大きく離れない
-    const r = i < 0 ? 0 : HOLDERS.has(p.role) ? 3.5 : 6.5;
+    const r = i < 0 ? 0 : HOLDERS.has(p.role) ? 3.5 : 8.5;
     const c: Vec = {
       x: clamp(baseRel.x + Math.cos(a) * r, 2, Math.min(lim - 0.4, PITCH_W - 3)),
       y: clamp(baseRel.y + Math.sin(a) * r, 2, 66),

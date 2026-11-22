@@ -11,6 +11,7 @@ import { createReadStream } from 'node:fs';
 import { tactic } from '../src/data/formations';
 import { createMatch, resume, step } from '../src/engine/match';
 import coordinationLimits from '../src/data/coordination-limits.json';
+import positioningLimits from '../src/data/positioning-limits.json';
 import { Coordination, compareCoordination } from './coordination';
 import { learnedShape } from '../src/engine/tracking';
 
@@ -132,7 +133,8 @@ export class Measure {
   }
 }
 async function main() {
-const args=process.argv.slice(2), realIndex=args.indexOf('--real'), m=new Measure();
+const args=process.argv.slice(2), realIndex=args.indexOf('--real'), summaryIndex=args.indexOf('--summary'), m=new Measure();
+const saved=summaryIndex>=0?JSON.parse(readFileSync(args[summaryIndex+1],'utf8')) as ReturnType<Measure['result']>&{seedStart:number;engineSha256:string}:undefined;
 // 実行開始時のコードを記録する（長い検証中にファイルが変わっても後の版と混同しない）。
 const engineHash=createHash('sha256');
 const engineFiles=readdirSync('src/engine').filter(f=>f.endsWith('.ts')&&!f.includes('.test.')&&f!=='testUtils.ts').sort();
@@ -141,7 +143,7 @@ for(const file of ['src/data/formations.ts','src/data/tracking.json','src/data/b
 const engineSha256=engineHash.digest('hex');
 if(realIndex>=0) {
   for await (const line of createInterface({input:createReadStream(args[realIndex+1]),crlfDelay:Infinity})) { const f:Frame=JSON.parse(line); if(args.includes('--equal-strength')&&[0,1].some(t=>f.p.filter(p=>p[1]===t).length!==11))continue; m.feed(f); }
-} else {
+} else if(!saved) {
   const n=Number(args.find(x=>/^\d+$/.test(x))??24);
   for(let seed=0;seed<n;seed++) {
     const match=createMatch({seed:Number(process.env.SEED_START ?? 9001)+seed,teams:[{name:'A',short:'A',color:'#36c',tactics:tactic({formation:'4-2-3-1'})},{name:'B',short:'B',color:'#c33',tactics:tactic({formation:'4-4-2'})}]});
@@ -154,8 +156,9 @@ if(realIndex>=0) {
   }
 }
 const reference=JSON.parse(readFileSync('src/data/behaviour.json','utf8'));
-const comparison=realIndex<0?compareCoordination(m.coordination.result(),reference.coordination):undefined;
-const result={comparison,...m.result(),seedStart:realIndex>=0?undefined:Number(process.env.SEED_START??9001),engineSha256:realIndex>=0?undefined:engineSha256};
+const observations=saved??m.result();
+const comparison=realIndex<0?compareCoordination(observations.coordination,reference.coordination):undefined;
+const result={...observations,comparison,seedStart:realIndex>=0?undefined:saved?.seedStart??Number(process.env.SEED_START??9001),engineSha256:realIndex>=0?undefined:saved?.engineSha256??engineSha256};
 if(args.includes('--write-reference')) {
   const source=JSON.parse(readFileSync(args[realIndex+1]+'.source.json','utf8'));
   writeFileSync('src/data/behaviour.json',JSON.stringify({schema:2,hz:1,window:8,coordinationMethod:'All 7 matches and 14 halves; stable anonymous roster and known possession over uninterrupted 8s; 9–11 players per team including GK; reduced-strength moments explicitly counted. Role units CB/FB/WB, DM/CM, AM/WG/ST; these are role groups, not inferred tactical lines. x/y attack-normalized; conditional cells phase x thirds x lanes, role WB=FB and DM=CM. Velocity Pearson pairs symmetrized. Correlation and cell coverage checked separately. See coordination-limits.json for engineering tolerances.',method:'11v11; both halves; uninterrupted in-play and known possession over entire 8s; stable anonymous roster; GK excluded; coordinates x=52.5+rawX, y=34+rawY (same as tracking.json); attack direction normalized by half-average GK position; each second, overlapping windows; drop=ranked 4/3/3 line velocity over 4s at ball approach >2m/s, same possession, ball 15–80m. No causal lag inference. matchMean95 is a conservative match-cluster mean +/-2.45SE, not independent-window uncertainty.',...source,...result},null,2)+'\n');
@@ -169,10 +172,16 @@ if(args.includes('--check')) {
  // 許容差は先に固定。分布の中央値・裾・帰陣・接近を別々に検査する。
  const limits: [string,'mean'|'p10'|'p50'|'p90',number][]=[['stranded','mean',.55],['displacement8','p50',2.5],['displacement8','p90',4],['alignment','mean',.12],['nearestOpponent','p50',1.5],['depthSpread','p50',2],['near10','mean',.6],['near20','mean',1.2],['drop0','mean',.7],['drop1','mean',.7],['drop2','mean',.7],['blockSweep8','p90',4],['ballReversal','mean',.12],['stranded','p90',2],['nearestOpponent','p90',2],['depthSpread','p10',2],['depthSpread','p90',3],['relativeDisplacement8','p50',2]];
  if(result.moments<5000 || result.matches<12) throw new Error('行動判定には12試合・5000窓以上が必要です');
+ limits.push(...positioningLimits.metrics as [string,'mean'|'p10'|'p50'|'p90',number][]);
  limits.push(...coordinationLimits.metrics as [string,'mean'|'p10'|'p50'|'p90',number][]);
  const checks=limits.map(([k,s,t])=>({metric:`${k}.${s}`,real:ref[k][s],sim:result.metrics[k][s],tolerance:t,pass:Math.abs(ref[k][s]-result.metrics[k][s])<=t}));
+ const zoneExposure=[0,1,2].map(i=>result.metrics[`near20zone${i}`].n);
+ const expectedNear20=zoneExposure.reduce((s,n,i)=>s+n*ref[`near20zone${i}`].mean,0)/zoneExposure.reduce((s,n)=>s+n,0);
+ const densityBias=result.metrics.near20.mean-expectedNear20;
+ checks.push({metric:'near20BallZoneBias.mean',real:0,sim:densityBias,tolerance:.5,pass:Math.abs(densityBias)<=.5});
  console.table(checks);
  const coordinationChecks = comparison ? [
+ ...Object.entries(positioningLimits.attackRoleBallRMSE).flatMap(([role,t])=>{const e=comparison.roleErrors[`attack|${role}`];return [{metric:`attack_${role}_ballRMSE`,sim:e?.ballRMSE,tolerance:t,pass:!!e&&e.ballRMSE<=t},{metric:`attack_${role}_centroidRMSE`,sim:e?.centroidRMSE,tolerance:positioningLimits.attackRoleCentroidRMSE,pass:!!e&&e.centroidRMSE<=positioningLimits.attackRoleCentroidRMSE}];}),
  ...Object.entries(coordinationLimits.errors).map(([k,t])=>({metric:k,sim:comparison[k as keyof typeof coordinationLimits.errors],tolerance:t,pass:comparison[k as keyof typeof coordinationLimits.errors]<=t})),
  ...Object.entries(coordinationLimits.correlationRMSE).map(([k,t])=>({metric:`${k}CorrelationRMSE`,sim:comparison.correlationRMSE[k],tolerance:t,pass:comparison.correlationRMSE[k]<=t})),
  ...Object.entries(comparison.correlationCoverage).map(([k,v])=>({metric:`${k}CorrelationCoverage`,sim:v,tolerance:coordinationLimits.minimumCoverage,pass:v>=coordinationLimits.minimumCoverage})),

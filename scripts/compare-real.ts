@@ -14,6 +14,7 @@ const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.le
 function measure(t: Tactics, n = N, both = true) {
   const sums = Object.fromEntries(phases.map((p) => [p, { n: 0, ballX: 0, values: Array<number>(10).fill(0) }])) as Record<TrackingPhase, { n: number; ballX: number; values: number[] }>;
   const geometryCells: Record<string,GeometryCell> = {};
+  const attackRoles:Record<string,number[]>={};
   const bands = Array<number>(6).fill(0);
   const conditioned = Object.fromEntries(phases.map(p => [p, Array<number>(7).fill(0)])) as Record<TrackingPhase, number[]>;
   let deadDistance = 0, deadTicks = 0, totalTicks = 0;
@@ -40,6 +41,7 @@ function measure(t: Tactics, n = N, both = true) {
         const values = [xs[0], xs[9] - xs[0], Math.max(...ys) - Math.min(...ys), mean(ys), mean(xs.slice(0, 4)), mean(xs.slice(4, 7)), mean(xs.slice(7)), distances.filter((d) => d < 10).length, distances.filter((d) => d < 20).length, spacing];
         const phase = trackingPhase(m, side), s = sums[phase]; s.n++; s.ballX += toRel(side, m.ball.pos).x;
         values.forEach((v, i) => s.values[i] += v);
+        if(phase==='attack')for(const p of players){const a=attackRoles[p.role]??=[0,0,0],r=toRel(side,p.pos);a[0]++;a[1]+=r.x;a[2]+=Math.abs(r.y-34);}
         const ball = toRel(side, m.ball.pos);
         const key = `all|${phase}|${Math.min(11, Math.floor(ball.x / 105 * 12))}|${Math.min(7, Math.floor(ball.y / 68 * 8))}`;
         const geometryKey=key.replace('all|','');
@@ -62,7 +64,7 @@ function measure(t: Tactics, n = N, both = true) {
   }
   for (const s of Object.values(sums)) { s.values = s.values.map((v) => v / Math.max(1, s.n)); s.ballX /= Math.max(1, s.n); }
   for(const cell of Object.values(geometryCells))cell.values=cell.values.map(v=>v/cell.n);
-  return { geometryCells, conditioned, deadShare: deadTicks / totalTicks, deadKmPer90: deadDistance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, phases: sums, meanSpeed: speedSum / samples, shares: bands.map((v) => v / samples), kmPer90: distance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, liveKmPer90: speedSum / samples * 5.4, pressure: pressure / carriers, pressers: pressers / defenseSamples };
+  return { attackRoles:Object.fromEntries(Object.entries(attackRoles).map(([r,a])=>[r,{n:a[0],x:a[1]/a[0],width:a[2]/a[0]}])), geometryCells, conditioned, deadShare: deadTicks / totalTicks, deadKmPer90: deadDistance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, phases: sums, meanSpeed: speedSum / samples, shares: bands.map((v) => v / samples), kmPer90: distance / (n * (both ? 20 : 10)) * (5400 / MATCH_SECONDS) / 1000, liveKmPer90: speedSum / samples * 5.4, pressure: pressure / carriers, pressers: pressers / defenseSamples };
 }
 const sim = measure(tactic({ formation: '4-2-3-1' }));
 console.log(`実測7試合 / シミュレーション${N}試合、インプレー5Hz・GK除外。ライン=後方4人/中間3人/前方3人の平均x。`);
@@ -95,6 +97,7 @@ console.log(`保持者圧力距離 m | ${real.validation.pressure.values[0].toFi
 console.log('\n戦術対照（同一シード群、変更チームの実位置を測定）: 設定 | 守備線 | 守備長 | 守備幅 | 攻撃幅 | プレス人数 | loss10m人数 | loss幅 | win前線');
 const effects: Record<string, ReturnType<typeof measure>> = {};
 for (const [label, over] of [
+  ['残留SB', { fullbacks: 'stay' }], ['内側SB', { fullbacks: 'invert' }], ['重なるSB', { fullbacks: 'overlap' }],
   ['低ライン', { lineHeight: 'deep' }], ['高ライン', { lineHeight: 'high' }],
   ['密集', { compactness: 'tight' }], ['緩い', { compactness: 'loose' }],
   ['狭い', { width: 'narrow' }], ['広い', { width: 'wide' }],
@@ -118,6 +121,9 @@ if (process.env.RESULT_JSON) writeFileSync(process.env.RESULT_JSON, JSON.stringi
 
 if (process.argv.includes('--check')) {
   const checks = {
+    SB内側化: effects['残留SB'].attackRoles.fb.width-effects['内側SB'].attackRoles.fb.width>4,
+    // Forward position relative to the ball separates role intent from different attack-zone exposure.
+    SBオーバーラップ: (effects['重なるSB'].attackRoles.fb.x-effects['重なるSB'].phases.attack.ballX)-(effects['残留SB'].attackRoles.fb.x-effects['残留SB'].phases.attack.ballX)>5,
     即時奪回: effects['即時奪回'].phases.loss.values[7] - effects['帰陣'].phases.loss.values[7] > 0.1,
     速攻: effects['速攻'].phases.win.values[6] - effects['保持'].phases.win.values[6] > 1,
     ライン高: effects['高ライン'].phases.defend.values[4]-effects['低ライン'].phases.defend.values[4]>5,
